@@ -1,35 +1,3 @@
-import dotenv from "dotenv";
-import { neon } from "@neondatabase/serverless";
-
-dotenv.config({ path: ".env.local" });
-
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set in .env.local");
-}
-if (!process.env.ESTAT_APP_ID) {
-  throw new Error("ESTAT_APP_ID is not set in .env.local");
-}
-
-const sql = neon(process.env.DATABASE_URL);
-const ESTAT_APP_ID = process.env.ESTAT_APP_ID;
-const YEARS = new Set([1995, 2000, 2005, 2010, 2015, 2020]);
-function toArray(v) {
-  if (!v) return [];
-  return Array.isArray(v) ? v : [v];
-}
-function isMunicipalityCode(code) {
-  return /^\d{5}$/.test(code) && !code.endsWith("000");
-}
-function isIntegerString(value) {
-  return /^-?\d+$/.test(String(value));
-}
-async function fetchPopulation() {
-  const url =
-    `https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData` +
-    `?appId=${ESTAT_APP_ID}` +
-    `&statsDataId=0000020201` +
-    `&cdCat01=A1101` +
-    `&metaGetFlg=N&cntGetFlg=N&explanationGetFlg=N&annotationGetFlg=N`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error(`e-Stat API error: ${res.status}`);
@@ -94,10 +62,8 @@ async function main() {
   }
 
   console.log("municipalities:", municipalities.size);
-console.log("population rows:", populationRows.length);
-console.log("skipped:", skipped);
-console.log("Writing DB...");
-await insertPopulationRows(populationRows);  console.log("Import finished");
+  conso  conso  conso  conso  conso  conso  conso en  conso  conso  conso ki  conso  conso  conso  conso  conso  conso  conso enawait   conso  conso  conso  conso  conso);
+  console.log("Import finished");
 }
 main().catch((err) => {
   console.error(err);
