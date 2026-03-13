@@ -6,7 +6,8 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export const metadata: Metadata = {
   title: '日本の主要駅一覧｜AreaScope',
-  description: '日本全国の主要駅と、駅が属する自治体の人口データを掲載。不動産投資のエリア分析にご活用ください。',
+  description:
+    '日本全国の主要駅と、駅が属する自治体の人口データを掲載。不動産投資のエリア分析にご活用ください。',
 };
 
 type RankingRow = {
@@ -20,7 +21,7 @@ type RankingRow = {
 };
 
 export default async function StationRankingPage() {
-  const rows = await sql<RankingRow[]>`
+  const rows = (await sql`
     SELECT
       s.station_name,
       s.line_name,
@@ -38,7 +39,7 @@ export default async function StationRankingPage() {
     WHERE s.slug IS NOT NULL
     ORDER BY mp.population DESC NULLS LAST
     LIMIT 100
-  `;
+  `) as RankingRow[];
 
   return (
     <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 20px' }}>
@@ -73,7 +74,10 @@ export default async function StationRankingPage() {
               </td>
               <td style={tdStyle}>{row.line_name}</td>
               <td style={tdStyle}>{row.operator_name}</td>
-              <td style={tdStyle}>{row.prefecture_name}{row.municipality_name}</td>
+              <td style={tdStyle}>
+                {row.prefecture_name}
+                {row.municipality_name}
+              </td>
               <td style={tdStyle}>
                 {row.population ? row.population.toLocaleString() : '-'}人
               </td>

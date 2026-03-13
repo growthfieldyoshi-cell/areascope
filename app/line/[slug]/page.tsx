@@ -35,27 +35,51 @@ const LINE_MAP: Record<string, string> = {
 
 type Props = { params: Promise<{ slug: string }> };
 
+type LineStationRow = {
+  station_name: string;
+  line_name: string;
+  prefecture_name: string;
+  municipality_name: string;
+  slug: string;
+  population: number | null;
+};
+
 export async function generateStaticParams() {
-  return Object.keys(LINE_MAP).map(slug => ({ slug }));
+  return Object.keys(LINE_MAP).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const lineName = LINE_MAP[slug];
-  if (!lineName) return { title: '路線が見つかりません' };
-  const title = `${lineName}の駅乗降者数ランキング・駅一覧｜AreaScope`;
-  const description = `${lineName}の駅乗降者数ランキングと全駅一覧を掲載。各駅の2011〜2021年の利用者数推移データも確認できます。不動産・都市分析にも活用できます。`;
+
+  if (!lineName) {
+    return {
+      title: '路線が見つかりません｜AreaScope',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = `${lineName}の駅一覧｜AreaScope`;
+  const description = `${lineName}の駅一覧を掲載。各駅が属する自治体の人口データとあわせて、沿線エリアの特徴を確認できます。`;
+
   return {
     title,
     description,
     alternates: { canonical: `${BASE_URL}/line/${slug}` },
     openGraph: {
-      type: 'website', title, description,
+      type: 'website',
+      title,
+      description,
       url: `${BASE_URL}/line/${slug}`,
       siteName: 'AreaScope',
       images: [{ url: OG_IMAGE }],
     },
-    twitter: { card: 'summary_large_image', title, description, images: [OG_IMAGE] },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [OG_IMAGE],
+    },
     robots: { index: true, follow: true },
   };
 }
@@ -63,61 +87,86 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LinePage({ params }: Props) {
   const { slug } = await params;
   const lineName = LINE_MAP[slug];
+
   if (!lineName) notFound();
 
-  const [top20, allStations] = await Promise.all([
-    sql`
-      SELECT station_name, line_name, prefecture, slug, passengers_2021
-      FROM stations
-      WHERE line_name ILIKE ${'%' + lineName + '%'}
-      ORDER BY passengers_2021 DESC NULLS LAST
-      LIMIT 20
-    `,
-    sql`
-      SELECT station_name, line_name, prefecture, slug, passengers_2021
-      FROM stations
-      WHERE line_name ILIKE ${'%' + lineName + '%'}
-      ORDER BY passengers_2021 DESC NULLS LAST
-    `,
-  ]);
+  const allStations = (await sql`
+    SELECT
+      s.station_name,
+      s.line_name,
+      s.prefecture_name,
+      s.municipality_name,
+      s.slug,
+      mp.population
+    FROM stations s
+    LEFT JOIN municipalities m
+      ON s.municipality_code = m.jis_code
+    LEFT JOIN municipality_populations mp
+      ON m.jis_code = mp.municipality_code
+      AND mp.year = 2020
+    WHERE s.line_name ILIKE ${'%' + lineName + '%'}
+      AND s.slug IS NOT NULL
+    ORDER BY mp.population DESC NULLS LAST, s.station_name ASC
+  `) as LineStationRow[];
 
   if (allStations.length === 0) notFound();
 
-  return (
-    <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', padding: '2rem', fontFamily: 'sans-serif', maxWidth: '960px', margin: '0 auto' }}>
+  const top20 = allStations.slice(0, 20);
 
+  return (
+    <main
+      style={{
+        background: '#0a0e1a',
+        minHeight: '100vh',
+        color: '#e8edf5',
+        padding: '2rem',
+        fontFamily: 'sans-serif',
+        maxWidth: '960px',
+        margin: '0 auto',
+      }}
+    >
       <h1 style={{ fontSize: '1.8rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
-        {lineName}の駅乗降者数ランキング・駅一覧
+        {lineName}の駅一覧
       </h1>
+
       <p style={{ color: '#aaa', marginBottom: '0.75rem', lineHeight: '1.9', fontSize: '0.95rem' }}>
-        {lineName}の全{allStations.length}駅の乗降者数データを掲載しています。
-        2021年のデータをもとにランキング形式で表示しており、各駅ページでは2011〜2021年の利用者数推移も確認できます。
-        不動産投資や都市分析など、沿線エリアの人流把握にもご活用いただけます。
+        {lineName}の全{allStations.length}駅を掲載しています。
+        自治体人口（2020年）をもとに並べており、各駅ページでは所在地や人口推移を確認できます。
       </p>
+
       <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.9rem' }}>
-        {lineName}沿線の主要駅の人流傾向を把握したい方にも役立ちます。
+        沿線エリアの規模感を把握したい場合の一覧ページとして活用できます。
       </p>
 
       <section style={{ marginBottom: '3rem' }}>
         <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
-          {lineName} 乗降者数トップ20
+          {lineName} 自治体人口上位20駅
         </h2>
         <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>
-          {lineName}で2021年の乗降者数が多い上位20駅です。駅名をクリックすると詳細データを確認できます。
+          駅が属する自治体の人口（2020年）が多い順に表示しています。
         </p>
+
         <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                {['順位', '駅名', '都道府県', '2021年乗降者数', ''].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
+                {['順位', '駅名', '都道府県', '自治体', '自治体人口（2020年）', ''].map((h) => (
+                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {top20.map((r, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid #1e2d45' }}>
-                  <td style={{ padding: '10px 16px', color: i < 3 ? '#00d4aa' : '#aaa', fontWeight: i < 3 ? 'bold' : 'normal' }}>
+                <tr key={`${r.slug}-${i}`} style={{ borderBottom: '1px solid #1e2d45' }}>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      color: i < 3 ? '#00d4aa' : '#aaa',
+                      fontWeight: i < 3 ? 'bold' : 'normal',
+                    }}
+                  >
                     {i + 1}位
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: 'bold' }}>
@@ -125,12 +174,23 @@ export default async function LinePage({ params }: Props) {
                       {r.station_name}駅
                     </Link>
                   </td>
-                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.prefecture}</td>
+                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.prefecture_name}</td>
+                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.municipality_name}</td>
                   <td style={{ padding: '10px 16px' }}>
-                    {r.passengers_2021 ? Number(r.passengers_2021).toLocaleString() + '人' : '-'}
+                    {r.population ? `${Number(r.population).toLocaleString()}人` : '-'}
                   </td>
                   <td style={{ padding: '10px 16px' }}>
-                    <Link href={`/station/${r.slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>
+                    <Link
+                      href={`/station/${r.slug}`}
+                      style={{
+                        color: '#00d4aa',
+                        textDecoration: 'none',
+                        fontSize: '0.85rem',
+                        border: '1px solid #00d4aa',
+                        borderRadius: '4px',
+                        padding: '4px 10px',
+                      }}
+                    >
                       詳細
                     </Link>
                   </td>
@@ -146,31 +206,45 @@ export default async function LinePage({ params }: Props) {
           {lineName}の駅一覧（全{allStations.length}駅）
         </h2>
         <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>
-          {lineName}の全駅を乗降者数の多い順に表示しています。各駅の詳細ページでは年次推移データも確認できます。
+          自治体人口（2020年）の多い順に表示しています。
         </p>
+
         <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                {['駅名', '都道府県', '2021年乗降者数', ''].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
+                {['駅名', '都道府県', '自治体', '自治体人口（2020年）', ''].map((h) => (
+                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {allStations.map((r, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid #1e2d45' }}>
+                <tr key={`${r.slug}-${i}`} style={{ borderBottom: '1px solid #1e2d45' }}>
                   <td style={{ padding: '10px 16px', fontWeight: 'bold' }}>
                     <Link href={`/station/${r.slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>
                       {r.station_name}駅
                     </Link>
                   </td>
-                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.prefecture}</td>
+                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.prefecture_name}</td>
+                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.municipality_name}</td>
                   <td style={{ padding: '10px 16px' }}>
-                    {r.passengers_2021 ? Number(r.passengers_2021).toLocaleString() + '人' : '-'}
+                    {r.population ? `${Number(r.population).toLocaleString()}人` : '-'}
                   </td>
                   <td style={{ padding: '10px 16px' }}>
-                    <Link href={`/station/${r.slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>
+                    <Link
+                      href={`/station/${r.slug}`}
+                      style={{
+                        color: '#00d4aa',
+                        textDecoration: 'none',
+                        fontSize: '0.85rem',
+                        border: '1px solid #00d4aa',
+                        borderRadius: '4px',
+                        padding: '4px 10px',
+                      }}
+                    >
                       詳細
                     </Link>
                   </td>
@@ -186,18 +260,24 @@ export default async function LinePage({ params }: Props) {
           ほかの駅データを見る
         </h2>
         <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>
-          全国の駅ランキングや都道府県別データもあわせてご覧ください。
+          全国の駅一覧やランキングページもあわせてご覧ください。
         </p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-            🏆 全国駅乗降者数ランキング
-          </Link>
-          <Link href="/station/list" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-            📋 全国駅一覧
+          <Link
+            href="/station-ranking"
+            style={{
+              color: '#00d4aa',
+              textDecoration: 'none',
+              border: '1px solid #00d4aa',
+              borderRadius: '6px',
+              padding: '10px 20px',
+              fontSize: '0.9rem',
+            }}
+          >
+            🏆 全国駅一覧
           </Link>
         </div>
       </section>
-
     </main>
   );
 }

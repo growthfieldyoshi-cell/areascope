@@ -34,13 +34,25 @@ const LINE_MAP: Record<string, string> = {
 
 type Props = { params: Promise<{ slug: string }> };
 
+type LineRankingRow = {
+  station_name: string;
+  prefecture_name: string;
+  municipality_name: string;
+  slug: string;
+  population: number | null;
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const lineName = LINE_MAP[slug];
-  if (!lineName) return { title: '路線が見つかりません' };
+
+  if (!lineName) {
+    return { title: '路線が見つかりません｜AreaScope' };
+  }
+
   return {
-    title: `${lineName} 駅乗降者数ランキング｜AreaScope`,
-    description: `${lineName}の駅乗降者数ランキングを掲載。主要駅の利用者数を比較できます。`,
+    title: `${lineName} 自治体人口上位駅｜AreaScope`,
+    description: `${lineName}の駅を、属する自治体の人口順で掲載しています。`,
     alternates: { canonical: `${BASE_URL}/line/${slug}/ranking` },
     robots: { index: true, follow: true },
   };
@@ -49,27 +61,48 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LineRankingPage({ params }: Props) {
   const { slug } = await params;
   const lineName = LINE_MAP[slug];
+
   if (!lineName) notFound();
 
-  const rows = await sql`
-    SELECT station_name, prefecture, slug, passengers_2021
-    FROM stations
-    WHERE line_name ILIKE ${'%' + lineName + '%'}
-    AND passengers_2021 IS NOT NULL
-    ORDER BY passengers_2021 DESC
+  const rows = (await sql`
+    SELECT
+      s.station_name,
+      s.prefecture_name,
+      s.municipality_name,
+      s.slug,
+      mp.population
+    FROM stations s
+    LEFT JOIN municipalities m
+      ON s.municipality_code = m.jis_code
+    LEFT JOIN municipality_populations mp
+      ON m.jis_code = mp.municipality_code
+      AND mp.year = 2020
+    WHERE s.line_name ILIKE ${'%' + lineName + '%'}
+      AND s.slug IS NOT NULL
+    ORDER BY mp.population DESC NULLS LAST, s.station_name ASC
     LIMIT 50
-  `;
+  `) as LineRankingRow[];
 
   if (rows.length === 0) notFound();
 
   return (
-    <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', padding: '2rem', fontFamily: 'sans-serif', maxWidth: '960px', margin: '0 auto' }}>
-
+    <main
+      style={{
+        background: '#0a0e1a',
+        minHeight: '100vh',
+        color: '#e8edf5',
+        padding: '2rem',
+        fontFamily: 'sans-serif',
+        maxWidth: '960px',
+        margin: '0 auto',
+      }}
+    >
       <h1 style={{ fontSize: '1.8rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
-        {lineName} 駅乗降者数ランキング
+        {lineName} 自治体人口上位駅
       </h1>
+
       <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: '1.8' }}>
-        {lineName}の駅乗降者数ランキングを掲載しています。2021年の利用者数データをもとに主要駅を比較できます。
+        {lineName}の駅を、駅が属する自治体の人口（2020年）順で掲載しています。
       </p>
 
       <section style={{ marginBottom: '2rem' }}>
@@ -77,15 +110,23 @@ export default async function LineRankingPage({ params }: Props) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                {['順位', '駅名', '都道府県', '2021年乗降者数', ''].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
+                {['順位', '駅名', '都道府県', '自治体', '自治体人口（2020年）', ''].map((h) => (
+                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid #1e2d45' }}>
-                  <td style={{ padding: '10px 16px', color: i < 3 ? '#00d4aa' : '#aaa', fontWeight: i < 3 ? 'bold' : 'normal' }}>
+                <tr key={`${r.slug}-${i}`} style={{ borderBottom: '1px solid #1e2d45' }}>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      color: i < 3 ? '#00d4aa' : '#aaa',
+                      fontWeight: i < 3 ? 'bold' : 'normal',
+                    }}
+                  >
                     {i + 1}位
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: 'bold' }}>
@@ -93,12 +134,23 @@ export default async function LineRankingPage({ params }: Props) {
                       {r.station_name}駅
                     </Link>
                   </td>
-                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.prefecture}</td>
+                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.prefecture_name}</td>
+                  <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.municipality_name}</td>
                   <td style={{ padding: '10px 16px' }}>
-                    {Number(r.passengers_2021).toLocaleString()}人
+                    {r.population ? `${Number(r.population).toLocaleString()}人` : '-'}
                   </td>
                   <td style={{ padding: '10px 16px' }}>
-                    <Link href={`/station/${r.slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>
+                    <Link
+                      href={`/station/${r.slug}`}
+                      style={{
+                        color: '#00d4aa',
+                        textDecoration: 'none',
+                        fontSize: '0.85rem',
+                        border: '1px solid #00d4aa',
+                        borderRadius: '4px',
+                        padding: '4px 10px',
+                      }}
+                    >
                       詳細
                     </Link>
                   </td>
@@ -110,11 +162,21 @@ export default async function LineRankingPage({ params }: Props) {
       </section>
 
       <section>
-        <Link href={`/line/${slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem', display: 'inline-block' }}>
+        <Link
+          href={`/line/${slug}`}
+          style={{
+            color: '#00d4aa',
+            textDecoration: 'none',
+            border: '1px solid #00d4aa',
+            borderRadius: '6px',
+            padding: '10px 20px',
+            fontSize: '0.9rem',
+            display: 'inline-block',
+          }}
+        >
           🚃 {lineName}の駅一覧を見る
         </Link>
       </section>
-
     </main>
   );
 }
