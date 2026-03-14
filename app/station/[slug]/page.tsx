@@ -2,63 +2,37 @@ import { neon } from '@neondatabase/serverless';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 
-type PageProps = {
-  params: Promise<{
-    slug: string;
-  }>;
-};
+type PageProps = { params: Promise<{ slug: string }> };
 
 type StationRow = {
   station_name: string;
   line_name: string;
   operator_name: string;
-  slug: string;
   prefecture_name: string;
   municipality_name: string;
   municipality_code: string;
-  lat: number | null;
-  lng: number | null;
+  prefecture_slug: string;
+  municipality_slug: string;
 };
 
-type PopulationRow = {
-  year: number;
-  population: number;
-};
+type PassengerRow = { year: number; passengers: number | null };
+type PopulationRow = { year: number; population: number };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-
-  const rows = (await sql`
-    SELECT
-      s.station_name,
-      s.line_name,
-      s.prefecture_name,
-      s.municipality_name
-    FROM stations s
-    WHERE s.slug = ${slug}
-    LIMIT 1
-  `) as {
-    station_name: string;
-    line_name: string;
-    prefecture_name: string;
-    municipality_name: string;
-  }[];
-
+  const rows = await sql`
+    SELECT station_name, prefecture_name, municipality_name
+    FROM stations WHERE station_group_slug = ${slug} LIMIT 1
+  `;
   const station = rows[0];
-
-  if (!station) {
-    return {
-      title: '駅が見つかりません｜AreaScope',
-      description: '指定された駅ページは存在しません。',
-    };
-  }
-
+  if (!station) return { title: '駅が見つかりません｜AreaScope' };
   return {
-    title: `${station.station_name}駅（${station.line_name}）｜AreaScope`,
-    description: `${station.prefecture_name}${station.municipality_name}にある${station.station_name}駅の人口推移・エリア情報を掲載しています。`,
+    title: `${station.station_name}駅｜AreaScope`,
+    description: `${station.prefecture_name}${station.municipality_name}にある${station.station_name}駅の路線・乗降者数・人口データを掲載しています。`,
   };
 }
 
@@ -66,95 +40,123 @@ export default async function StationPage({ params }: PageProps) {
   const { slug } = await params;
 
   const stationRows = (await sql`
-    SELECT
-      s.station_name,
-      s.line_name,
-      s.operator_name,
-      s.slug,
-      s.prefecture_name,
-      s.municipality_name,
-      s.municipality_code,
-      s.lat,
-      s.lng
-    FROM stations s
-    WHERE s.slug = ${slug}
-    LIMIT 1
+    SELECT DISTINCT ON (line_name)
+      station_name, line_name, operator_name,
+      prefecture_name, municipality_name, municipality_code,
+      prefecture_slug, municipality_slug
+    FROM stations
+    WHERE station_group_slug = ${slug}
+    ORDER BY line_name, station_name
   `) as StationRow[];
+
+  if (stationRows.length === 0) notFound();
 
   const station = stationRows[0];
 
-  if (!station) {
-    notFound();
-  }
+  const passengerRows = (await sql`
+    SELECT sp.year, CAST(SUM(sp.passengers) AS bigint) AS passengers
+    FROM station_passengers sp
+    JOIN stations s ON s.station_key = sp.station_key
+    WHERE s.station_group_slug = ${slug}
+    GROUP BY sp.year ORDER BY sp.year ASC
+  `) as PassengerRow[];
 
   const populationRows = (await sql`
-    SELECT
-      mp.year,
-      mp.population
-    FROM municipality_populations mp
-    WHERE mp.municipality_code = ${station.municipality_code}
-    ORDER BY mp.year ASC
+    SELECT year, population FROM municipality_populations
+    WHERE municipality_code = ${station.municipality_code}
+    ORDER BY year ASC
   `) as PopulationRow[];
 
-  return (
-    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <Link href="/station-ranking" style={{ textDecoration: 'none' }}>
-          ← 駅一覧に戻る
-        </Link>
-      </div>
+  const maxPassengers = Math.max(...passengerRows.map(r => Number(r.passengers) ?? 0), 1);
 
-      <h1 style={{ fontSize: '32px', marginBottom: '12px' }}>
-        {station.station_name}駅
+  return (
+    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px', background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .station-title { font-size: 24px !important; }
+          .station-meta { font-size: 13px !important; }
+          .passenger-bar-label { font-size: 11px !important; }
+          .section-title { font-size: 17px !important; }
+        }
+      `}</style>
+
+      <Breadcrumb items={[
+        { label: 'TOP', href: '/' },
+        { label: station.prefecture_name, href: `/prefecture/${station.prefecture_slug}` },
+        { label: station.municipality_name, href: `/city/${station.prefecture_slug}/${station.municipality_slug}` },
+        { label: `${station.station_name}駅` },
+      ]} />
+
+      <h1 className="station-title" style={{ fontSize: '32px', fontWeight: 800, marginBottom: '8px' }}>
+        {station.station_name}<span style={{ color: '#00d4aa' }}>駅</span>
       </h1>
 
-      <div style={{ lineHeight: 1.9, marginBottom: '28px' }}>
-        <div><strong>路線:</strong> {station.line_name}</div>
-        <div><strong>運営会社:</strong> {station.operator_name}</div>
-        <div><strong>所在地:</strong> {station.prefecture_name}{station.municipality_name}</div>
-        <div><strong>緯度:</strong> {station.lat ?? '-'}</div>
-        <div><strong>経度:</strong> {station.lng ?? '-'}</div>
+      <div className="station-meta" style={{ lineHeight: 2, marginBottom: '40px', color: '#aaa', fontSize: '14px' }}>
+        <div><strong style={{ color: '#e8edf5' }}>所在地:</strong> {station.prefecture_name}{station.municipality_name}</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+          <strong style={{ color: '#e8edf5' }}>路線:</strong>
+          {stationRows.map((r, i) => (
+            <span key={i} style={{ background: '#1e2d45', borderRadius: '4px', padding: '2px 8px', fontSize: '13px', color: '#e8edf5' }}>
+              {r.line_name}
+            </span>
+          ))}
+        </div>
       </div>
 
-      <section>
-        <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>
-          自治体の人口推移
+      {/* 乗降者数推移 */}
+      <section style={{ marginBottom: '48px' }}>
+        <h2 className="section-title" style={{ fontSize: '20px', fontWeight: 800, marginBottom: '20px' }}>
+          乗降者数<span style={{ color: '#00d4aa' }}>推移</span>
         </h2>
-
-        {populationRows.length === 0 ? (
-          <p>人口データがありません。</p>
+        {passengerRows.length === 0 ? (
+          <p style={{ color: '#aaa' }}>乗降者数データがありません。</p>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>年</th>
-                <th style={thStyle}>人口</th>
-              </tr>
-            </thead>
-            <tbody>
-              {populationRows.map((row) => (
-                <tr key={row.year}>
-                  <td style={tdStyle}>{row.year}</td>
-                  <td style={tdStyle}>{row.population.toLocaleString()}人</td>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {passengerRows.map((row) => {
+              const pct = maxPassengers > 0 ? (Number(row.passengers) / maxPassengers) * 100 : 0;
+              return (
+                <div key={row.year} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '40px', textAlign: 'right', fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', flexShrink: 0 }}>{row.year}</div>
+                  <div style={{ flex: 1, background: '#1e2d45', borderRadius: '4px', height: '28px', minWidth: 0 }}>
+                    <div className="passenger-bar-label" style={{ width: `${pct}%`, background: '#00d4aa', borderRadius: '4px', height: '28px', display: 'flex', alignItems: 'center', paddingLeft: '8px', fontSize: '12px', fontFamily: 'monospace', color: '#0a0e1a', fontWeight: 700, minWidth: pct > 0 ? '60px' : '0', overflow: 'hidden' }}>
+                      {row.passengers != null ? Number(row.passengers).toLocaleString() : '－'}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* 人口推移 */}
+      <section>
+        <h2 className="section-title" style={{ fontSize: '20px', fontWeight: 800, marginBottom: '20px' }}>
+          自治体の人口<span style={{ color: '#00d4aa' }}>推移</span>
+        </h2>
+        {populationRows.length === 0 ? (
+          <p style={{ color: '#aaa' }}>人口データがありません。</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '320px' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid #1e2d45', padding: '10px 8px', color: '#aaa' }}>年</th>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid #1e2d45', padding: '10px 8px', color: '#aaa' }}>人口</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {populationRows.map((row) => (
+                  <tr key={row.year}>
+                    <td style={{ borderBottom: '1px solid #1e2d45', padding: '10px 8px' }}>{row.year}</td>
+                    <td style={{ borderBottom: '1px solid #1e2d45', padding: '10px 8px' }}>{row.population.toLocaleString()}人</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </main>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  textAlign: 'left',
-  borderBottom: '1px solid #ccc',
-  padding: '10px 8px',
-  fontWeight: 700,
-};
-
-const tdStyle: React.CSSProperties = {
-  borderBottom: '1px solid #eee',
-  padding: '10px 8px',
-  verticalAlign: 'top',
-};

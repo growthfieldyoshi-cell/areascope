@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -40,7 +41,7 @@ type LineStationRow = {
   line_name: string;
   prefecture_name: string;
   municipality_name: string;
-  slug: string;
+  station_group_slug: string;
   population: number | null;
 };
 
@@ -91,22 +92,24 @@ export default async function LinePage({ params }: Props) {
   if (!lineName) notFound();
 
   const allStations = (await sql`
-    SELECT
-      s.station_name,
-      s.line_name,
-      s.prefecture_name,
-      s.municipality_name,
-      s.slug,
-      mp.population
-    FROM stations s
-    LEFT JOIN municipalities m
-      ON s.municipality_code = m.jis_code
-    LEFT JOIN municipality_populations mp
-      ON m.jis_code = mp.municipality_code
-      AND mp.year = 2020
-    WHERE s.line_name ILIKE ${'%' + lineName + '%'}
-      AND s.slug IS NOT NULL
-    ORDER BY mp.population DESC NULLS LAST, s.station_name ASC
+    WITH grouped AS (
+      SELECT DISTINCT ON (s.station_group_slug)
+        s.station_name,
+        s.line_name,
+        s.prefecture_name,
+        s.municipality_name,
+        s.station_group_slug,
+        mp.population
+      FROM stations s
+      LEFT JOIN municipality_populations mp
+        ON s.municipality_code = mp.municipality_code
+        AND mp.year = 2020
+      WHERE s.line_name ILIKE ${'%' + lineName + '%'}
+        AND s.station_group_slug IS NOT NULL
+      ORDER BY s.station_group_slug, s.station_name
+    )
+    SELECT * FROM grouped
+    ORDER BY population DESC NULLS LAST, station_name ASC
   `) as LineStationRow[];
 
   if (allStations.length === 0) notFound();
@@ -114,17 +117,13 @@ export default async function LinePage({ params }: Props) {
   const top20 = allStations.slice(0, 20);
 
   return (
-    <main
-      style={{
-        background: '#0a0e1a',
-        minHeight: '100vh',
-        color: '#e8edf5',
-        padding: '2rem',
-        fontFamily: 'sans-serif',
-        maxWidth: '960px',
-        margin: '0 auto',
-      }}
-    >
+    <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', padding: '2rem', fontFamily: 'sans-serif', maxWidth: '960px', margin: '0 auto' }}>
+      <Breadcrumb items={[
+        { label: 'TOP', href: '/' },
+        { label: '路線一覧', href: '/line' },
+        { label: lineName },
+      ]} />
+
       <h1 style={{ fontSize: '1.8rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
         {lineName}の駅一覧
       </h1>
@@ -151,26 +150,18 @@ export default async function LinePage({ params }: Props) {
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
                 {['順位', '駅名', '都道府県', '自治体', '自治体人口（2020年）', ''].map((h) => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>
-                    {h}
-                  </th>
+                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {top20.map((r, i) => (
-                <tr key={`${r.slug}-${i}`} style={{ borderBottom: '1px solid #1e2d45' }}>
-                  <td
-                    style={{
-                      padding: '10px 16px',
-                      color: i < 3 ? '#00d4aa' : '#aaa',
-                      fontWeight: i < 3 ? 'bold' : 'normal',
-                    }}
-                  >
+                <tr key={r.station_group_slug} style={{ borderBottom: '1px solid #1e2d45' }}>
+                  <td style={{ padding: '10px 16px', color: i < 3 ? '#00d4aa' : '#aaa', fontWeight: i < 3 ? 'bold' : 'normal' }}>
                     {i + 1}位
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: 'bold' }}>
-                    <Link href={`/station/${r.slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>
+                    <Link href={`/station/${r.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>
                       {r.station_name}駅
                     </Link>
                   </td>
@@ -180,17 +171,7 @@ export default async function LinePage({ params }: Props) {
                     {r.population ? `${Number(r.population).toLocaleString()}人` : '-'}
                   </td>
                   <td style={{ padding: '10px 16px' }}>
-                    <Link
-                      href={`/station/${r.slug}`}
-                      style={{
-                        color: '#00d4aa',
-                        textDecoration: 'none',
-                        fontSize: '0.85rem',
-                        border: '1px solid #00d4aa',
-                        borderRadius: '4px',
-                        padding: '4px 10px',
-                      }}
-                    >
+                    <Link href={`/station/${r.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>
                       詳細
                     </Link>
                   </td>
@@ -214,17 +195,15 @@ export default async function LinePage({ params }: Props) {
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
                 {['駅名', '都道府県', '自治体', '自治体人口（2020年）', ''].map((h) => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>
-                    {h}
-                  </th>
+                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {allStations.map((r, i) => (
-                <tr key={`${r.slug}-${i}`} style={{ borderBottom: '1px solid #1e2d45' }}>
+              {allStations.map((r) => (
+                <tr key={r.station_group_slug} style={{ borderBottom: '1px solid #1e2d45' }}>
                   <td style={{ padding: '10px 16px', fontWeight: 'bold' }}>
-                    <Link href={`/station/${r.slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>
+                    <Link href={`/station/${r.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>
                       {r.station_name}駅
                     </Link>
                   </td>
@@ -234,17 +213,7 @@ export default async function LinePage({ params }: Props) {
                     {r.population ? `${Number(r.population).toLocaleString()}人` : '-'}
                   </td>
                   <td style={{ padding: '10px 16px' }}>
-                    <Link
-                      href={`/station/${r.slug}`}
-                      style={{
-                        color: '#00d4aa',
-                        textDecoration: 'none',
-                        fontSize: '0.85rem',
-                        border: '1px solid #00d4aa',
-                        borderRadius: '4px',
-                        padding: '4px 10px',
-                      }}
-                    >
+                    <Link href={`/station/${r.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>
                       詳細
                     </Link>
                   </td>
@@ -263,18 +232,8 @@ export default async function LinePage({ params }: Props) {
           全国の駅一覧やランキングページもあわせてご覧ください。
         </p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <Link
-            href="/station-ranking"
-            style={{
-              color: '#00d4aa',
-              textDecoration: 'none',
-              border: '1px solid #00d4aa',
-              borderRadius: '6px',
-              padding: '10px 20px',
-              fontSize: '0.9rem',
-            }}
-          >
-            🏆 全国駅一覧
+          <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            🏆 全国駅ランキング
           </Link>
         </div>
       </section>

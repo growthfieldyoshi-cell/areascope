@@ -1,118 +1,263 @@
+import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+const sql = neon(process.env.DATABASE_URL!);
 
 const BASE_URL = 'https://areascope.jp';
 const OG_IMAGE = 'https://areascope.jp/og-default.jpg';
 
-export const metadata: Metadata = {
-  title: '日本の鉄道路線別 駅乗降者数ランキング一覧｜AreaScope',
-  description: '日本の主要鉄道路線ごとの駅乗降者数ランキングページ一覧です。各路線の駅ランキングや駅一覧を確認できます。',
-  alternates: {
-    canonical: `${BASE_URL}/line`,
-  },
-  openGraph: {
-    type: 'website',
-    title: '日本の鉄道路線別 駅乗降者数ランキング一覧｜AreaScope',
-    description: '日本の主要鉄道路線ごとの駅乗降者数ランキングページ一覧です。各路線の駅ランキングや駅一覧を確認できます。',
-    url: `${BASE_URL}/line`,
-    siteName: 'AreaScope',
-    images: [{ url: OG_IMAGE }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: '日本の鉄道路線別 駅乗降者数ランキング一覧｜AreaScope',
-    description: '日本の主要鉄道路線ごとの駅乗降者数ランキングページ一覧です。各路線の駅ランキングや駅一覧を確認できます。',
-    images: [OG_IMAGE],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+const LINE_MAP: Record<string, string> = {
+  yamanote: '山手線',
+  chuo: '中央線',
+  toyoko: '東横線',
+  'keio-inokashira': '京王井の頭線',
+  keio: '京王線',
+  odakyu: '小田急線',
+  tokaido: '東海道線',
+  sobu: '総武線',
+  saikyo: '埼京線',
+  marunouchi: '丸ノ内線',
+  hibiya: '日比谷線',
+  ginza: '銀座線',
+  hanzomon: '半蔵門線',
+  fukutoshin: '副都心線',
+  namboku: '南北線',
+  chiyoda: '千代田線',
+  yurakucho: '有楽町線',
+  tozai: '東西線',
+  mita: '三田線',
+  shinjuku: '新宿線',
+  asakusa: '浅草線',
+  oedo: '大江戸線',
 };
 
-const LINES: { name: string; slug: string }[] = [
-  { name: '山手線', slug: 'yamanote' },
-  { name: '中央線', slug: 'chuo' },
-  { name: '東横線', slug: 'toyoko' },
-  { name: '京王井の頭線', slug: 'keio-inokashira' },
-  { name: '京王線', slug: 'keio' },
-  { name: '小田急線', slug: 'odakyu' },
-  { name: '東海道線', slug: 'tokaido' },
-  { name: '総武線', slug: 'sobu' },
-  { name: '埼京線', slug: 'saikyo' },
-  { name: '丸ノ内線', slug: 'marunouchi' },
-  { name: '日比谷線', slug: 'hibiya' },
-  { name: '銀座線', slug: 'ginza' },
-  { name: '半蔵門線', slug: 'hanzomon' },
-  { name: '副都心線', slug: 'fukutoshin' },
-  { name: '南北線', slug: 'namboku' },
-  { name: '千代田線', slug: 'chiyoda' },
-  { name: '有楽町線', slug: 'yurakucho' },
-  { name: '東西線', slug: 'tozai' },
-  { name: '三田線', slug: 'mita' },
-  { name: '新宿線', slug: 'shinjuku' },
-  { name: '浅草線', slug: 'asakusa' },
-  { name: '大江戸線', slug: 'oedo' },
-];
+type Props = { params: Promise<{ slug: string }> };
 
-export default function LineListPage() {
+type LineStationRow = {
+  station_name: string;
+  line_name: string;
+  prefecture_name: string;
+  municipality_name: string;
+  station_group_slug: string;
+  population: number | null;
+};
+
+export async function generateStaticParams() {
+  return Object.keys(LINE_MAP).map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const lineName = LINE_MAP[slug];
+  if (!lineName) return { title: '路線が見つかりません｜AreaScope', robots: { index: false, follow: false } };
+  const title = `${lineName}の駅一覧｜AreaScope`;
+  const description = `${lineName}の駅一覧を掲載。各駅が属する自治体の人口データとあわせて、沿線エリアの特徴を確認できます。`;
+  return {
+    title, description,
+    alternates: { canonical: `${BASE_URL}/line/${slug}` },
+    openGraph: { type: 'website', title, description, url: `${BASE_URL}/line/${slug}`, siteName: 'AreaScope', images: [{ url: OG_IMAGE }] },
+    twitter: { card: 'summary_large_image', title, description, images: [OG_IMAGE] },
+    robots: { index: true, follow: true },
+  };
+}
+
+export default async function LinePage({ params }: Props) {
+  const { slug } = await params;
+  const lineName = LINE_MAP[slug];
+  if (!lineName) notFound();
+
+  const allStations = (await sql`
+    WITH grouped AS (
+      SELECT DISTINCT ON (s.station_group_slug)
+        s.station_name,
+        s.line_name,
+        s.prefecture_name,
+        s.municipality_name,
+        s.station_group_slug,
+        mp.population
+      FROM stations s
+      LEFT JOIN municipality_populations mp
+        ON s.municipality_code = mp.municipality_code
+        AND mp.year = 2020
+      WHERE s.line_name ILIKE ${'%' + lineName + '%'}
+        AND s.station_group_slug IS NOT NULL
+      ORDER BY s.station_group_slug, s.station_name
+    )
+    SELECT * FROM grouped
+    ORDER BY population DESC NULLS LAST, station_name ASC
+  `) as LineStationRow[];
+
+  if (allStations.length === 0) notFound();
+
+  const top20 = allStations.slice(0, 20);
+
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', padding: '2rem', fontFamily: 'sans-serif', maxWidth: '960px', margin: '0 auto' }}>
+      <style>{`
+        .line-table-wrap { overflow-x: auto; }
+        .line-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .line-table th { padding: 10px 16px; text-align: left; color: #aaa; }
+        .line-table td { padding: 10px 16px; border-bottom: 1px solid #1e2d45; }
+        .line-cards { display: none; }
+        .line-card { background: #111827; border: 1px solid #1e2d45; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+        .line-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+        .line-card-rank { font-family: monospace; font-size: 13px; color: #6b7a99; min-width: 32px; }
+        .line-card-rank.top3 { color: #00d4aa; font-weight: bold; }
+        .line-card-name { font-size: 15px; font-weight: 700; flex: 1; }
+        .line-card-btn { color: #00d4aa; text-decoration: none; font-size: 12px; border: 1px solid #00d4aa; border-radius: 4px; padding: 4px 10px; white-space: nowrap; }
+        .line-card-meta { font-size: 12px; color: #aaa; display: flex; gap: 16px; flex-wrap: wrap; }
+        @media (max-width: 640px) {
+          .line-table-wrap { display: none; }
+          .line-cards { display: block; }
+        }
+      `}</style>
+
+      <Breadcrumb items={[
+        { label: 'TOP', href: '/' },
+        { label: '路線一覧', href: '/line' },
+        { label: lineName },
+      ]} />
 
       <h1 style={{ fontSize: '1.8rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
-        日本の鉄道路線別 駅乗降者数データ
+        {lineName}の駅一覧
       </h1>
-      <p style={{ color: '#aaa', marginBottom: '2rem', lineHeight: '1.9', fontSize: '0.95rem' }}>
-        日本の主要鉄道路線ごとの駅乗降者数ランキングと駅一覧を掲載しています。
-        各路線ページでは主要駅のランキングや沿線駅一覧を確認できます。
+      <p style={{ color: '#aaa', marginBottom: '0.75rem', lineHeight: '1.9', fontSize: '0.95rem' }}>
+        {lineName}の全{allStations.length}駅を掲載しています。自治体人口（2020年）をもとに並べており、各駅ページでは所在地や人口推移を確認できます。
+      </p>
+      <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.9rem' }}>
+        沿線エリアの規模感を把握したい場合の一覧ページとして活用できます。
       </p>
 
-      <section>
-        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>
-          路線一覧
+      {/* 上位20駅 */}
+      <section style={{ marginBottom: '3rem' }}>
+        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
+          {lineName} 自治体人口上位20駅
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-          {LINES.map(line => (
-            <Link
-              key={line.slug}
-              href={`/line/${line.slug}`}
-              style={{
-                background: '#111827',
-                border: '1px solid #1e2d45',
-                borderRadius: '8px',
-                padding: '0.75rem 1rem',
-                color: '#e8edf5',
-                textDecoration: 'none',
-                fontSize: '0.95rem',
-                display: 'block',
-              }}
-            >
-              {line.name}
-            </Link>
+        <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>
+          駅が属する自治体の人口（2020年）が多い順に表示しています。
+        </p>
+
+        {/* PC */}
+        <div style={{ background: '#111827', borderRadius: '8px' }}>
+          <div className="line-table-wrap">
+            <table className="line-table">
+              <thead>
+                <tr style={{ borderBottom: '2px solid #1e2d45' }}>
+                  {['順位', '駅名', '都道府県', '自治体', '自治体人口（2020年）', ''].map(h => (
+                    <th key={h}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {top20.map((r, i) => (
+                  <tr key={r.station_group_slug}>
+                    <td style={{ color: i < 3 ? '#00d4aa' : '#aaa', fontWeight: i < 3 ? 'bold' : 'normal' }}>{i + 1}位</td>
+                    <td style={{ fontWeight: 'bold' }}>
+                      <Link href={`/station/${r.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>{r.station_name}駅</Link>
+                    </td>
+                    <td style={{ color: '#aaa' }}>{r.prefecture_name}</td>
+                    <td style={{ color: '#aaa' }}>{r.municipality_name}</td>
+                    <td>{r.population != null ? `${Number(r.population).toLocaleString()}人` : 'データなし'}</td>
+                    <td>
+                      <Link href={`/station/${r.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>詳細</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* スマホ */}
+        <div className="line-cards">
+          {top20.map((r, i) => (
+            <div key={r.station_group_slug} className="line-card">
+              <div className="line-card-top">
+                <div className={`line-card-rank ${i < 3 ? 'top3' : ''}`}>{i + 1}位</div>
+                <div className="line-card-name">
+                  <Link href={`/station/${r.station_group_slug}`} style={{ textDecoration: 'none', color: '#e8edf5' }}>{r.station_name}駅</Link>
+                </div>
+                <Link href={`/station/${r.station_group_slug}`} className="line-card-btn">詳細</Link>
+              </div>
+              <div className="line-card-meta">
+                <span>{r.prefecture_name} {r.municipality_name}</span>
+                <span>人口: {r.population != null ? `${Number(r.population).toLocaleString()}人` : 'データなし'}</span>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      <section style={{ marginTop: '3rem' }}>
+      {/* 全駅一覧 */}
+      <section style={{ marginBottom: '3rem' }}>
         <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
-          ほかの駅データを見る
+          {lineName}の駅一覧（全{allStations.length}駅）
         </h2>
         <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>
-          全国の駅ランキングや都道府県別データもあわせてご覧ください。
+          自治体人口（2020年）の多い順に表示しています。
         </p>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-            🏆 全国駅乗降者数ランキング
-          </Link>
-          <Link href="/prefecture" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-            📍 都道府県別データ
-          </Link>
-          <Link href="/station/list" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-            📋 全国駅一覧
-          </Link>
+
+        {/* PC */}
+        <div style={{ background: '#111827', borderRadius: '8px' }}>
+          <div className="line-table-wrap">
+            <table className="line-table">
+              <thead>
+                <tr style={{ borderBottom: '2px solid #1e2d45' }}>
+                  {['駅名', '都道府県', '自治体', '自治体人口（2020年）', ''].map(h => (
+                    <th key={h}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {allStations.map((r) => (
+                  <tr key={r.station_group_slug}>
+                    <td style={{ fontWeight: 'bold' }}>
+                      <Link href={`/station/${r.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>{r.station_name}駅</Link>
+                    </td>
+                    <td style={{ color: '#aaa' }}>{r.prefecture_name}</td>
+                    <td style={{ color: '#aaa' }}>{r.municipality_name}</td>
+                    <td>{r.population != null ? `${Number(r.population).toLocaleString()}人` : 'データなし'}</td>
+                    <td>
+                      <Link href={`/station/${r.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>詳細</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* スマホ */}
+        <div className="line-cards">
+          {allStations.map((r) => (
+            <div key={r.station_group_slug} className="line-card">
+              <div className="line-card-top">
+                <div className="line-card-name">
+                  <Link href={`/station/${r.station_group_slug}`} style={{ textDecoration: 'none', color: '#e8edf5' }}>{r.station_name}駅</Link>
+                </div>
+                <Link href={`/station/${r.station_group_slug}`} className="line-card-btn">詳細</Link>
+              </div>
+              <div className="line-card-meta">
+                <span>{r.prefecture_name} {r.municipality_name}</span>
+                <span>人口: {r.population != null ? `${Number(r.population).toLocaleString()}人` : 'データなし'}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
+      <section>
+        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '0.5rem' }}>ほかの駅データを見る</h2>
+        <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>全国の駅一覧やランキングページもあわせてご覧ください。</p>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            🏆 全国駅ランキング
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
