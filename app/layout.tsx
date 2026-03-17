@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: 'AREASCOPE | データで選ぶ、投資エリア。',
   description:
     '駅別乗降客数・市区町村人口推移を一目で可視化。全国8,124駅・1,741市区町村の公式データを無料で閲覧できます。',
+  other: {
+    'google-adsense-account': 'ca-pub-5313429744754781',
+  },
   openGraph: {
     title: 'AREASCOPE | データで選ぶ、投資エリア。',
     description:
@@ -38,26 +41,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
     <html lang="ja">
-      <head>
-        <meta
-          name="google-adsense-account"
-          content="ca-pub-5313429744754781"
-        />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
+
         <Script
+          id="adsense-script"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5313429744754781"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-      </head>
-
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
       </body>
 
       <GoogleAnalytics gaId="G-W711TVYVQT" />
