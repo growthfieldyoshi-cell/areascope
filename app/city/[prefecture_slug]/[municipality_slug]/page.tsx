@@ -20,7 +20,7 @@ type StationRow = {
 
 type PopulationRow = {
   year: number;
-  population: number;
+  population: number | string;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!rows[0]) return { title: '自治体が見つかりません｜AreaScope' };
   const { municipality_name, prefecture_name } = rows[0];
   const title = `${prefecture_name}${municipality_name}の駅一覧・人口推移｜AreaScope`;
-  const description = `${prefecture_name}${municipality_name}の駅一覧、主要駅の乗降者数、人口推移を掲載しています。`;
+  const description = `${prefecture_name}${municipality_name}の駅一覧、主要駅の乗降者数、人口推移・増減率を掲載しています。`;
   return {
     title, description,
     alternates: { canonical: `${BASE_URL}/city/${prefecture_slug}/${municipality_slug}` },
@@ -84,6 +84,19 @@ export default async function CityPage({ params }: Props) {
     GROUP BY mp.year ORDER BY mp.year ASC
   `) as PopulationRow[];
 
+  // 人口KPI計算（Number()で確実に数値化）
+  const popNormalized = populationRows.map(r => ({ year: r.year, population: Number(r.population) }));
+  const latestPop = popNormalized.length > 0 ? popNormalized[popNormalized.length - 1] : null;
+  const oldestPop = popNormalized.length > 0 ? popNormalized[0] : null;
+  const peakPop = popNormalized.length > 0 ? popNormalized.reduce((a, b) => a.population > b.population ? a : b) : null;
+  const changeRate = latestPop && oldestPop && oldestPop.population > 0
+    ? (((latestPop.population - oldestPop.population) / oldestPop.population) * 100).toFixed(1)
+    : null;
+  const maxPop = popNormalized.length > 0 ? Math.max(...popNormalized.map(r => r.population)) : 1;
+
+  // 最多利用駅
+  const topStation = stationRows[0];
+
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', padding: '2rem', fontFamily: 'sans-serif', maxWidth: '960px', margin: '0 auto' }}>
       <style>{`
@@ -99,15 +112,18 @@ export default async function CityPage({ params }: Props) {
         .city-card-name { font-size: 15px; font-weight: 700; flex: 1; }
         .city-card-btn { color: #00d4aa; text-decoration: none; font-size: 12px; border: 1px solid #00d4aa; border-radius: 4px; padding: 4px 10px; white-space: nowrap; }
         .city-card-passengers { font-size: 12px; color: #aaa; margin-top: 4px; }
+        .kpi { background: #111827; border: 1px solid #1e2d45; border-radius: 12px; padding: 16px 20px; }
         @media (max-width: 640px) {
           .city-table-wrap { display: none; }
           .city-cards { display: block; }
+          .kpi-grid { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
 
+      {/* パンくず（都道府県は暫定で station-ranking へ） */}
       <Breadcrumb items={[
         { label: 'TOP', href: '/' },
-        { label: prefecture_name, href: `/prefecture/${prefecture_slug}` },
+        { label: prefecture_name, href: `/station-ranking/${prefecture_slug}` },
         { label: municipality_name },
       ]} />
 
@@ -115,16 +131,70 @@ export default async function CityPage({ params }: Props) {
         {prefecture_name}<span style={{ color: '#00d4aa' }}>{municipality_name}</span>の駅一覧
       </h1>
       <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: 1.8 }}>
-        {prefecture_name}{municipality_name}内の全{stationRows.length}駅を掲載しています。乗降者数（2021年）をもとに並べています。
+        {prefecture_name}{municipality_name}には主要駅が{stationRows.length}駅あります。
+        {topStation?.passengers != null && (
+          <>最多利用駅は<Link href={`/station/${topStation.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none' }}>{topStation.station_name}駅</Link>で、2021年の乗降者数は{Number(topStation.passengers).toLocaleString()}人です。</>
+        )}
+        乗降者数と人口推移をあわせて確認できます。
       </p>
 
-      {/* 駅一覧 */}
-      <section style={{ marginBottom: '3rem' }}>
-        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>
-          駅一覧（全{stationRows.length}駅）
-        </h2>
+      {/* 人口推移・増減率 */}
+      <section style={{ marginBottom: '2.5rem' }}>
+        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>人口推移・増減率</h2>
+        {popNormalized.length === 0 ? (
+          <p style={{ color: '#aaa' }}>人口データがありません。</p>
+        ) : (
+          <>
+            <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+              <div className="kpi">
+                <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>最新人口（{latestPop?.year}年）</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#00d4aa' }}>{latestPop?.population.toLocaleString()}</div>
+                <div style={{ fontSize: '11px', color: '#6b7a99' }}>人</div>
+              </div>
+              <div className="kpi">
+                <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>人口ピーク年</div>
+                <div style={{ fontSize: '24px', fontWeight: 800 }}>{peakPop?.year}年</div>
+                <div style={{ fontSize: '11px', color: '#6b7a99' }}>{peakPop?.population.toLocaleString()}人</div>
+              </div>
+              <div className="kpi">
+                <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>長期変化（{oldestPop?.year}年比）</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: parseFloat(changeRate || '0') >= 0 ? '#00d4aa' : '#ff4757' }}>
+                  {parseFloat(changeRate || '0') >= 0 ? '▲' : '▼'}{Math.abs(parseFloat(changeRate || '0'))}%
+                </div>
+                <div style={{ fontSize: '11px', color: '#6b7a99' }}>{oldestPop?.population.toLocaleString()} → {latestPop?.population.toLocaleString()}人</div>
+              </div>
+            </div>
 
-        {/* PC */}
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
+                人口推移グラフ
+                <span style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginLeft: '12px' }}>1995〜2020年 国勢調査</span>
+              </div>
+              {popNormalized.map(row => {
+                const pct = maxPop > 0 ? (row.population / maxPop) * 100 : 0;
+                return (
+                  <div key={row.year} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', width: '40px', textAlign: 'right' }}>{row.year}</div>
+                    <div style={{ flex: 1, background: '#1e2d45', borderRadius: '4px', height: '28px' }}>
+                      <div style={{ width: `${pct}%`, background: '#00d4aa', borderRadius: '4px', height: '28px', display: 'flex', alignItems: 'center', paddingLeft: '8px', fontSize: '11px', fontFamily: 'monospace', color: '#0a0e1a', fontWeight: 700, minWidth: pct > 0 ? '80px' : '0', overflow: 'hidden' }}>
+                        {row.population.toLocaleString()}人
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* 主要駅ランキング */}
+      <section style={{ marginBottom: '3rem' }}>
+        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
+          主要駅ランキング（全{stationRows.length}駅）
+        </h2>
+        <p style={{ fontSize: '13px', color: '#6b7a99', marginBottom: '1rem' }}>乗降者数（2021年）順に並べています。各駅の詳細ページで年次推移を確認できます。</p>
+
         <div style={{ background: '#111827', borderRadius: '8px' }}>
           <div className="city-table-wrap">
             <table className="city-table">
@@ -153,7 +223,6 @@ export default async function CityPage({ params }: Props) {
           </div>
         </div>
 
-        {/* スマホ */}
         <div className="city-cards">
           {stationRows.map((r, i) => (
             <div key={r.station_group_slug} className="city-card">
@@ -172,43 +241,15 @@ export default async function CityPage({ params }: Props) {
         </div>
       </section>
 
-      {/* 人口推移 */}
-      <section style={{ marginBottom: '3rem' }}>
-        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>人口推移</h2>
-        {populationRows.length === 0 ? (
-          <p style={{ color: '#aaa' }}>人口データがありません。</p>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', minWidth: '320px' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                  {['年', '人口'].map(h => (
-                    <th key={h} style={{ padding: '10px 8px', textAlign: 'left', color: '#aaa' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {populationRows.map(row => (
-                  <tr key={row.year} style={{ borderBottom: '1px solid #1e2d45' }}>
-                    <td style={{ padding: '10px 8px' }}>{row.year}</td>
-                    <td style={{ padding: '10px 8px' }}>{Number(row.population).toLocaleString()}人</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
       {/* 関連ページ */}
       <section>
         <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>関連ページ</h2>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <Link href={`/prefecture/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-            🗾 {prefecture_name}の駅一覧
-          </Link>
           <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
             🏆 全国駅ランキング
+          </Link>
+          <Link href="/population-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            🏙️ 全国人口ランキング
           </Link>
         </div>
       </section>

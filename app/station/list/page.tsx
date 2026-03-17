@@ -1,3 +1,4 @@
+// app/station/list/page.tsx
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -9,6 +10,9 @@ const PER_PAGE = 100;
 export const metadata: Metadata = {
   title: '駅乗降者数データ一覧｜全国駅データ',
   description: '全国の駅乗降者数データを一覧で確認できます。駅ごとの利用者数推移やランキングも確認可能です。',
+  alternates: {
+    canonical: 'https://areascope.jp/station/list',
+  },
 };
 
 type Props = { searchParams: Promise<{ page?: string }> };

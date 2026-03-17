@@ -1,3 +1,4 @@
+// app/city/page.tsx
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -8,6 +9,9 @@ const sql = neon(process.env.DATABASE_URL!);
 export const metadata: Metadata = {
   title: '市区町村一覧｜AreaScope',
   description: '全国の市区町村一覧を都道府県別に掲載。各市区町村の駅一覧・人口推移を確認できます。',
+  alternates: {
+    canonical: 'https://areascope.jp/city',
+  },
 };
 
 type MunicipalityRow = {
@@ -34,10 +38,7 @@ export default async function CityListPage() {
   const grouped = rows.reduce<Record<string, { prefecture_name: string; municipalities: MunicipalityRow[] }>>(
     (acc, row) => {
       if (!acc[row.prefecture_slug]) {
-        acc[row.prefecture_slug] = {
-          prefecture_name: row.prefecture_name,
-          municipalities: [],
-        };
+        acc[row.prefecture_slug] = { prefecture_name: row.prefecture_name, municipalities: [] };
       }
       acc[row.prefecture_slug].municipalities.push(row);
       return acc;
@@ -88,15 +89,7 @@ export default async function CityListPage() {
                 <Link
                   key={m.municipality_slug}
                   href={`/city/${prefSlug}/${m.municipality_slug}`}
-                  style={{
-                    color: '#e8edf5',
-                    textDecoration: 'none',
-                    background: '#111827',
-                    border: '1px solid #1e2d45',
-                    borderRadius: '4px',
-                    padding: '4px 12px',
-                    fontSize: '0.85rem',
-                  }}
+                  style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}
                 >
                   {m.municipality_name}
                 </Link>

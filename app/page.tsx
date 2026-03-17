@@ -1,4 +1,12 @@
+// app/page.tsx
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://areascope.jp',
+  },
+};
 
 export default function Home() {
   return (
@@ -33,7 +41,6 @@ export default function Home() {
         }
       `}</style>
 
-      {/* ヘッダー */}
       <header style={{ padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1e2d45', background: 'rgba(10,14,26,0.95)' }}>
         <div style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '0.05em' }}>
           AREA<span style={{ color: '#00d4aa' }}>SCOPE</span>
@@ -46,7 +53,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ヒーロー */}
       <section className="hero">
         <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#00d4aa', letterSpacing: '3px', marginBottom: '16px' }}>
           // 不動産投資家向けエリア分析
@@ -65,45 +71,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 主要ナビカード */}
       <div style={{ borderTop: '1px solid #1e2d45', paddingTop: '40px' }}>
         <div className="nav-section">
           <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
             // 主要ページ
           </p>
           <div className="nav-grid">
-            <Link href="/station-ranking" className="nav-card">
-              <div className="nav-card-icon">🏆</div>
-              <div className="nav-card-title">全国駅ランキング</div>
-              <div className="nav-card-desc">2021年の乗降者数順で全国9,012駅をランキング表示。新宿・池袋・渋谷など主要駅のデータを確認できます。</div>
-              <div className="nav-card-link">/station-ranking →</div>
+            <Link href="/station" className="nav-card">
+              <div className="nav-card-icon">🔍</div>
+              <div className="nav-card-title">駅検索</div>
+              <div className="nav-card-desc">駅名を入力して乗降者数データを検索。全国9,012駅の時系列データを確認できます。</div>
+              <div className="nav-card-link">/station →</div>
             </Link>
 
-            <Link href="/city" className="nav-card">
-              <div className="nav-card-icon">🏙️</div>
-              <div className="nav-card-title">市区町村一覧</div>
-              <div className="nav-card-desc">全国1,256市区町村の駅一覧・人口推移を掲載。投資エリアの人口動態を都道府県別に確認できます。</div>
-              <div className="nav-card-link">/city →</div>
+            <Link href="/station-ranking" className="nav-card">
+              <div className="nav-card-icon">🏆</div>
+              <div className="nav-card-title">駅ランキング</div>
+              <div className="nav-card-desc">全国の駅乗降者数ランキング。乗降者数順で主要駅を比較できます。</div>
+              <div className="nav-card-link">/station-ranking →</div>
             </Link>
 
             <Link href="/line" className="nav-card">
               <div className="nav-card-icon">🗺️</div>
               <div className="nav-card-title">路線一覧</div>
-              <div className="nav-card-desc">山手線・中央線・東横線など主要路線の駅一覧と沿線データを掲載しています。</div>
+              <div className="nav-card-desc">路線ごとの駅データ。山手線・中央線など主要路線の沿線データを掲載しています。</div>
               <div className="nav-card-link">/line →</div>
             </Link>
 
-            <Link href="/station/list" className="nav-card">
-              <div className="nav-card-icon">🚃</div>
-              <div className="nav-card-title">駅データ一覧</div>
-              <div className="nav-card-desc">全国9,012駅の乗降者数データを一覧で確認。駅ごとの詳細ページへ移動できます。</div>
-              <div className="nav-card-link">/station/list →</div>
+            <Link href="/population" className="nav-card">
+              <div className="nav-card-icon">🏙️</div>
+              <div className="nav-card-title">人口分析</div>
+              <div className="nav-card-desc">市区町村人口推移を分析。都道府県・市区町村を選んで人口動態を確認できます。</div>
+              <div className="nav-card-link">/population →</div>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* フッター */}
       <footer style={{ padding: '20px 32px', borderTop: '1px solid #1e2d45', fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', textAlign: 'center', marginTop: 'auto' }}>
         出典: 国土交通省 国土数値情報 / 総務省統計局 e-Stat | © 2025 AREASCOPE
       </footer>
