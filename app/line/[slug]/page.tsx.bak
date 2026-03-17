@@ -1,3 +1,4 @@
+cat > app/line/\[slug\]/page.tsx << 'ENDOFFILE'
 // app/line/[slug]/page.tsx
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
@@ -198,3 +199,4 @@ export default async function LinePage({ params }: Props) {
     </main>
   );
 }
+ENDOFFILE
