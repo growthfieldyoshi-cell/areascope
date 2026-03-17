@@ -56,54 +56,53 @@ export default function AboutPage() {
       </p>
 
       <section style={{ marginBottom: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.2rem',
-            color: '#00d4aa',
-            marginBottom: '0.75rem',
-          }}
-        >
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
           サイト名
         </h2>
         <p style={{ color: '#ccc' }}>AreaScope</p>
       </section>
 
       <section style={{ marginBottom: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.2rem',
-            color: '#00d4aa',
-            marginBottom: '0.75rem',
-          }}
-        >
-          運営者
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
+          運営会社
         </h2>
         <p style={{ color: '#ccc' }}>グロースフィールド株式会社</p>
       </section>
 
       <section style={{ marginBottom: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.2rem',
-            color: '#00d4aa',
-            marginBottom: '0.75rem',
-          }}
-        >
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
           所在地
         </h2>
         <p style={{ color: '#ccc' }}>
-          東京都渋谷区恵比寿西1-32-29 風の館103
+          〒253-0054
+          <br />
+          神奈川県茅ヶ崎市東海岸南4-8-5
+          <br />
+          ベルピア茅ヶ崎第04 103号室
         </p>
       </section>
 
       <section style={{ marginBottom: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.2rem',
-            color: '#00d4aa',
-            marginBottom: '0.75rem',
-          }}
-        >
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
+          公式サイト
+        </h2>
+        <p>
+          <a
+            href="https://growthfield.net/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: '#00d4aa',
+              textDecoration: 'none',
+            }}
+          >
+            https://growthfield.net/
+          </a>
+        </p>
+      </section>
+
+      <section style={{ marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
           サイト概要
         </h2>
         <p style={{ color: '#ccc' }}>
@@ -113,47 +112,20 @@ export default function AboutPage() {
       </section>
 
       <section style={{ marginBottom: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.2rem',
-            color: '#00d4aa',
-            marginBottom: '0.75rem',
-          }}
-        >
-          掲載データ
-        </h2>
-        <p style={{ color: '#ccc' }}>
-          駅別乗降者数、市区町村人口推移、路線別駅一覧、各種ランキング情報など
-        </p>
-      </section>
-
-      <section style={{ marginBottom: '2rem' }}>
-        <h2
-          style={{
-            fontSize: '1.2rem',
-            color: '#00d4aa',
-            marginBottom: '0.75rem',
-          }}
-        >
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
           データ出典
         </h2>
         <p style={{ color: '#ccc' }}>
-          国土交通省 国土数値情報 / 総務省統計局 e-Stat などの公的データをもとに掲載しています。
+          国土交通省 国土数値情報 / 総務省統計局 e-Stat などの公的機関の公開データをもとに掲載しています。
         </p>
       </section>
 
       <section>
-        <h2
-          style={{
-            fontSize: '1.2rem',
-            color: '#00d4aa',
-            marginBottom: '0.75rem',
-          }}
-        >
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '0.75rem' }}>
           お問い合わせ
         </h2>
         <p style={{ color: '#ccc' }}>
-          本サイトに関するお問い合わせは、今後設置予定のお問い合わせフォームよりお願いいたします。
+          本サイトに関するお問い合わせは、今後設置予定のお問い合わせページよりお願いいたします。
         </p>
       </section>
     </main>
