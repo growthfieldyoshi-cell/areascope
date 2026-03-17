@@ -16,7 +16,7 @@ const PREF_SLUGS = [
 
 const LINE_SLUGS = [
   'yamanote','chuo','toyoko','keio-inokashira','keio','odakyu',
-  'tokaido','sobu','saikyo','marunouchi',
+  'tokaido','sobu','marunouchi',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
