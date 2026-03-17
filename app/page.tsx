@@ -1,23 +1,24 @@
-// app/page.tsx
-import type { Metadata } from 'next';
-import Link from 'next/link';
+import type { Metadata } from 'next'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   alternates: {
     canonical: 'https://areascope.jp',
   },
-};
+}
 
 export default function Home() {
   return (
-    <main style={{
-      minHeight: '100vh',
-      background: '#0a0e1a',
-      color: '#e8edf5',
-      fontFamily: "'Noto Sans JP', sans-serif",
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
+    <main
+      style={{
+        minHeight: '100vh',
+        background: '#0a0e1a',
+        color: '#e8edf5',
+        fontFamily: "'Noto Sans JP', sans-serif",
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <style>{`
         .hero { padding: 60px 32px 40px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
         .hero-title { font-size: 52px; font-weight: 800; line-height: 1.1; margin-bottom: 24px; }
@@ -41,10 +42,20 @@ export default function Home() {
         }
       `}</style>
 
-      <header style={{ padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1e2d45', background: 'rgba(10,14,26,0.95)' }}>
+      <header
+        style={{
+          padding: '16px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: '1px solid #1e2d45',
+          background: 'rgba(10,14,26,0.95)',
+        }}
+      >
         <div style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '0.05em' }}>
           AREA<span style={{ color: '#00d4aa' }}>SCOPE</span>
         </div>
+
         <div className="nav-links" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <Link href="/station-ranking" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🏆 駅ランキング</Link>
           <Link href="/station/list" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🚃 駅一覧</Link>
@@ -57,13 +68,17 @@ export default function Home() {
         <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#00d4aa', letterSpacing: '3px', marginBottom: '16px' }}>
           // 不動産投資家向けエリア分析
         </div>
+
         <h1 className="hero-title">
-          データで選ぶ、<br />
+          データで選ぶ、
+          <br />
           <span style={{ color: '#00d4aa' }}>投資エリア</span>。
         </h1>
+
         <p style={{ fontSize: '15px', color: '#6b7a99', lineHeight: 1.8, marginBottom: '24px', maxWidth: '560px' }}>
           駅別乗降者数・市区町村人口推移を一目で可視化。公式データを無料で閲覧できます。
         </p>
+
         <div className="hero-meta">
           <div className="hero-meta-item">全国 <span>9,012</span> 駅</div>
           <div className="hero-meta-item"><span>1,256</span> 市区町村</div>
@@ -76,6 +91,7 @@ export default function Home() {
           <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
             // 主要ページ
           </p>
+
           <div className="nav-grid">
             <Link href="/station" className="nav-card">
               <div className="nav-card-icon">🔍</div>
@@ -108,9 +124,31 @@ export default function Home() {
         </div>
       </div>
 
-      <footer style={{ padding: '20px 32px', borderTop: '1px solid #1e2d45', fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', textAlign: 'center', marginTop: 'auto' }}>
-        出典: 国土交通省 国土数値情報 / 総務省統計局 e-Stat | © 2025 AREASCOPE
+      <footer
+        style={{
+          padding: '20px 32px',
+          borderTop: '1px solid #1e2d45',
+          fontFamily: 'monospace',
+          fontSize: '11px',
+          color: '#6b7a99',
+          textAlign: 'center',
+          marginTop: 'auto',
+        }}
+      >
+        <div style={{ marginBottom: '10px' }}>
+          出典: 国土交通省 国土数値情報 / 総務省統計局 e-Stat | © 2025 AREASCOPE
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <Link href="/about" style={{ color: '#00d4aa', textDecoration: 'none' }}>
+            運営者情報
+          </Link>
+
+          <Link href="/privacy" style={{ color: '#00d4aa', textDecoration: 'none' }}>
+            プライバシーポリシー
+          </Link>
+        </div>
       </footer>
     </main>
-  );
+  )
 }
