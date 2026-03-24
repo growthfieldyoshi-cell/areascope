@@ -18,7 +18,7 @@ type StationInfo = {
   municipality_code: string;
   line_names: string;
   operator_names: string;
-  line_slug: string;
+  line_slug: string | null;
 };
 
 type PopulationRow = {
@@ -59,15 +59,14 @@ export default async function StationPage({ params }: PageProps) {
       s.municipality_name,
       s.municipality_slug,
       s.municipality_code,
-      s.line_slug,
+      MAX(s.line_slug) FILTER (WHERE s.line_slug IS NOT NULL) AS line_slug,
       STRING_AGG(DISTINCT s.line_name, '・' ORDER BY s.line_name) AS line_names,
       STRING_AGG(DISTINCT s.operator_name, '・' ORDER BY s.operator_name) AS operator_names
     FROM stations s
     WHERE s.station_group_slug = ${slug}
     GROUP BY
       s.station_name, s.prefecture_name, s.prefecture_slug,
-      s.municipality_name, s.municipality_slug, s.municipality_code,
-      s.line_slug
+      s.municipality_name, s.municipality_slug, s.municipality_code
     LIMIT 1
   `;
 
@@ -121,7 +120,6 @@ export default async function StationPage({ params }: PageProps) {
 
       <div className="content" style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px' }}>
 
-        {/* パンくず */}
         <nav style={{ marginBottom: '1.5rem', fontSize: '0.85rem', color: '#6b7a99' }}>
           <Link href="/" style={{ color: '#6b7a99', textDecoration: 'none' }}>トップ</Link>
           {' / '}
@@ -142,14 +140,15 @@ export default async function StationPage({ params }: PageProps) {
           {station.line_names}｜{station.operator_names}｜{station.prefecture_name}{station.municipality_name}
         </p>
 
-        {/* 内部リンク4系統 */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '32px' }}>
           <Link href={`/city/${station.prefecture_slug}/${station.municipality_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#00d4aa', background: 'rgba(0,212,170,0.1)', border: '1px solid #00d4aa', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
             🏙️ {station.municipality_name}の駅一覧
           </Link>
-          <Link href={`/line/${station.line_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#00d4aa', background: 'rgba(0,212,170,0.1)', border: '1px solid #00d4aa', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
-            🗺️ 路線の駅一覧
-          </Link>
+          {station.line_slug && (
+            <Link href={`/line/${station.line_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#00d4aa', background: 'rgba(0,212,170,0.1)', border: '1px solid #00d4aa', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
+              🗺️ 路線の駅一覧
+            </Link>
+          )}
           <Link href={`/station-ranking?pref=${station.prefecture_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
             🏆 {station.prefecture_name}の駅ランキング
           </Link>
@@ -158,7 +157,6 @@ export default async function StationPage({ params }: PageProps) {
           </Link>
         </div>
 
-        {/* KPI */}
         <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
           <div className="kpi">
             <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>乗降者数（2021年）</div>
@@ -183,7 +181,6 @@ export default async function StationPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* 分析テキスト */}
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#00d4aa' }}>
             {station.station_name}駅のデータ分析
@@ -219,7 +216,6 @@ export default async function StationPage({ params }: PageProps) {
           </p>
         </section>
 
-        {/* 特徴と傾向 */}
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#00d4aa' }}>
             {station.station_name}駅の特徴と傾向
@@ -239,7 +235,6 @@ export default async function StationPage({ params }: PageProps) {
           </p>
         </section>
 
-        {/* FAQ */}
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#00d4aa' }}>
             {station.station_name}駅に関するよくある質問
@@ -276,7 +271,6 @@ export default async function StationPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* 乗降者数推移 */}
         {passengerRows.length > 0 && (
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>乗降者数推移</h2>
@@ -298,7 +292,6 @@ export default async function StationPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* 人口推移 */}
         {populationRows.length > 0 && (
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>
@@ -322,16 +315,17 @@ export default async function StationPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* 関連リンク */}
         <section>
           <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>関連ページ</h2>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href={`/city/${station.prefecture_slug}/${station.municipality_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
               🏙️ {station.municipality_name}の駅一覧
             </Link>
-            <Link href={`/line/${station.line_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-              🗺️ 路線の駅一覧
-            </Link>
+            {station.line_slug && (
+              <Link href={`/line/${station.line_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+                🗺️ 路線の駅一覧
+              </Link>
+            )}
             <Link href={`/station-ranking?pref=${station.prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
               🏆 {station.prefecture_name}の駅ランキング
             </Link>
