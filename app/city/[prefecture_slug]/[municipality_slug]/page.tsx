@@ -72,8 +72,6 @@ export default async function CityPage({ params }: Props) {
     ORDER BY passengers DESC NULLS LAST, g.station_name ASC
   `) as StationRow[];
 
-  if (stationRows.length === 0) notFound();
-
   const populationRows = (await sql`
     SELECT mp.year, SUM(mp.population) AS population
     FROM municipality_populations mp
@@ -119,7 +117,7 @@ export default async function CityPage({ params }: Props) {
 
       <Breadcrumb items={[
         { label: 'TOP', href: '/' },
-        { label: prefecture_name, href: `/station-ranking?pref=${prefecture_slug}` },
+        { label: prefecture_name, href: `/prefecture/${prefecture_slug}` },
         { label: municipality_name },
       ]} />
 
@@ -133,6 +131,26 @@ export default async function CityPage({ params }: Props) {
         )}
         乗降者数と人口推移をあわせて確認できます。
       </p>
+
+      {/* データ分析セクション */}
+      <section style={{ marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '12px' }}>
+          {prefecture_name}{municipality_name}のデータ分析
+        </h2>
+        <p style={{ color: '#aaa', fontSize: '0.95rem', lineHeight: 1.8, marginBottom: '12px' }}>
+          {prefecture_name}{municipality_name}の人口は
+          <strong style={{ color: '#e8edf5' }}>{latestPop?.population.toLocaleString() ?? 'データなし'}人</strong>
+          で、{oldestPop?.year}年から{latestPop?.year}年にかけて
+          <strong style={{ color: '#e8edf5' }}>
+            {changeRate ? `${parseFloat(changeRate) >= 0 ? '増加' : '減少'}（${changeRate}%）` : '大きな変動は確認できません'}
+          </strong>
+          。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '0.95rem', lineHeight: 1.8 }}>
+          主要駅の乗降者数と人口推移をあわせて見ることで、
+          居住規模と人の流れの両面からエリアの特徴を把握できます。
+        </p>
+      </section>
 
       <section style={{ marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>人口推移・増減率</h2>
@@ -189,50 +207,56 @@ export default async function CityPage({ params }: Props) {
         </h2>
         <p style={{ fontSize: '13px', color: '#6b7a99', marginBottom: '1rem' }}>乗降者数（2021年）順に並べています。</p>
 
-        <div style={{ background: '#111827', borderRadius: '8px' }}>
-          <div className="city-table-wrap">
-            <table className="city-table">
-              <thead>
-                <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                  {['順位', '駅名', '乗降者数（2021年）', ''].map(h => (
-                    <th key={h}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {stationRows.map((r, i) => (
-                  <tr key={r.station_group_slug}>
-                    <td style={{ color: i < 3 ? '#00d4aa' : '#aaa', fontWeight: i < 3 ? 'bold' : 'normal' }}>{i + 1}位</td>
-                    <td style={{ fontWeight: 'bold' }}>
-                      <Link href={`/station/${r.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>{r.station_name}駅</Link>
-                    </td>
-                    <td>{r.passengers != null ? `${Number(r.passengers).toLocaleString()}人` : 'データなし'}</td>
-                    <td>
-                      <Link href={`/station/${r.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>詳細</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="city-cards">
-          {stationRows.map((r, i) => (
-            <div key={r.station_group_slug} className="city-card">
-              <div className="city-card-top">
-                <div className={`city-card-rank ${i < 3 ? 'top3' : ''}`}>{i + 1}位</div>
-                <div className="city-card-name">
-                  <Link href={`/station/${r.station_group_slug}`} style={{ textDecoration: 'none', color: '#e8edf5' }}>{r.station_name}駅</Link>
-                </div>
-                <Link href={`/station/${r.station_group_slug}`} className="city-card-btn">詳細</Link>
-              </div>
-              <div className="city-card-passengers">
-                乗降者数: {r.passengers != null ? `${Number(r.passengers).toLocaleString()}人` : 'データなし'}
+        {stationRows.length === 0 ? (
+          <p style={{ color: '#aaa' }}>駅データがありません。</p>
+        ) : (
+          <>
+            <div style={{ background: '#111827', borderRadius: '8px' }}>
+              <div className="city-table-wrap">
+                <table className="city-table">
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #1e2d45' }}>
+                      {['順位', '駅名', '乗降者数（2021年）', ''].map(h => (
+                        <th key={h}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stationRows.map((r, i) => (
+                      <tr key={r.station_group_slug}>
+                        <td style={{ color: i < 3 ? '#00d4aa' : '#aaa', fontWeight: i < 3 ? 'bold' : 'normal' }}>{i + 1}位</td>
+                        <td style={{ fontWeight: 'bold' }}>
+                          <Link href={`/station/${r.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>{r.station_name}駅</Link>
+                        </td>
+                        <td>{r.passengers != null ? `${Number(r.passengers).toLocaleString()}人` : 'データなし'}</td>
+                        <td>
+                          <Link href={`/station/${r.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>詳細</Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          ))}
-        </div>
+
+            <div className="city-cards">
+              {stationRows.map((r, i) => (
+                <div key={r.station_group_slug} className="city-card">
+                  <div className="city-card-top">
+                    <div className={`city-card-rank ${i < 3 ? 'top3' : ''}`}>{i + 1}位</div>
+                    <div className="city-card-name">
+                      <Link href={`/station/${r.station_group_slug}`} style={{ textDecoration: 'none', color: '#e8edf5' }}>{r.station_name}駅</Link>
+                    </div>
+                    <Link href={`/station/${r.station_group_slug}`} className="city-card-btn">詳細</Link>
+                  </div>
+                  <div className="city-card-passengers">
+                    乗降者数: {r.passengers != null ? `${Number(r.passengers).toLocaleString()}人` : 'データなし'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       <section>
@@ -241,7 +265,10 @@ export default async function CityPage({ params }: Props) {
           <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
             🏆 全国駅ランキング
           </Link>
-          <Link href="/city" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+          <Link href={`/prefecture/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            🗾 {prefecture_name}のエリア分析
+          </Link>
+          <Link href="/city" style={{ color: '#6b7a99', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
             🏙️ 市区町村一覧
           </Link>
         </div>
