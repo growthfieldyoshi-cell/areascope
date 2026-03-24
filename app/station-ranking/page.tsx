@@ -1,198 +1,103 @@
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 
 export const metadata: Metadata = {
-  title: '全国駅乗降者数ランキング【2021年】｜AreaScope',
-  description: '2021年の乗降者数データをもとに、日本全国の駅を利用者数順にランキング。各駅の路線・乗降者数推移・自治体人口推移を確認できます。上位100駅を掲載。',
-  alternates: {
-    canonical: 'https://areascope.jp/station-ranking',
-  },
+  title: '日本の主要駅一覧｜AreaScope',
+  description:
+    '日本全国の主要駅と、駅が属する自治体の人口データを掲載。不動産投資のエリア分析にご活用ください。',
 };
 
 type RankingRow = {
   station_name: string;
-  station_group_slug: string;
-  prefecture_name: string;
-  prefecture_slug: string;
+  line_name: string;
+  operator_name: string;
+  slug: string;
   municipality_name: string;
-  passengers: number | null;
+  prefecture_name: string;
+  population: number | null;
 };
 
 export default async function StationRankingPage() {
   const rows = (await sql`
-    WITH grouped_stations AS (
-      SELECT DISTINCT ON (station_group_slug)
-        station_group_slug,
-        station_name,
-        prefecture_name,
-        prefecture_slug,
-        municipality_name
-      FROM stations
-      WHERE station_group_slug IS NOT NULL
-      ORDER BY station_group_slug, station_name
-    )
     SELECT
-      gs.station_name,
-      gs.station_group_slug,
-      gs.prefecture_name,
-      gs.prefecture_slug,
-      gs.municipality_name,
-      CAST(SUM(sp.passengers) AS bigint) AS passengers
-    FROM grouped_stations gs
-    JOIN stations s ON s.station_group_slug = gs.station_group_slug
-    JOIN station_passengers sp ON sp.station_key = s.station_key
-    WHERE sp.year = 2021
-    GROUP BY gs.station_group_slug, gs.station_name, gs.prefecture_name, gs.prefecture_slug, gs.municipality_name
-    ORDER BY passengers DESC NULLS LAST
+      s.station_name,
+      s.line_name,
+      s.operator_name,
+      s.slug,
+      s.municipality_name,
+      s.prefecture_name,
+      mp.population
+    FROM stations s
+    LEFT JOIN municipalities m
+      ON s.municipality_code = m.jis_code
+    LEFT JOIN municipality_populations mp
+      ON m.jis_code = mp.municipality_code
+      AND mp.year = 2020
+    WHERE s.slug IS NOT NULL
+    ORDER BY mp.population DESC NULLS LAST
     LIMIT 100
   `) as RankingRow[];
 
-  // ランキング内に登場する都道府県を重複なしで抽出（NULL除外）
-  const prefectures = Array.from(
-    new Map(
-      rows
-        .filter((r) => r.prefecture_slug)
-        .map((r) => [r.prefecture_slug, r.prefecture_name])
-    ).entries()
-  ).map(([slug, name]) => ({ slug, name }));
-
-  // JSON-LD用
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: '全国駅乗降者数ランキング（2021年）',
-    numberOfItems: rows.length,
-    itemListElement: rows.map((row, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: `${row.station_name}駅`,
-      url: `https://areascope.jp/station/${row.station_group_slug}`,
-    })),
-  };
-
   return (
-    <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 20px', background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <style>{`
-        .ranking-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .ranking-table th { text-align: left; border-bottom: 2px solid #1e2d45; padding: 10px 8px; color: #aaa; font-weight: 700; }
-        .ranking-table td { padding: 10px 8px; border-bottom: 1px solid #1e2d45; }
-        .ranking-cards { display: none; }
-        .ranking-card { background: #111827; border: 1px solid #1e2d45; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; }
-        .ranking-card-rank { font-family: monospace; font-size: 18px; font-weight: 700; color: #6b7a99; min-width: 36px; text-align: center; }
-        .ranking-card-rank.top3 { color: #00d4aa; }
-        .ranking-card-body { flex: 1; }
-        .ranking-card-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-        .ranking-card-meta { font-size: 12px; color: #aaa; margin-bottom: 6px; }
-        .ranking-card-passengers { font-size: 14px; color: #00d4aa; font-family: monospace; }
-        .ranking-card-btn { color: #00d4aa; text-decoration: none; font-size: 12px; border: 1px solid #00d4aa; border-radius: 4px; padding: 4px 10px; white-space: nowrap; }
-        .pref-link { display: inline-block; font-size: 12px; color: #6b7a99; background: #111827; border: 1px solid #1e2d45; border-radius: 4px; padding: 4px 10px; text-decoration: none; margin: 4px 4px 4px 0; }
-        .pref-link:hover { border-color: #00d4aa; color: #00d4aa; }
-        @media (max-width: 640px) {
-          .ranking-table-wrap { display: none; }
-          .ranking-cards { display: block; }
-        }
-      `}</style>
-
-      <Breadcrumb items={[
-        { label: 'TOP', href: '/' },
-        { label: '全国駅ランキング' },
-      ]} />
-
-      <h1 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '12px' }}>
-        全国駅<span style={{ color: '#00d4aa' }}>ランキング</span>
+    <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 20px' }}>
+      <h1 style={{ fontSize: '32px', marginBottom: '16px' }}>
+        日本の主要駅一覧
       </h1>
 
-      {/* 導入文 */}
-      <p style={{ marginBottom: '8px', lineHeight: 1.8, color: '#aaa', fontSize: '14px' }}>
-        2021年の乗降者数データをもとに、日本全国の駅を利用者数順に掲載しています。
-        各駅の詳細ページでは、路線情報・乗降者数の年次推移・所在自治体の人口推移も確認できます。
-      </p>
-      <p style={{ marginBottom: '24px', fontSize: '12px', color: '#6b7a99', fontFamily: 'monospace' }}>
-        ※ 上位100駅を掲載
+      <p style={{ marginBottom: '24px', lineHeight: 1.8 }}>
+        駅が属する自治体の人口（2020年）順に掲載しています。
+        各駅ページでは、エリアの人口推移や不動産投資情報を確認できます。
       </p>
 
-      {/* 都道府県別ランキング導線 */}
-      <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '16px 20px', marginBottom: '32px' }}>
-        <div style={{ fontSize: '12px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '10px' }}>
-          // 都道府県別ランキング
-        </div>
-        <div>
-          {prefectures.map(p => (
-            <Link key={p.slug} href={`/station-ranking/${p.slug}`} className="pref-link">
-              {p.name}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* PC表示：テーブル */}
-      <div className="ranking-table-wrap">
-        <table className="ranking-table">
-          <thead>
-            <tr>
-              {['順位', '駅名', '所在地', '乗降者数（2021年）', ''].map(h => (
-                <th key={h}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr key={row.station_group_slug}>
-                <td style={{ color: index < 3 ? '#00d4aa' : '#6b7a99', fontFamily: 'monospace', fontWeight: index < 3 ? 700 : 400 }}>
-                  {index + 1}
-                </td>
-                <td style={{ fontWeight: 700 }}>
-                  <Link href={`/station/${row.station_group_slug}`} style={{ textDecoration: 'none', color: '#00d4aa' }}>
-                    {row.station_name}駅
-                  </Link>
-                </td>
-                <td style={{ color: '#aaa' }}>{row.prefecture_name}{row.municipality_name}</td>
-                <td>{row.passengers != null ? `${Number(row.passengers).toLocaleString()}人` : 'データなし'}</td>
-                <td>
-                  <Link href={`/station/${row.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>
-                    詳細
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* スマホ表示：カード */}
-      <div className="ranking-cards">
-        {rows.map((row, index) => (
-          <div key={row.station_group_slug} className="ranking-card">
-            <div className={`ranking-card-rank ${index < 3 ? 'top3' : ''}`}>
-              {index + 1}
-            </div>
-            <div className="ranking-card-body">
-              <div className="ranking-card-name">
-                <Link href={`/station/${row.station_group_slug}`} style={{ textDecoration: 'none', color: '#e8edf5' }}>
-                  {row.station_name}駅
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={thStyle}>順位</th>
+            <th style={thStyle}>駅名</th>
+            <th style={thStyle}>路線</th>
+            <th style={thStyle}>運営会社</th>
+            <th style={thStyle}>所在地</th>
+            <th style={thStyle}>自治体人口（2020年）</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={`${row.slug}-${index}`}>
+              <td style={tdStyle}>{index + 1}</td>
+              <td style={tdStyle}>
+                <Link href={`/station/${row.slug}`} style={{ textDecoration: 'none' }}>
+                  {row.station_name}
                 </Link>
-              </div>
-              <div className="ranking-card-meta">{row.prefecture_name}{row.municipality_name}</div>
-              <div className="ranking-card-passengers">
-                {row.passengers != null ? `${Number(row.passengers).toLocaleString()}人` : 'データなし'}
-              </div>
-            </div>
-            <Link href={`/station/${row.station_group_slug}`} className="ranking-card-btn">
-              詳細
-            </Link>
-          </div>
-        ))}
-      </div>
+              </td>
+              <td style={tdStyle}>{row.line_name}</td>
+              <td style={tdStyle}>{row.operator_name}</td>
+              <td style={tdStyle}>
+                {row.prefecture_name}
+                {row.municipality_name}
+              </td>
+              <td style={tdStyle}>
+                {row.population ? row.population.toLocaleString() : '-'}人
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </main>
   );
 }
+
+const thStyle: React.CSSProperties = {
+  textAlign: 'left',
+  borderBottom: '1px solid #ccc',
+  padding: '10px 8px',
+  fontWeight: 700,
+};
+
+const tdStyle: React.CSSProperties = {
+  borderBottom: '1px solid #eee',
+  padding: '10px 8px',
+  verticalAlign: 'top',
+};

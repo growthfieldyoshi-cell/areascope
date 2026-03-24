@@ -1,8 +1,6 @@
-// app/station/list/page.tsx
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 const PER_PAGE = 100;
@@ -10,9 +8,6 @@ const PER_PAGE = 100;
 export const metadata: Metadata = {
   title: '駅乗降者数データ一覧｜全国駅データ',
   description: '全国の駅乗降者数データを一覧で確認できます。駅ごとの利用者数推移やランキングも確認可能です。',
-  alternates: {
-    canonical: 'https://areascope.jp/station/list',
-  },
 };
 
 type Props = { searchParams: Promise<{ page?: string }> };
@@ -55,7 +50,11 @@ export default async function StationListPage({ searchParams }: Props) {
       ORDER BY passengers DESC NULLS LAST
       LIMIT ${PER_PAGE} OFFSET ${offset}
     `,
-    sql`SELECT COUNT(DISTINCT station_group_slug) as cnt FROM stations WHERE station_group_slug IS NOT NULL`,
+    sql`
+      SELECT COUNT(DISTINCT station_group_slug) as cnt
+      FROM stations
+      WHERE station_group_slug IS NOT NULL
+    `,
   ]) as [StationRow[], { cnt: number }[]];
 
   const total = Number(countRows[0].cnt);
@@ -63,29 +62,6 @@ export default async function StationListPage({ searchParams }: Props) {
 
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', padding: '2rem', fontFamily: 'sans-serif', maxWidth: '960px', margin: '0 auto' }}>
-      <style>{`
-        .list-table-wrap { overflow-x: auto; }
-        .list-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .list-table th { padding: 12px 16px; text-align: left; color: #aaa; border-bottom: 2px solid #1e2d45; }
-        .list-table td { padding: 10px 16px; border-bottom: 1px solid #1e2d45; }
-        .list-cards { display: none; }
-        .list-card { background: #111827; border: 1px solid #1e2d45; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
-        .list-card-body { flex: 1; }
-        .list-card-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-        .list-card-meta { font-size: 12px; color: #aaa; margin-bottom: 4px; }
-        .list-card-passengers { font-size: 13px; color: #00d4aa; font-family: monospace; }
-        .list-card-btn { color: #00d4aa; text-decoration: none; font-size: 12px; border: 1px solid #00d4aa; border-radius: 4px; padding: 4px 10px; white-space: nowrap; }
-        @media (max-width: 640px) {
-          .list-table-wrap { display: none; }
-          .list-cards { display: block; }
-        }
-      `}</style>
-
-      <Breadcrumb items={[
-        { label: 'TOP', href: '/' },
-        { label: '駅一覧' },
-      ]} />
-
       <h1 style={{ fontSize: '1.8rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
         駅乗降者数データ一覧
       </h1>
@@ -96,28 +72,29 @@ export default async function StationListPage({ searchParams }: Props) {
         全{total.toLocaleString()}駅 ／ {currentPage} / {totalPages}ページ
       </p>
 
-      {/* PC表示：テーブル */}
-      <div className="list-table-wrap" style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem' }}>
-        <table className="list-table">
+      <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
           <thead>
-            <tr>
+            <tr style={{ borderBottom: '2px solid #1e2d45' }}>
               {['駅名', '都道府県', '自治体', '2021年乗降者数', ''].map(h => (
-                <th key={h}>{h}</th>
+                <th key={h} style={{ padding: '12px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.station_group_slug}>
-                <td style={{ fontWeight: 'bold' }}>
+              <tr key={r.station_group_slug} style={{ borderBottom: '1px solid #1e2d45' }}>
+                <td style={{ padding: '10px 16px', fontWeight: 'bold' }}>
                   <Link href={`/station/${r.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none' }}>
                     {r.station_name}駅
                   </Link>
                 </td>
-                <td style={{ color: '#aaa' }}>{r.prefecture_name}</td>
-                <td style={{ color: '#aaa' }}>{r.municipality_name}</td>
-                <td>{r.passengers != null ? `${Number(r.passengers).toLocaleString()}人` : 'データなし'}</td>
-                <td>
+                <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.prefecture_name}</td>
+                <td style={{ padding: '10px 16px', color: '#aaa' }}>{r.municipality_name}</td>
+                <td style={{ padding: '10px 16px' }}>
+                  {r.passengers != null ? `${Number(r.passengers).toLocaleString()}人` : 'データなし'}
+                </td>
+                <td style={{ padding: '10px 16px' }}>
                   <Link href={`/station/${r.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '0.85rem', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px' }}>
                     詳細
                   </Link>
@@ -128,29 +105,6 @@ export default async function StationListPage({ searchParams }: Props) {
         </table>
       </div>
 
-      {/* スマホ表示：カード */}
-      <div className="list-cards" style={{ marginBottom: '1.5rem' }}>
-        {rows.map((r) => (
-          <div key={r.station_group_slug} className="list-card">
-            <div className="list-card-body">
-              <div className="list-card-name">
-                <Link href={`/station/${r.station_group_slug}`} style={{ textDecoration: 'none', color: '#e8edf5' }}>
-                  {r.station_name}駅
-                </Link>
-              </div>
-              <div className="list-card-meta">{r.prefecture_name} {r.municipality_name}</div>
-              <div className="list-card-passengers">
-                {r.passengers != null ? `${Number(r.passengers).toLocaleString()}人` : 'データなし'}
-              </div>
-            </div>
-            <Link href={`/station/${r.station_group_slug}`} className="list-card-btn">
-              詳細
-            </Link>
-          </div>
-        ))}
-      </div>
-
-      {/* ページネーション */}
       <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
         {currentPage > 1 && (
           <Link href={`/station/list?page=${currentPage - 1}`} style={{ color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '4px', padding: '6px 14px', textDecoration: 'none', fontSize: '0.9rem' }}>

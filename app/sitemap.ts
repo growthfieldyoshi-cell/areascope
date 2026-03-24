@@ -2,7 +2,9 @@ import { neon } from '@neondatabase/serverless';
 import type { MetadataRoute } from 'next';
 
 const sql = neon(process.env.DATABASE_URL!);
-const BASE_URL = 'https://areascope.jp';
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://areascope.vercel.app';
 
 const PREF_SLUGS = [
   'hokkaido','aomori','iwate','miyagi','akita','yamagata','fukushima',
@@ -16,34 +18,21 @@ const PREF_SLUGS = [
 
 const LINE_SLUGS = [
   'yamanote','chuo','toyoko','keio-inokashira','keio','odakyu',
-  'tokaido','sobu','marunouchi',
+  'tokaido','sobu','saikyo','marunouchi',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [stations, municipalities] = await Promise.all([
-    sql`
-      SELECT DISTINCT station_group_slug
-      FROM stations
-      WHERE station_group_slug IS NOT NULL
-    `,
-    sql`
-      SELECT DISTINCT prefecture_slug, municipality_slug
-      FROM stations
-      WHERE prefecture_slug IS NOT NULL
-        AND municipality_slug IS NOT NULL
-    `,
-  ]);
+  const stations = await sql`
+    SELECT DISTINCT station_group_slug
+    FROM stations
+    WHERE station_group_slug IS NOT NULL
+      AND station_group_slug ~ '^[a-z0-9][a-z0-9\-]*$'
+  `;
 
   const stationUrls: MetadataRoute.Sitemap = stations.map((s) => ({
     url: `${BASE_URL}/station/${s.station_group_slug}`,
     changeFrequency: 'monthly',
     priority: 0.8,
-  }));
-
-  const municipalityUrls: MetadataRoute.Sitemap = municipalities.map((m) => ({
-    url: `${BASE_URL}/city/${m.prefecture_slug}/${m.municipality_slug}`,
-    changeFrequency: 'monthly',
-    priority: 0.7,
   }));
 
   const prefUrls: MetadataRoute.Sitemap = PREF_SLUGS.map((slug) => ({
@@ -59,18 +48,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   return [
-    { url: BASE_URL, changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${BASE_URL}/station`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${BASE_URL}/station/list`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${BASE_URL}/station-ranking`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${BASE_URL}/population`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/population-ranking`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/city`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/line`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/prefecture`, changeFrequency: 'monthly', priority: 0.7 },
+    {
+      url: BASE_URL,
+      changeFrequency: 'weekly',
+      priority: 1.0,
+    },
+    {
+      url: `${BASE_URL}/station`,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/station/list`,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/population`,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
     ...prefUrls,
     ...lineUrls,
-    ...municipalityUrls,
     ...stationUrls,
   ];
 }

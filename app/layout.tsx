@@ -1,6 +1,6 @@
+// app/layout.tsx
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata } from 'next'
-import Script from 'next/script'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   title: 'AREASCOPE | データで選ぶ、投資エリア。',
   description:
     '駅別乗降客数・市区町村人口推移を一目で可視化。全国8,124駅・1,741市区町村の公式データを無料で閲覧できます。',
-  other: {
-    'google-adsense-account': 'ca-pub-5313429744754781',
+  alternates: {
+    canonical: '/',
   },
   openGraph: {
     title: 'AREASCOPE | データで選ぶ、投資エリア。',
@@ -48,16 +48,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
-
-        <Script
-          id="adsense-script"
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5313429744754781"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
       </body>
-
       <GoogleAnalytics gaId="G-W711TVYVQT" />
     </html>
   )
