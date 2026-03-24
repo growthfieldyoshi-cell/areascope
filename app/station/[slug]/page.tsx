@@ -6,18 +6,20 @@ import { notFound } from 'next/navigation';
 const sql = neon(process.env.DATABASE_URL!);
 
 type PageProps = {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 };
 
 type StationRow = {
   station_name: string;
   line_name: string;
+  line_slug: string;
   operator_name: string;
   slug: string;
+  station_group_slug: string;
   prefecture_name: string;
+  prefecture_slug: string;
   municipality_name: string;
+  municipality_slug: string;
   municipality_code: string;
   lat: number | null;
   lng: number | null;
@@ -28,37 +30,23 @@ type PopulationRow = {
   population: number;
 };
 
+type PassengerRow = {
+  year: number;
+  passengers: number;
+};
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-
-  const rows = (await sql`
-    SELECT
-      s.station_name,
-      s.line_name,
-      s.prefecture_name,
-      s.municipality_name
-    FROM stations s
-    WHERE s.slug = ${slug}
-    LIMIT 1
-  `) as {
-    station_name: string;
-    line_name: string;
-    prefecture_name: string;
-    municipality_name: string;
-  }[];
-
+  const rows = await sql`
+    SELECT station_name, line_name, prefecture_name, municipality_name
+    FROM stations WHERE slug = ${slug} LIMIT 1
+  `;
   const station = rows[0];
-
-  if (!station) {
-    return {
-      title: '駅が見つかりません｜AreaScope',
-      description: '指定された駅ページは存在しません。',
-    };
-  }
-
+  if (!station) return { title: '駅が見つかりません｜AreaScope' };
   return {
-    title: `${station.station_name}駅（${station.line_name}）｜AreaScope`,
-    description: `${station.prefecture_name}${station.municipality_name}にある${station.station_name}駅の人口推移・エリア情報を掲載しています。`,
+    title: `${station.station_name}駅（${station.line_name}）の乗降者数・人口推移｜AreaScope`,
+    description: `${station.prefecture_name}${station.municipality_name}にある${station.station_name}駅の乗降者数推移・自治体人口データを掲載しています。`,
+    alternates: { canonical: `https://areascope.jp/station/${slug}` },
   };
 }
 
@@ -67,94 +55,286 @@ export default async function StationPage({ params }: PageProps) {
 
   const stationRows = (await sql`
     SELECT
-      s.station_name,
-      s.line_name,
-      s.operator_name,
-      s.slug,
-      s.prefecture_name,
-      s.municipality_name,
-      s.municipality_code,
-      s.lat,
-      s.lng
+      s.station_name, s.line_name, s.line_slug, s.operator_name, s.slug,
+      s.station_group_slug, s.prefecture_name, s.prefecture_slug,
+      s.municipality_name, s.municipality_slug, s.municipality_code,
+      s.lat, s.lng
     FROM stations s
     WHERE s.slug = ${slug}
     LIMIT 1
   `) as StationRow[];
 
   const station = stationRows[0];
-
-  if (!station) {
-    notFound();
-  }
+  if (!station) notFound();
 
   const populationRows = (await sql`
-    SELECT
-      mp.year,
-      mp.population
-    FROM municipality_populations mp
-    WHERE mp.municipality_code = ${station.municipality_code}
-    ORDER BY mp.year ASC
+    SELECT year, population
+    FROM municipality_populations
+    WHERE municipality_code = ${station.municipality_code}
+    ORDER BY year ASC
   `) as PopulationRow[];
 
+  const passengerRows = (await sql`
+    SELECT sp.year, sp.passengers
+    FROM station_passengers sp
+    JOIN stations s ON s.station_key = sp.station_key
+    WHERE s.slug = ${slug}
+    ORDER BY sp.year ASC
+  `) as PassengerRow[];
+
+  const maxPop = populationRows.length > 0 ? Math.max(...populationRows.map(r => r.population)) : 1;
+  const maxPass = passengerRows.length > 0 ? Math.max(...passengerRows.map(r => r.passengers)) : 1;
+  const latestPass = passengerRows.length > 0 ? passengerRows[passengerRows.length - 1] : null;
+  const latestPop = populationRows.length > 0 ? populationRows[populationRows.length - 1] : null;
+  const oldestPop = populationRows.length > 0 ? populationRows[0] : null;
+  const changeRate = latestPop && oldestPop && oldestPop.population > 0
+    ? (((latestPop.population - oldestPop.population) / oldestPop.population) * 100).toFixed(1)
+    : null;
+
   return (
-    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <Link href="/station-ranking" style={{ textDecoration: 'none' }}>
-          ← 駅一覧に戻る
+    <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: "'Noto Sans JP', sans-serif" }}>
+      <style>{`
+        .kpi { background: #111827; border: 1px solid #1e2d45; border-radius: 12px; padding: 16px 20px; }
+        @media (max-width: 640px) {
+          .kpi-grid { grid-template-columns: 1fr 1fr !important; }
+          .content { padding: 24px 16px !important; }
+        }
+      `}</style>
+
+      <header style={{ padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1e2d45', background: 'rgba(10,14,26,0.95)' }}>
+        <Link href="/" style={{ fontSize: '22px', fontWeight: 800, textDecoration: 'none', color: '#e8edf5' }}>
+          AREA<span style={{ color: '#00d4aa' }}>SCOPE</span>
         </Link>
-      </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Link href="/station-ranking" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🏆 ランキング</Link>
+          <Link href="/line" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🗺️ 路線</Link>
+        </div>
+      </header>
 
-      <h1 style={{ fontSize: '32px', marginBottom: '12px' }}>
-        {station.station_name}駅
-      </h1>
+      <div className="content" style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px' }}>
 
-      <div style={{ lineHeight: 1.9, marginBottom: '28px' }}>
-        <div><strong>路線:</strong> {station.line_name}</div>
-        <div><strong>運営会社:</strong> {station.operator_name}</div>
-        <div><strong>所在地:</strong> {station.prefecture_name}{station.municipality_name}</div>
-        <div><strong>緯度:</strong> {station.lat ?? '-'}</div>
-        <div><strong>経度:</strong> {station.lng ?? '-'}</div>
-      </div>
+        {/* パンくず */}
+        <nav style={{ marginBottom: '1.5rem', fontSize: '0.85rem', color: '#6b7a99' }}>
+          <Link href="/" style={{ color: '#6b7a99', textDecoration: 'none' }}>トップ</Link>
+          {' / '}
+          <Link href="/station" style={{ color: '#6b7a99', textDecoration: 'none' }}>駅検索</Link>
+          {' / '}
+          <Link href={`/city/${station.prefecture_slug}/${station.municipality_slug}`} style={{ color: '#6b7a99', textDecoration: 'none' }}>
+            {station.prefecture_name}{station.municipality_name}
+          </Link>
+          {' / '}
+          <span style={{ color: '#e8edf5' }}>{station.station_name}駅</span>
+        </nav>
 
-      <section>
-        <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>
-          自治体の人口推移
-        </h2>
+        <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#00d4aa', letterSpacing: '3px', marginBottom: '12px' }}>// 駅データ</div>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>
+          {station.station_name}<span style={{ color: '#00d4aa' }}>駅</span>
+        </h1>
+        <p style={{ color: '#6b7a99', fontSize: '14px', marginBottom: '16px' }}>
+          {station.line_name}｜{station.operator_name}｜{station.prefecture_name}{station.municipality_name}
+        </p>
 
-        {populationRows.length === 0 ? (
-          <p>人口データがありません。</p>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>年</th>
-                <th style={thStyle}>人口</th>
-              </tr>
-            </thead>
-            <tbody>
-              {populationRows.map((row) => (
-                <tr key={row.year}>
-                  <td style={tdStyle}>{row.year}</td>
-                  <td style={tdStyle}>{row.population.toLocaleString()}人</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* 内部リンク4系統 */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '32px' }}>
+          <Link href={`/city/${station.prefecture_slug}/${station.municipality_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#00d4aa', background: 'rgba(0,212,170,0.1)', border: '1px solid #00d4aa', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
+            🏙️ {station.municipality_name}の駅一覧
+          </Link>
+          <Link href={`/line/${station.line_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#00d4aa', background: 'rgba(0,212,170,0.1)', border: '1px solid #00d4aa', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
+            🗺️ {station.line_name}の駅一覧
+          </Link>
+          <Link href={`/station-ranking?pref=${station.prefecture_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
+            🏆 {station.prefecture_name}の駅ランキング
+          </Link>
+          <Link href={`/prefecture/${station.prefecture_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
+            🗾 {station.prefecture_name}のエリア分析
+          </Link>
+        </div>
+
+        {/* KPI */}
+        <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
+          <div className="kpi">
+            <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>乗降者数（2021年）</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: '#00d4aa' }}>
+              {latestPass ? latestPass.passengers.toLocaleString() : '-'}
+            </div>
+            <div style={{ fontSize: '11px', color: '#6b7a99' }}>人</div>
+          </div>
+          <div className="kpi">
+            <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>自治体人口（{latestPop?.year}年）</div>
+            <div style={{ fontSize: '24px', fontWeight: 800 }}>
+              {latestPop ? latestPop.population.toLocaleString() : '-'}
+            </div>
+            <div style={{ fontSize: '11px', color: '#6b7a99' }}>人</div>
+          </div>
+          <div className="kpi">
+            <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>人口変化（{oldestPop?.year}年比）</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: parseFloat(changeRate || '0') >= 0 ? '#00d4aa' : '#ff4757' }}>
+              {changeRate ? `${parseFloat(changeRate) >= 0 ? '▲' : '▼'}${Math.abs(parseFloat(changeRate))}%` : '-'}
+            </div>
+            <div style={{ fontSize: '11px', color: '#6b7a99' }}>{oldestPop?.year}〜{latestPop?.year}年</div>
+          </div>
+        </div>
+
+        {/* 分析テキスト */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#00d4aa' }}>
+            {station.station_name}駅のデータ分析
+          </h2>
+          <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '12px' }}>
+            {station.station_name}駅は{station.prefecture_name}{station.municipality_name}に位置し、
+            {station.line_name}（{station.operator_name}）が利用できる駅です。
+          </p>
+          <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '12px' }}>
+            最新の乗降者数は<strong style={{ color: '#e8edf5' }}>{latestPass?.passengers.toLocaleString() ?? 'データなし'}人</strong>、
+            同エリアの人口は<strong style={{ color: '#e8edf5' }}>{latestPop?.population.toLocaleString() ?? 'データなし'}人</strong>となっています。
+          </p>
+          <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '12px' }}>
+            人口は{oldestPop?.year}年から{latestPop?.year}年にかけて
+            <strong style={{ color: '#e8edf5' }}>
+              {changeRate
+                ? `${parseFloat(changeRate) >= 0 ? '増加' : '減少'}（${changeRate}%）`
+                : '大きな変動なし'}
+            </strong>
+            しており、
+            {parseFloat(changeRate || '0') >= 0
+              ? 'エリアとしては人口が維持または増加している傾向があります。'
+              : 'エリアとしては人口が減少傾向にあります。'}
+          </p>
+          <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '12px' }}>
+            {latestPass && latestPop && latestPass.passengers > latestPop.population * 0.7
+              ? 'この駅は人の流れが比較的多く、商業・業務機能を持つエリアとしての特徴が見られます。'
+              : 'この駅は居住者中心の比較的落ち着いたエリアとしての特徴が見られます。'}
+          </p>
+          <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8 }}>
+            乗降者数は駅周辺の人の流れを示し、人口は居住している人の規模を示します。
+            これらのデータを組み合わせることで、駅周辺エリアの特徴や違いを把握することができます。
+          </p>
+        </section>
+
+        {/* 特徴と傾向 */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#00d4aa' }}>
+            {station.station_name}駅の特徴と傾向
+          </h2>
+          <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '12px' }}>
+            {latestPass && latestPass.passengers > 100000
+              ? `${station.station_name}駅は1日10万人以上が利用する主要ターミナル駅です。周辺エリアは交通利便性が高く、商業・業務・居住の複合エリアとしての性格を持ちます。`
+              : latestPass && latestPass.passengers > 30000
+              ? `${station.station_name}駅は1日3万人以上が利用する中規模以上の駅です。`
+              : `${station.station_name}駅は地域密着型の駅です。`}
+          </p>
+          <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8 }}>
+            同規模の駅と比較しても、
+            {latestPass && latestPass.passengers > 30000
+              ? '比較的利用者数が多い駅といえます。'
+              : '平均的な利用規模の駅といえます。'}
+          </p>
+        </section>
+　　　　　{/* FAQ */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#00d4aa' }}>
+            {station.station_name}駅に関するよくある質問
+          </h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '16px' }}>
+              <p style={{ fontWeight: 700, marginBottom: '8px' }}>Q. {station.station_name}駅の利用者数は多いですか？</p>
+              <p style={{ color: '#9aa5c3', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>
+                {latestPass
+                  ? `${latestPass.passengers.toLocaleString()}人が利用しており、${
+                      latestPass.passengers > 30000 ? '比較的利用者数が多い駅です。' : '平均的な利用規模の駅です。'
+                    }`
+                  : '現在、利用者数データは取得中です。'}
+              </p>
+            </div>
+
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '16px' }}>
+              <p style={{ fontWeight: 700, marginBottom: '8px' }}>Q. {station.station_name}駅周辺の人口は増えていますか？</p>
+              <p style={{ color: '#9aa5c3', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>
+                {changeRate
+                  ? `${oldestPop?.year}年から${latestPop?.year}年にかけて${changeRate}% ${
+                      parseFloat(changeRate) >= 0 ? '増加' : '減少'
+                    }しています。`
+                  : '人口データは現在整備中です。'}
+              </p>
+            </div>
+
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '16px' }}>
+              <p style={{ fontWeight: 700, marginBottom: '8px' }}>Q. {station.station_name}駅はどのようなエリアですか？</p>
+              <p style={{ color: '#9aa5c3', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>
+                {latestPass && latestPop && latestPass.passengers > latestPop.population * 0.7
+                  ? '人の流れが多く、商業・業務機能が集まるエリアと考えられます。'
+                  : '居住者中心の落ち着いたエリアと考えられます。'}
+              </p>
+            </div>
+          </div>
+        </section>
+        {/* 乗降者数推移 */}
+        {passengerRows.length > 0 && (
+          <section style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>乗降者数推移</h2>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              {passengerRows.map(row => {
+                const pct = maxPass > 0 ? (row.passengers / maxPass) * 100 : 0;
+                return (
+                  <div key={row.year} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', width: '40px', textAlign: 'right' }}>{row.year}</div>
+                    <div style={{ flex: 1, background: '#1e2d45', borderRadius: '4px', height: '28px' }}>
+                      <div style={{ width: `${pct}%`, background: '#00d4aa', borderRadius: '4px', height: '28px', display: 'flex', alignItems: 'center', paddingLeft: '8px', fontSize: '11px', fontFamily: 'monospace', color: '#0a0e1a', fontWeight: 700, minWidth: pct > 0 ? '80px' : '0', overflow: 'hidden' }}>
+                        {row.passengers.toLocaleString()}人
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
         )}
-      </section>
+
+        {/* 人口推移 */}
+        {populationRows.length > 0 && (
+          <section style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>
+              {station.municipality_name}の人口推移
+            </h2>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              {populationRows.map(row => {
+                const pct = maxPop > 0 ? (row.population / maxPop) * 100 : 0;
+                return (
+                  <div key={row.year} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', width: '40px', textAlign: 'right' }}>{row.year}</div>
+                    <div style={{ flex: 1, background: '#1e2d45', borderRadius: '4px', height: '28px' }}>
+                      <div style={{ width: `${pct}%`, background: '#1e5a8e', borderRadius: '4px', height: '28px', display: 'flex', alignItems: 'center', paddingLeft: '8px', fontSize: '11px', fontFamily: 'monospace', color: '#e8edf5', fontWeight: 700, minWidth: pct > 0 ? '80px' : '0', overflow: 'hidden' }}>
+                        {row.population.toLocaleString()}人
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* 関連リンク */}
+        <section>
+          <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>関連ページ</h2>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <Link href={`/city/${station.prefecture_slug}/${station.municipality_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+              🏙️ {station.municipality_name}の駅一覧
+            </Link>
+            <Link href={`/line/${station.line_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+              🗺️ {station.line_name}の駅一覧
+            </Link>
+            <Link href={`/station-ranking?pref=${station.prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+              🏆 {station.prefecture_name}の駅ランキング
+            </Link>
+            <Link href={`/prefecture/${station.prefecture_slug}`} style={{ color: '#6b7a99', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+              🗾 {station.prefecture_name}のエリア分析
+            </Link>
+          </div>
+        </section>
+
+      </div>
     </main>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  textAlign: 'left',
-  borderBottom: '1px solid #ccc',
-  padding: '10px 8px',
-  fontWeight: 700,
-};
-
-const tdStyle: React.CSSProperties = {
-  borderBottom: '1px solid #eee',
-  padding: '10px 8px',
-  verticalAlign: 'top',
-};
