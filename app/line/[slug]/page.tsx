@@ -7,6 +7,7 @@ const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 
 // TODO: stations.line_slug を全路線で整備後、line_slug ベースに移行
+// TODO: 埼京線はDB上でline_nameが分散しているため保留。将来、表示用路線マスタを作って再構成予定
 const LINE_MAP: Record<string, { display_name: string; line_name: string; operator_name: string }> = {
   yamanote:          { display_name: '山手線',       line_name: '山手線',           operator_name: '東日本旅客鉄道' },
   chuo:              { display_name: '中央線',       line_name: '中央線',           operator_name: '東日本旅客鉄道' },
@@ -16,7 +17,6 @@ const LINE_MAP: Record<string, { display_name: string; line_name: string; operat
   odakyu:            { display_name: '小田急線',     line_name: '小田原線',         operator_name: '小田急電鉄' },
   tokaido:           { display_name: '東海道線',     line_name: '東海道線',         operator_name: '東日本旅客鉄道' },
   sobu:              { display_name: '総武線',       line_name: '総武線',           operator_name: '東日本旅客鉄道' },
-  saikyo:            { display_name: '埼京線',       line_name: '埼京線',           operator_name: '東日本旅客鉄道' },
   marunouchi:        { display_name: '丸ノ内線',     line_name: '4号線丸ノ内線',    operator_name: '東京地下鉄' },
   hibiya:            { display_name: '日比谷線',     line_name: '2号線日比谷線',    operator_name: '東京地下鉄' },
   ginza:             { display_name: '銀座線',       line_name: '3号線銀座線',      operator_name: '東京地下鉄' },

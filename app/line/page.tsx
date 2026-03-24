@@ -19,7 +19,6 @@ const LINE_SLUGS: { slug: string; display_name: string }[] = [
   { slug: 'odakyu',            display_name: '小田急線' },
   { slug: 'tokaido',           display_name: '東海道線' },
   { slug: 'sobu',              display_name: '総武線' },
-  { slug: 'saikyo',            display_name: '埼京線' },
   { slug: 'marunouchi',        display_name: '丸ノ内線' },
   { slug: 'hibiya',            display_name: '日比谷線' },
   { slug: 'ginza',             display_name: '銀座線' },
