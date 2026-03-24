@@ -8,7 +8,6 @@ const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
 })
-
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
@@ -16,16 +15,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://areascope.jp'),
-  title: 'AREASCOPE | データで選ぶ、投資エリア。',
+  title: 'AreaScope｜駅・エリアデータを可視化',
   description:
-    '駅別乗降客数・市区町村人口推移を一目で可視化。全国8,124駅・1,741市区町村の公式データを無料で閲覧できます。',
+    '全国の駅乗降者数・市区町村人口推移を可視化。全国9,012駅・1,256市区町村の公式データを無料で閲覧できます。',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'AREASCOPE | データで選ぶ、投資エリア。',
+    title: 'AreaScope｜駅・エリアデータを可視化',
     description:
-      '駅別乗降客数・市区町村人口推移を一目で可視化。全国8,124駅・1,741市区町村の公式データを無料で閲覧できます。',
+      '全国の駅乗降者数・市区町村人口推移を可視化。全国9,012駅・1,256市区町村の公式データを無料で閲覧できます。',
     url: 'https://areascope.jp',
     siteName: 'AREASCOPE',
     locale: 'ja_JP',
@@ -33,9 +32,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AREASCOPE | データで選ぶ、投資エリア。',
+    title: 'AreaScope｜駅・エリアデータを可視化',
     description:
-      '駅別乗降客数・市区町村人口推移を一目で可視化。全国8,124駅・1,741市区町村の公式データを無料で閲覧できます。',
+      '全国の駅乗降者数・市区町村人口推移を可視化。全国9,012駅・1,256市区町村の公式データを無料で閲覧できます。',
   },
 }
 
