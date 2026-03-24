@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
+  title: 'AreaScope｜駅・エリアデータを可視化',
+  description: '全国の駅乗降者数・市区町村人口推移を可視化。全国9,012駅・1,256市区町村の公式データを無料で閲覧できます。',
   alternates: {
     canonical: 'https://areascope.jp',
   },
@@ -31,20 +33,22 @@ export default function Home() {
         .nav-card-title { font-size: 18px; font-weight: 700; color: #00d4aa; }
         .nav-card-desc { font-size: 13px; color: #6b7a99; line-height: 1.7; }
         .nav-card-link { font-size: 12px; color: #00d4aa; font-family: monospace; margin-top: 4px; }
+        .header-nav { display: flex; gap: 10px; flex-wrap: wrap; }
         @media (max-width: 768px) {
           .hero { padding: 40px 20px 32px; }
           .hero-title { font-size: 36px; }
           .nav-section { padding: 0 20px 40px; }
           .nav-grid { grid-template-columns: 1fr; }
-          .nav-links a { padding: 5px 10px !important; font-size: 11px !important; }
+          .header-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+          .header-nav a { text-align: center; font-size: 11px !important; padding: 5px 8px !important; }
         }
       `}</style>
 
-      <header style={{ padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1e2d45', background: 'rgba(10,14,26,0.95)' }}>
-        <div style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '0.05em' }}>
+      <header style={{ padding: '16px 20px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', borderBottom: '1px solid #1e2d45', background: 'rgba(10,14,26,0.95)' }}>
+        <div style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '0.05em', flexShrink: 0 }}>
           AREA<span style={{ color: '#00d4aa' }}>SCOPE</span>
         </div>
-        <div className="nav-links" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div className="header-nav">
           <Link href="/station-ranking" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🏆 駅ランキング</Link>
           <Link href="/station/list" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🚃 駅一覧</Link>
           <Link href="/city" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🏙️ 市区町村</Link>
@@ -54,14 +58,14 @@ export default function Home() {
 
       <section className="hero">
         <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#00d4aa', letterSpacing: '3px', marginBottom: '16px' }}>
-          // 不動産投資家向けエリア分析
+          // 駅・エリアデータ可視化
         </div>
         <h1 className="hero-title">
-          データで選ぶ、<br />
-          <span style={{ color: '#00d4aa' }}>投資エリア</span>。
+          日本全国の駅・<br />
+          <span style={{ color: '#00d4aa' }}>エリアデータ</span>を可視化。
         </h1>
         <p style={{ fontSize: '15px', color: '#6b7a99', lineHeight: 1.8, marginBottom: '24px', maxWidth: '560px' }}>
-          駅別乗降者数・市区町村人口推移を一目で可視化。公式データを無料で閲覧できます。
+          駅別乗降者数・市区町村人口推移を一目で確認。全国の公式データを無料で閲覧できます。
         </p>
         <div className="hero-meta">
           <div className="hero-meta-item">全国 <span>9,012</span> 駅</div>
