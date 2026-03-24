@@ -11,36 +11,34 @@ export const metadata: Metadata = {
 };
 
 type RankingRow = {
+  station_group_slug: string;
   station_name: string;
+  prefecture_name: string;
+  municipality_name: string;
   line_name: string;
   operator_name: string;
-  station_group_slug: string;
-  municipality_name: string;
-  prefecture_name: string;
   passengers: number | null;
 };
 
 export default async function StationRankingPage() {
   const rows = (await sql`
-    SELECT DISTINCT ON (s.station_group_slug)
-      s.station_name,
-      s.line_name,
-      s.operator_name,
+    SELECT
       s.station_group_slug,
-      s.municipality_name,
-      s.prefecture_name,
-      sp.passengers
+      MAX(s.station_name) AS station_name,
+      MAX(s.prefecture_name) AS prefecture_name,
+      MAX(s.municipality_name) AS municipality_name,
+      MAX(s.line_name) AS line_name,
+      MAX(s.operator_name) AS operator_name,
+      CAST(SUM(sp.passengers) AS bigint) AS passengers
     FROM stations s
     LEFT JOIN station_passengers sp
       ON s.station_key = sp.station_key
       AND sp.year = 2021
     WHERE s.station_group_slug IS NOT NULL
-      AND s.station_group_slug ~ '^[a-z0-9][a-z0-9\-]*$'
-    ORDER BY s.station_group_slug, sp.passengers DESC NULLS LAST
+    GROUP BY s.station_group_slug
+    ORDER BY passengers DESC NULLS LAST
     LIMIT 100
   `) as RankingRow[];
-
-  const sorted = [...rows].sort((a, b) => (b.passengers ?? 0) - (a.passengers ?? 0));
 
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: "'Noto Sans JP', sans-serif" }}>
@@ -69,7 +67,7 @@ export default async function StationRankingPage() {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((row, index) => (
+              {rows.map((row, index) => (
                 <tr key={row.station_group_slug} style={{ borderBottom: '1px solid #1e2d45' }}>
                   <td style={{ padding: '10px 16px', color: index < 3 ? '#00d4aa' : '#aaa', fontWeight: index < 3 ? 'bold' : 'normal' }}>
                     {index + 1}位
