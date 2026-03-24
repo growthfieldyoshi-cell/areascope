@@ -51,20 +51,17 @@ export default async function LineDetailPage({ params }: Props) {
   if (!lineName) notFound();
 
   const stations = await sql`
-    SELECT DISTINCT ON (s.station_group_slug)
-      s.station_name,
-      s.prefecture_name,
-      s.municipality_name,
-      s.station_group_slug,
-      sp.passengers_2021
-    FROM stations s
-    LEFT JOIN station_passengers sp
-      ON s.station_group_slug = sp.station_group_slug
-      AND sp.year = 2021
-    WHERE s.line_name ILIKE ${'%' + lineName + '%'}
-      AND s.station_group_slug IS NOT NULL
-      AND s.station_group_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
-    ORDER BY s.station_group_slug, sp.passengers_2021 DESC NULLS LAST
+    SELECT DISTINCT ON (station_group_slug)
+      station_name,
+      prefecture_name,
+      municipality_name,
+      station_group_slug,
+      passengers_2021
+    FROM stations_v2
+    WHERE line_name ILIKE ${'%' + lineName + '%'}
+      AND station_group_slug IS NOT NULL
+      AND station_group_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
+    ORDER BY station_group_slug, passengers_2021 DESC NULLS LAST
   `;
 
   if (stations.length === 0) notFound();
