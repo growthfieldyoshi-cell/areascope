@@ -1,14 +1,23 @@
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import PrefFilter from './PrefFilter';
 
 const sql = neon(process.env.DATABASE_URL!);
 
-export const metadata: Metadata = {
-  title: '全国駅乗降者数ランキング｜AreaScope',
-  description: '日本全国の駅乗降者数ランキング。乗降者数順で主要駅を比較できます。',
-  alternates: { canonical: 'https://areascope.jp/station-ranking' },
-};
+type Props = { searchParams: Promise<{ pref?: string }> };
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { pref } = await searchParams;
+  const title = pref
+    ? `${pref} 駅乗降者数ランキング｜AreaScope`
+    : '全国駅乗降者数ランキング｜AreaScope';
+  return {
+    title,
+    description: '日本全国の駅乗降者数ランキング。都道府県別に絞り込んで比較できます。',
+    alternates: { canonical: pref ? `https://areascope.jp/station-ranking?pref=${pref}` : 'https://areascope.jp/station-ranking' },
+  };
+}
 
 type RankingRow = {
   station_group_slug: string;
@@ -20,7 +29,9 @@ type RankingRow = {
   passengers: number | null;
 };
 
-export default async function StationRankingPage() {
+export default async function StationRankingPage({ searchParams }: Props) {
+  const { pref } = await searchParams;
+
   const rows = (await sql`
     SELECT
       s.station_group_slug,
@@ -35,10 +46,13 @@ export default async function StationRankingPage() {
       ON s.station_key = sp.station_key
       AND sp.year = 2021
     WHERE s.station_group_slug IS NOT NULL
+      ${pref ? sql`AND s.prefecture_slug = ${pref}` : sql``}
     GROUP BY s.station_group_slug
     ORDER BY passengers DESC NULLS LAST
     LIMIT 100
   `) as RankingRow[];
+
+  const title = pref ? `${pref}の駅乗降者数ランキング` : '全国駅乗降者数ランキング';
 
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: "'Noto Sans JP', sans-serif" }}>
@@ -54,8 +68,10 @@ export default async function StationRankingPage() {
           全国駅<span style={{ color: '#00d4aa' }}>乗降者数</span>ランキング
         </h1>
         <p style={{ color: '#6b7a99', fontSize: '14px', marginBottom: '32px', lineHeight: 1.7 }}>
-          全国の駅を乗降者数（2021年）順に掲載しています。
+          {title}（2021年）を掲載しています。
         </p>
+
+        <PrefFilter current={pref ?? ''} />
 
         <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
