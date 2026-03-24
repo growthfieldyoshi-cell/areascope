@@ -6,40 +6,41 @@ import type { Metadata } from 'next';
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 
-const LINE_MAP: Record<string, string> = {
-  yamanote: '山手線',
-  chuo: '中央線',
-  toyoko: '東横線',
-  'keio-inokashira': '京王井の頭線',
-  keio: '京王線',
-  odakyu: '小田急線',
-  tokaido: '東海道線',
-  sobu: '総武線',
-  saikyo: '埼京線',
-  marunouchi: '丸ノ内線',
-  hibiya: '日比谷線',
-  ginza: '銀座線',
-  hanzomon: '半蔵門線',
-  fukutoshin: '副都心線',
-  namboku: '南北線',
-  chiyoda: '千代田線',
-  yurakucho: '有楽町線',
-  tozai: '東西線',
-  mita: '三田線',
-  shinjuku: '新宿線',
-  asakusa: '浅草線',
-  oedo: '大江戸線',
+// TODO: stations.line_slug を全路線で整備後、line_slug ベースに移行
+const LINE_MAP: Record<string, { display_name: string; line_name: string; operator_name: string }> = {
+  yamanote:          { display_name: '山手線',       line_name: '山手線',           operator_name: '東日本旅客鉄道' },
+  chuo:              { display_name: '中央線',       line_name: '中央線',           operator_name: '東日本旅客鉄道' },
+  toyoko:            { display_name: '東横線',       line_name: '東横線',           operator_name: '東急電鉄' },
+  'keio-inokashira': { display_name: '京王井の頭線', line_name: '京王井の頭線',     operator_name: '京王電鉄' },
+  keio:              { display_name: '京王線',       line_name: '京王線',           operator_name: '京王電鉄' },
+  odakyu:            { display_name: '小田急線',     line_name: '小田原線',         operator_name: '小田急電鉄' },
+  tokaido:           { display_name: '東海道線',     line_name: '東海道線',         operator_name: '東日本旅客鉄道' },
+  sobu:              { display_name: '総武線',       line_name: '総武線',           operator_name: '東日本旅客鉄道' },
+  saikyo:            { display_name: '埼京線',       line_name: '埼京線',           operator_name: '東日本旅客鉄道' },
+  marunouchi:        { display_name: '丸ノ内線',     line_name: '4号線丸ノ内線',    operator_name: '東京地下鉄' },
+  hibiya:            { display_name: '日比谷線',     line_name: '2号線日比谷線',    operator_name: '東京地下鉄' },
+  ginza:             { display_name: '銀座線',       line_name: '3号線銀座線',      operator_name: '東京地下鉄' },
+  hanzomon:          { display_name: '半蔵門線',     line_name: '11号線半蔵門線',   operator_name: '東京地下鉄' },
+  fukutoshin:        { display_name: '副都心線',     line_name: '13号線副都心線',   operator_name: '東京地下鉄' },
+  namboku:           { display_name: '南北線',       line_name: '7号線南北線',      operator_name: '東京地下鉄' },
+  chiyoda:           { display_name: '千代田線',     line_name: '9号線千代田線',    operator_name: '東京地下鉄' },
+  yurakucho:         { display_name: '有楽町線',     line_name: '8号線有楽町線',    operator_name: '東京地下鉄' },
+  tozai:             { display_name: '東西線',       line_name: '5号線東西線',      operator_name: '東京地下鉄' },
+  mita:              { display_name: '三田線',       line_name: '6号線三田線',      operator_name: '東京都' },
+  shinjuku:          { display_name: '新宿線',       line_name: '10号線新宿線',     operator_name: '東京都' },
+  asakusa:           { display_name: '浅草線',       line_name: '1号線浅草線',      operator_name: '東京都' },
+  oedo:              { display_name: '大江戸線',     line_name: '12号線大江戸線',   operator_name: '東京都' },
 };
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const lineName = LINE_MAP[slug];
-  if (!lineName) return { title: '路線が見つかりません｜AreaScope' };
+  const line = LINE_MAP[slug];
+  if (!line) return { title: '路線が見つかりません｜AreaScope' };
   return {
-    title: `${lineName} 駅一覧・乗降者数データ｜AreaScope`,
-    description: `${lineName}の駅一覧と乗降者数データを掲載しています。`,
+    title: `${line.display_name} 駅一覧・乗降者数データ｜AreaScope`,
+    description: `${line.display_name}の駅一覧と乗降者数データを掲載しています。各駅の人の流れを比較することで、路線全体の特徴を把握できます。`,
     alternates: { canonical: `${BASE_URL}/line/${slug}` },
     robots: { index: true, follow: true },
   };
@@ -47,25 +48,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LineDetailPage({ params }: Props) {
   const { slug } = await params;
-  const lineName = LINE_MAP[slug];
-  if (!lineName) notFound();
+  const line = LINE_MAP[slug];
+  if (!line) notFound();
 
   const stations = await sql`
-    SELECT DISTINCT ON (s.station_group_slug)
-      s.station_name,
-      s.prefecture_name,
-      s.municipality_name,
+    SELECT
       s.station_group_slug,
-      s.slug,
-      sp.passengers
+      MAX(s.station_name) AS station_name,
+      MAX(s.prefecture_name) AS prefecture_name,
+      MAX(s.municipality_name) AS municipality_name,
+      CAST(SUM(sp.passengers) AS bigint) AS passengers
     FROM stations s
     LEFT JOIN station_passengers sp
       ON s.station_key = sp.station_key
       AND sp.year = 2021
-    WHERE s.line_name ILIKE ${'%' + lineName + '%'}
+    WHERE s.line_name = ${line.line_name}
+      AND s.operator_name = ${line.operator_name}
       AND s.station_group_slug IS NOT NULL
-      AND s.station_group_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
-    ORDER BY s.station_group_slug, sp.passengers DESC NULLS LAST
+    GROUP BY s.station_group_slug
+    ORDER BY passengers DESC NULLS LAST, station_name ASC
   `;
 
   if (stations.length === 0) notFound();
@@ -77,18 +78,22 @@ export default async function LineDetailPage({ params }: Props) {
         {' / '}
         <Link href="/line" style={{ color: '#6b7a99', textDecoration: 'none' }}>路線一覧</Link>
         {' / '}
-        <span style={{ color: '#e8edf5' }}>{lineName}</span>
+        <span style={{ color: '#e8edf5' }}>{line.display_name}</span>
       </nav>
 
       <h1 style={{ fontSize: '1.8rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
-        {lineName} 駅一覧
+        {line.display_name} 駅一覧
       </h1>
       <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: '1.8' }}>
-        {lineName}の駅一覧です。各駅の乗降者数データを確認できます。
+        {line.display_name}に属する駅一覧と乗降者数データを掲載しています。
+        各駅の人の流れを比較することで、路線全体の特徴を把握できます。
       </p>
 
       <section style={{ marginBottom: '2rem' }}>
-        <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden' }}>
+        <h2 style={{ fontSize: '1.2rem', color: '#00d4aa', marginBottom: '12px' }}>
+          {line.display_name}の主要駅と人の流れ
+        </h2>
+        <div style={{ background: '#111827', borderRadius: '8px', overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
@@ -123,8 +128,8 @@ export default async function LineDetailPage({ params }: Props) {
       </section>
 
       <section style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <Link href={`/line/${slug}/ranking`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-          🏆 {lineName} 人口ランキングを見る
+        <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+          🏆 全国駅乗降者数ランキング
         </Link>
         <Link href="/line" style={{ color: '#6b7a99', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
           ← 路線一覧に戻る
