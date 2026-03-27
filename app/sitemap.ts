@@ -26,6 +26,11 @@ const KANA_LIST = [
   '\u306F','\u307E','\u3084','\u3089','\u308F','\u305D\u306E\u4ED6',
 ];
 
+const ARTICLE_SLUGS = [
+  'how-to-find-population-growth-area',
+  'station-passengers-area-analysis',
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [stations, cities, stationKanaPref, cityKanaPref] = await Promise.all([
     sql`
@@ -118,15 +123,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const articleUrls: MetadataRoute.Sitemap = ARTICLE_SLUGS.map((slug) => ({
+    url: `${BASE_URL}/articles/${slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
   return [
     { url: BASE_URL, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${BASE_URL}/station`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE_URL}/station/list`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE_URL}/station-ranking`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE_URL}/quiz`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE_URL}/articles`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/line`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/prefecture`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/city`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/population`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/privacy`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/station/hard-reading`, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/station/quiz`, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/station/quiz/prefecture`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/station/quiz/passengers`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/station/quiz/line`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/city/hard-reading`, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/city/quiz`, changeFrequency: 'monthly', priority: 0.8 },
+    ...articleUrls,
     ...prefUrls,
     ...lineUrls,
     ...lineRankingUrls,
