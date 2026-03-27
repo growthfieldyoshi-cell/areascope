@@ -10,7 +10,9 @@
     "fill:station-readings:dry": "node scripts/fill-station-readings.mjs --dry-run --limit=100",
     "fill:station-readings": "node scripts/fill-station-readings.mjs",
     "export:review": "node scripts/export-review-candidates.mjs",
-    "build:overrides": "node scripts/build-overrides-from-csv.mjs"
+    "build:overrides": "node scripts/build-overrides-from-csv.mjs",
+    "fill:municipality-readings:dry": "node scripts/fill-municipality-readings.mjs --dry-run --limit=50",
+    "fill:municipality-readings": "node scripts/fill-municipality-readings.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
