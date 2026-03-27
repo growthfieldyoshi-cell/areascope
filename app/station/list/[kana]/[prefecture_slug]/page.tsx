@@ -18,29 +18,35 @@ function kanaLabel(kana: Kana): string {
 }
 
 type Props = {
-  params: Promise<{ kana: string }>;
+  params: Promise<{ kana: string; prefecture_slug: string }>;
 };
 
-export function generateStaticParams() {
-  return VALID_KANA.map((kana) => ({ kana }));
+async function getPrefectureName(slug: string, kana: string): Promise<string | null> {
+  const rows = await sql`
+    SELECT DISTINCT prefecture_name
+    FROM stations
+    WHERE prefecture_slug = ${slug}
+      AND station_name_initial_kana = ${kana}
+      AND prefecture_name IS NOT NULL
+    LIMIT 1
+  `;
+  return rows.length > 0 ? rows[0].prefecture_name : null;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { kana } = await params;
+  const { kana, prefecture_slug } = await params;
   const decoded = decodeURIComponent(kana);
   if (!isValidKana(decoded)) return {};
 
+  const prefName = await getPrefectureName(prefecture_slug, decoded);
+  if (!prefName) return {};
+
   const label = kanaLabel(decoded);
   return {
-    title: `「${label}」の駅一覧・乗降者数データ｜AreaScope`,
-    description: `「${label}」で始まる全国の駅一覧です。2021年乗降者数データとともに各駅の詳細を確認できます。`,
+    title: `${prefName}の${label}の駅一覧・乗降者数データ｜AreaScope`,
+    description: `${prefName}の${label}で始まる駅を2021年乗降者数順で掲載しています。`,
   };
 }
-
-type PrefRow = {
-  prefecture_slug: string;
-  prefecture_name: string;
-};
 
 type StationRow = {
   station_name: string;
@@ -50,13 +56,15 @@ type StationRow = {
   passengers: number | null;
 };
 
-export default async function KanaStationListPage({ params }: Props) {
-  const { kana } = await params;
+export default async function KanaPrefectureStationListPage({ params }: Props) {
+  const { kana, prefecture_slug } = await params;
   const decoded = decodeURIComponent(kana);
   if (!isValidKana(decoded)) notFound();
 
-  const [rows, prefRows] = await Promise.all([
-    sql`
+  const prefName = await getPrefectureName(prefecture_slug, decoded);
+  if (!prefName) notFound();
+
+  const rows = (await sql`
     WITH grouped AS (
       SELECT DISTINCT ON (s.station_group_slug)
         s.station_name,
@@ -66,6 +74,7 @@ export default async function KanaStationListPage({ params }: Props) {
       FROM stations s
       WHERE s.station_group_slug IS NOT NULL
         AND s.station_name_initial_kana = ${decoded}
+        AND s.prefecture_slug = ${prefecture_slug}
       ORDER BY s.station_group_slug, s.station_name
     )
     SELECT
@@ -79,16 +88,7 @@ export default async function KanaStationListPage({ params }: Props) {
     LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = 2021
     GROUP BY g.station_name, g.prefecture_name, g.municipality_name, g.station_group_slug
     ORDER BY passengers DESC NULLS LAST
-  `,
-    sql`
-    SELECT DISTINCT prefecture_slug, prefecture_name
-    FROM stations
-    WHERE station_name_initial_kana = ${decoded}
-      AND prefecture_slug IS NOT NULL
-      AND prefecture_name IS NOT NULL
-    ORDER BY prefecture_name
-  `,
-  ]) as [StationRow[], PrefRow[]];
+  `) as StationRow[];
 
   const label = kanaLabel(decoded);
 
@@ -98,18 +98,19 @@ export default async function KanaStationListPage({ params }: Props) {
         items={[
           { label: 'トップ', href: '/' },
           { label: '駅一覧', href: '/station/list' },
-          { label: `${label}の駅一覧` },
+          { label: `${label}の駅一覧`, href: `/station/list/${decoded}` },
+          { label: prefName },
         ]}
       />
 
       <h1 style={{ fontSize: '1.8rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
-        「{label}」の駅一覧
+        {prefName}の「{label}」の駅一覧
       </h1>
       <p style={{ color: '#aaa', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
         全{rows.length.toLocaleString()}駅
       </p>
       <p style={{ color: '#6b7a99', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-        ※駅名は「{label}」で絞り込み、掲載順は2021年乗降者数が多い順です。
+        ※{prefName}の「{label}」で始まる駅を2021年乗降者数が多い順で掲載しています。
       </p>
 
       {/* かな行ナビ */}
@@ -117,7 +118,7 @@ export default async function KanaStationListPage({ params }: Props) {
         {VALID_KANA.map((k) => (
           <Link
             key={k}
-            href={`/station/list/${k}`}
+            href={`/station/list/${k}/${prefecture_slug}`}
             style={{
               color: k === decoded ? '#0a0e1a' : '#00d4aa',
               background: k === decoded ? '#00d4aa' : 'transparent',
@@ -132,31 +133,6 @@ export default async function KanaStationListPage({ params }: Props) {
           </Link>
         ))}
       </div>
-
-      {/* 都道府県ナビ */}
-      {prefRows.length > 0 && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <p style={{ color: '#aaa', fontSize: '0.8rem', marginBottom: '6px' }}>都道府県で絞り込む：</p>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {prefRows.map((p) => (
-              <Link
-                key={p.prefecture_slug}
-                href={`/station/list/${decoded}/${p.prefecture_slug}`}
-                style={{
-                  color: '#00d4aa',
-                  border: '1px solid #1e2d45',
-                  borderRadius: '4px',
-                  padding: '4px 10px',
-                  textDecoration: 'none',
-                  fontSize: '0.8rem',
-                }}
-              >
-                {p.prefecture_name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
