@@ -71,6 +71,23 @@ export default async function CityListPage() {
         全国の市区町村を都道府県別に掲載しています。各市区町村ページでは駅一覧・人口推移を確認できます。
       </p>
 
+      <section style={{ marginBottom: '2.5rem' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #1e2d45' }}>
+          かな別一覧
+        </h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {['あ','か','さ','た','な','は','ま','や','ら','わ','その他'].map((kana) => (
+            <Link
+              key={kana}
+              href={`/city/list/${encodeURIComponent(kana)}`}
+              style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}
+            >
+              {kana === 'その他' ? 'その他' : `${kana}行`}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {sortedPrefs.map((prefSlug) => {
         const { prefecture_name, municipalities } = grouped[prefSlug];
         return (

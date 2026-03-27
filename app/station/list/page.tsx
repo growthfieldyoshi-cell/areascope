@@ -72,6 +72,23 @@ export default async function StationListPage({ searchParams }: Props) {
         全{total.toLocaleString()}駅 ／ {currentPage} / {totalPages}ページ
       </p>
 
+      <section style={{ marginBottom: '1.5rem' }}>
+        <h2 style={{ fontSize: '1rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
+          かな別一覧
+        </h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+          {['あ','か','さ','た','な','は','ま','や','ら','わ','その他'].map((kana) => (
+            <Link
+              key={kana}
+              href={`/station/list/${encodeURIComponent(kana)}`}
+              style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '4px', padding: '4px 10px', fontSize: '0.85rem' }}
+            >
+              {kana === 'その他' ? 'その他' : `${kana}行`}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
           <thead>
