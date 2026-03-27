@@ -21,22 +21,48 @@ const LINE_SLUGS = [
   'shinjuku','asakusa','oedo',
 ];
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const stations = await sql`
-    SELECT DISTINCT station_group_slug
-    FROM stations
-    WHERE station_group_slug IS NOT NULL
-      AND station_group_slug ~ '^[a-z0-9][a-z0-9\-]*$'
-  `;
+const KANA_LIST = [
+  '\u3042','\u304B','\u3055','\u305F','\u306A',
+  '\u306F','\u307E','\u3084','\u3089','\u308F','\u305D\u306E\u4ED6',
+];
 
-  const cities = await sql`
-    SELECT DISTINCT prefecture_slug, municipality_slug
-    FROM stations
-    WHERE prefecture_slug IS NOT NULL
-      AND municipality_slug IS NOT NULL
-      AND prefecture_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
-      AND municipality_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
-  `;
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [stations, cities, stationKanaPref, cityKanaPref] = await Promise.all([
+    sql`
+      SELECT DISTINCT station_group_slug
+      FROM stations
+      WHERE station_group_slug IS NOT NULL
+        AND station_group_slug ~ '^[a-z0-9][a-z0-9\-]*$'
+    `,
+    sql`
+      SELECT DISTINCT prefecture_slug, municipality_slug
+      FROM stations
+      WHERE prefecture_slug IS NOT NULL
+        AND municipality_slug IS NOT NULL
+        AND prefecture_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
+        AND municipality_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
+    `,
+    sql`
+      SELECT DISTINCT station_name_initial_kana, prefecture_slug
+      FROM stations
+      WHERE station_name_initial_kana IS NOT NULL
+        AND prefecture_slug IS NOT NULL
+        AND prefecture_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
+    `,
+    sql`
+      SELECT DISTINCT m.municipality_name_initial_kana, s.prefecture_slug
+      FROM municipalities m
+      JOIN (
+        SELECT DISTINCT municipality_code, prefecture_slug
+        FROM stations
+        WHERE municipality_code IS NOT NULL
+          AND prefecture_slug IS NOT NULL
+          AND prefecture_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
+      ) s
+        ON s.municipality_code = m.code5
+      WHERE m.municipality_name_initial_kana IS NOT NULL
+    `,
+  ]);
 
   const stationUrls: MetadataRoute.Sitemap = stations.map((s) => ({
     url: `${BASE_URL}/station/${s.station_group_slug}`,
@@ -56,8 +82,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const lineRankingUrls: MetadataRoute.Sitemap = LINE_SLUGS.map((slug) => ({
+    url: `${BASE_URL}/line/${slug}/ranking`,
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
   const cityUrls: MetadataRoute.Sitemap = cities.map((c) => ({
     url: `${BASE_URL}/city/${c.prefecture_slug}/${c.municipality_slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
+  const stationKanaUrls: MetadataRoute.Sitemap = KANA_LIST.map((kana) => ({
+    url: `${BASE_URL}/station/list/${encodeURIComponent(kana)}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
+  const cityKanaUrls: MetadataRoute.Sitemap = KANA_LIST.map((kana) => ({
+    url: `${BASE_URL}/city/list/${encodeURIComponent(kana)}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
+  const stationKanaPrefUrls: MetadataRoute.Sitemap = stationKanaPref.map((row) => ({
+    url: `${BASE_URL}/station/list/${encodeURIComponent(row.station_name_initial_kana)}/${row.prefecture_slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
+  const cityKanaPrefUrls: MetadataRoute.Sitemap = cityKanaPref.map((row) => ({
+    url: `${BASE_URL}/city/list/${encodeURIComponent(row.municipality_name_initial_kana)}/${row.prefecture_slug}`,
     changeFrequency: 'monthly',
     priority: 0.6,
   }));
@@ -73,6 +129,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/population`, changeFrequency: 'monthly', priority: 0.7 },
     ...prefUrls,
     ...lineUrls,
+    ...lineRankingUrls,
+    ...stationKanaUrls,
+    ...cityKanaUrls,
+    ...stationKanaPrefUrls,
+    ...cityKanaPrefUrls,
     ...cityUrls,
     ...stationUrls,
   ];
