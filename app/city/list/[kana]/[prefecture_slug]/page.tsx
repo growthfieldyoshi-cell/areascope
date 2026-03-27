@@ -18,29 +18,36 @@ function kanaLabel(kana: Kana): string {
 }
 
 type Props = {
-  params: Promise<{ kana: string }>;
+  params: Promise<{ kana: string; prefecture_slug: string }>;
 };
 
-export function generateStaticParams() {
-  return VALID_KANA.map((kana) => ({ kana }));
+async function getPrefectureName(prefSlug: string, kana: string): Promise<string | null> {
+  const rows = await sql`
+    SELECT DISTINCT s.prefecture_name
+    FROM municipalities m
+    LEFT JOIN stations s ON m.code5 = s.municipality_code
+    WHERE m.municipality_name_initial_kana = ${kana}
+      AND s.prefecture_slug = ${prefSlug}
+      AND s.prefecture_name IS NOT NULL
+    LIMIT 1
+  `;
+  return rows.length > 0 ? rows[0].prefecture_name : null;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { kana } = await params;
+  const { kana, prefecture_slug } = await params;
   const decoded = decodeURIComponent(kana);
   if (!isValidKana(decoded)) return {};
 
+  const prefName = await getPrefectureName(prefecture_slug, decoded);
+  if (!prefName) return {};
+
   const label = kanaLabel(decoded);
   return {
-    title: `「${label}」の市区町村一覧・人口データ｜AreaScope`,
-    description: `${label}で始まる市区町村を人口順で掲載しています。`,
+    title: `${prefName}の${label}の市区町村一覧・人口データ｜AreaScope`,
+    description: `${prefName}の${label}で始まる市区町村を人口順で掲載しています。`,
   };
 }
-
-type PrefRow = {
-  prefecture_slug: string;
-  prefecture_name: string;
-};
 
 type MunicipalityRow = {
   municipality: string;
@@ -50,13 +57,15 @@ type MunicipalityRow = {
   population: number | null;
 };
 
-export default async function KanaCityListPage({ params }: Props) {
-  const { kana } = await params;
+export default async function KanaPrefectureCityListPage({ params }: Props) {
+  const { kana, prefecture_slug } = await params;
   const decoded = decodeURIComponent(kana);
   if (!isValidKana(decoded)) notFound();
 
-  const [rows, prefRows] = await Promise.all([
-    sql`
+  const prefName = await getPrefectureName(prefecture_slug, decoded);
+  if (!prefName) notFound();
+
+  const rows = (await sql`
     SELECT
       m.municipality,
       s.prefecture_name,
@@ -78,20 +87,10 @@ export default async function KanaCityListPage({ params }: Props) {
     LEFT JOIN municipality_populations mp
       ON mp.municipality_code = m.code5 AND mp.year = 2020
     WHERE m.municipality_name_initial_kana = ${decoded}
-      AND s.prefecture_slug IS NOT NULL
+      AND s.prefecture_slug = ${prefecture_slug}
       AND s.municipality_slug IS NOT NULL
     ORDER BY mp.population DESC NULLS LAST, m.municipality
-  `,
-    sql`
-    SELECT DISTINCT s.prefecture_slug, s.prefecture_name
-    FROM municipalities m
-    LEFT JOIN stations s ON m.code5 = s.municipality_code
-    WHERE m.municipality_name_initial_kana = ${decoded}
-      AND s.prefecture_slug IS NOT NULL
-      AND s.prefecture_name IS NOT NULL
-    ORDER BY s.prefecture_name
-  `,
-  ]) as [MunicipalityRow[], PrefRow[]];
+  `) as MunicipalityRow[];
 
   const label = kanaLabel(decoded);
 
@@ -101,18 +100,19 @@ export default async function KanaCityListPage({ params }: Props) {
         items={[
           { label: 'TOP', href: '/' },
           { label: '市区町村一覧', href: '/city' },
-          { label: `${label}の市区町村一覧` },
+          { label: `${label}の市区町村一覧`, href: `/city/list/${decoded}` },
+          { label: prefName },
         ]}
       />
 
       <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>
-        「{label}」の市区町村<span style={{ color: '#00d4aa' }}>一覧</span>
+        {prefName}の「{label}」の市区町村<span style={{ color: '#00d4aa' }}>一覧</span>
       </h1>
       <p style={{ color: '#aaa', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
         全{rows.length.toLocaleString()}市区町村
       </p>
       <p style={{ color: '#6b7a99', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-        ※市区町村名は「{label}」で絞り込み、掲載順は2020年人口が多い順です。
+        ※{prefName}の「{label}」で始まる市区町村を2020年人口が多い順で掲載しています。
       </p>
 
       {/* かな行ナビ */}
@@ -120,7 +120,7 @@ export default async function KanaCityListPage({ params }: Props) {
         {VALID_KANA.map((k) => (
           <Link
             key={k}
-            href={`/city/list/${k}`}
+            href={`/city/list/${k}/${prefecture_slug}`}
             style={{
               color: k === decoded ? '#0a0e1a' : '#00d4aa',
               background: k === decoded ? '#00d4aa' : 'transparent',
@@ -135,31 +135,6 @@ export default async function KanaCityListPage({ params }: Props) {
           </Link>
         ))}
       </div>
-
-      {/* 都道府県ナビ */}
-      {prefRows.length > 0 && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <p style={{ color: '#aaa', fontSize: '0.8rem', marginBottom: '6px' }}>都道府県で絞り込む：</p>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {prefRows.map((p) => (
-              <Link
-                key={p.prefecture_slug}
-                href={`/city/list/${decoded}/${p.prefecture_slug}`}
-                style={{
-                  color: '#00d4aa',
-                  border: '1px solid #1e2d45',
-                  borderRadius: '4px',
-                  padding: '4px 10px',
-                  textDecoration: 'none',
-                  fontSize: '0.8rem',
-                }}
-              >
-                {p.prefecture_name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
