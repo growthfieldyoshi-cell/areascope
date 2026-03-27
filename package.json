@@ -6,7 +6,11 @@
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "fill:station-readings:dry": "node scripts/fill-station-readings.mjs --dry-run --limit=100",
+    "fill:station-readings": "node scripts/fill-station-readings.mjs",
+    "export:review": "node scripts/export-review-candidates.mjs",
+    "build:overrides": "node scripts/build-overrides-from-csv.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
@@ -16,6 +20,7 @@
     "kuroshiro": "^1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "next": "16.1.6",
+    "pg": "^8.20.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "source-map-js": "^1.2.1",
