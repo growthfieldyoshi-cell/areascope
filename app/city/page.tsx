@@ -88,6 +88,18 @@ export default async function CityListPage() {
         </div>
       </section>
 
+      <section style={{ marginBottom: '2.5rem' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#00d4aa', marginBottom: '0.5rem' }}>市区町村名クイズに挑戦</h2>
+        <p style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: '1rem' }}>
+          難読地名など、市区町村データをクイズ形式で楽しめます。
+        </p>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <Link href="/quiz" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}>クイズ一覧を見る</Link>
+          <Link href="/city/quiz" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}>難読市区町村名クイズ</Link>
+          <Link href="/city/hard-reading" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}>難読市区町村名一覧</Link>
+        </div>
+      </section>
+
       {sortedPrefs.map((prefSlug) => {
         const { prefecture_name, municipalities } = grouped[prefSlug];
         return (
@@ -115,17 +127,6 @@ export default async function CityListPage() {
         );
       })}
 
-      <section style={{ borderTop: '1px solid #1e2d45', marginTop: '1rem', paddingTop: '2rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#00d4aa', marginBottom: '0.5rem' }}>市区町村名クイズに挑戦</h2>
-        <p style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: '1rem' }}>
-          難読地名など、市区町村データをクイズ形式で楽しめます。
-        </p>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <Link href="/quiz" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}>クイズ一覧を見る</Link>
-          <Link href="/city/quiz" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}>難読市区町村名クイズ</Link>
-          <Link href="/city/hard-reading" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}>難読市区町村名一覧</Link>
-        </div>
-      </section>
     </main>
   );
 }
