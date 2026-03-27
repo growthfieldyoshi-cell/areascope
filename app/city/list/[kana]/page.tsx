@@ -58,7 +58,7 @@ export default async function KanaCityListPage({ params }: Props) {
       s.municipality_slug,
       mp.population
     FROM municipalities m
-    INNER JOIN (
+    LEFT JOIN (
       SELECT DISTINCT ON (municipality_code)
         municipality_code,
         prefecture_name,
@@ -68,10 +68,11 @@ export default async function KanaCityListPage({ params }: Props) {
       WHERE prefecture_slug IS NOT NULL
         AND municipality_slug IS NOT NULL
       ORDER BY municipality_code, station_name
-    ) s ON s.municipality_code = m.code
+    ) s ON s.municipality_code = m.code5
     LEFT JOIN municipality_populations mp
-      ON mp.municipality_code = m.code AND mp.year = 2020
+      ON mp.municipality_code = m.code5 AND mp.year = 2020
     WHERE m.municipality_name_initial_kana = ${decoded}
+      AND s.prefecture_slug IS NOT NULL
       AND s.municipality_slug IS NOT NULL
     ORDER BY mp.population DESC NULLS LAST, m.municipality
   `) as MunicipalityRow[];
