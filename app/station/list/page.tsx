@@ -142,6 +142,18 @@ export default async function StationListPage({ searchParams }: Props) {
           </Link>
         )}
       </div>
+
+      <div style={{ borderTop: '1px solid #1e2d45', marginTop: '2rem', paddingTop: '2rem' }}>
+        <h2 style={{ fontSize: '1rem', color: '#00d4aa', marginBottom: '0.5rem' }}>駅名クイズに挑戦</h2>
+        <p style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: '1rem' }}>
+          難読駅名や路線・都道府県など、駅データをクイズ形式で楽しめます。
+        </p>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <Link href="/quiz" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '6px', padding: '8px 16px', fontSize: '0.85rem' }}>クイズ一覧を見る</Link>
+          <Link href="/station/quiz" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '6px', padding: '8px 16px', fontSize: '0.85rem' }}>難読駅名クイズ</Link>
+          <Link href="/station/hard-reading" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '6px', padding: '8px 16px', fontSize: '0.85rem' }}>難読駅名一覧</Link>
+        </div>
+      </div>
     </main>
   );
 }
