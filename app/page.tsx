@@ -108,6 +108,58 @@ export default function Home() {
         </div>
       </div>
 
+      <div style={{ borderTop: '1px solid #1e2d45', paddingTop: '48px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 32px 60px' }}>
+          <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
+            // AreaScopeについて
+          </p>
+
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '32px', marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>AreaScopeとは</h2>
+            <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '16px' }}>
+              AreaScopeは、国土交通省・総務省の公式データをもとに、全国9,000超の駅の乗降者数と1,200超の市区町村の人口推移を可視化するデータサービスです。駅やエリアごとの利用状況・人口動態を、誰でも無料で確認できます。
+            </p>
+            <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8 }}>
+              データは2011年〜2021年の時系列で収録しており、コロナ前後の変化や長期トレンドの把握に活用できます。
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>引っ越し・住み替え検討に</h3>
+              <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+                最寄り駅の利用者数や周辺人口の増減を確認すれば、街の活気度や将来性の判断材料になります。通勤路線の混雑度も乗降者数から推定できます。
+              </p>
+            </div>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>エリア比較・出店検討に</h3>
+              <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+                複数駅の乗降者数を比較し、集客ポテンシャルを定量的に評価できます。人口推移と合わせて見ることで、エリアの成長性も判断可能です。
+              </p>
+            </div>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>路線・沿線分析に</h3>
+              <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+                路線単位で駅の乗降者数を一覧比較できます。ターミナル駅との距離感や、沿線全体の利用動向を把握するのに役立ちます。
+              </p>
+            </div>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>データの出典と信頼性</h3>
+              <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+                駅乗降者数は国土交通省「国土数値情報」、人口データは総務省「e-Stat」の公式統計を使用しています。推計値や独自集計ではなく、政府公開データに基づいています。
+              </p>
+            </div>
+          </div>
+
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>今後の展望</h3>
+            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+              今後は不動産価格データとの連携、駅周辺の商業施設情報の追加、AIによるエリア将来予測など、データの幅と分析機能を拡充していく予定です。
+            </p>
+          </div>
+        </div>
+      </div>
+
       <footer style={{ padding: '20px 32px', borderTop: '1px solid #1e2d45', fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', textAlign: 'center', marginTop: 'auto' }}>
         <div style={{ marginBottom: '10px' }}>出典: 国土交通省 国土数値情報 / 総務省統計局 e-Stat | © 2025 AREASCOPE</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>

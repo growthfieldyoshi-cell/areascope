@@ -109,6 +109,41 @@ export default async function StationRankingPage({ searchParams }: Props) {
             </tbody>
           </table>
         </div>
+
+        <div style={{ marginTop: '48px' }}>
+          <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
+            // ランキングの読み方
+          </p>
+
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '32px', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00d4aa', marginBottom: '14px' }}>駅乗降者数ランキングの見方</h2>
+            <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8 }}>
+              乗降者数とは、1日あたりにその駅で乗車・降車した人数の合計です。国土交通省「国土数値情報」に基づく2021年の年間データを掲載しています。同じ駅名でも路線が異なる場合は合算して集計しています。
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '20px' }}>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#e8edf5', marginBottom: '10px' }}>上位駅の特徴</h3>
+              <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+                新宿・渋谷・池袋など上位を占めるのは、複数路線が交差するターミナル駅です。乗り換え需要が大きいため、乗降者数が突出して多くなります。商業施設の集積度とも相関しています。
+              </p>
+            </div>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#e8edf5', marginBottom: '10px' }}>エリア分析への活用</h3>
+              <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+                乗降者数は、その駅周辺の商圏規模を示す指標です。出店検討やエリア比較の際、人口データと合わせて確認することで、集客ポテンシャルをより正確に把握できます。
+              </p>
+            </div>
+          </div>
+
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#e8edf5', marginBottom: '10px' }}>2021年データの留意点</h3>
+            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
+              2021年はコロナ禍の影響で多くの駅が2019年比で大幅減となっています。各駅の詳細ページでは時系列推移を確認でき、コロナ前後の回復度合いを把握できます。
+            </p>
+          </div>
+        </div>
       </div>
     </main>
   );
