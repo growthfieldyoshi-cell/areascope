@@ -160,6 +160,28 @@ export default function Home() {
         </div>
       </div>
 
+      <div style={{ borderTop: '1px solid #1e2d45', paddingTop: '48px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 32px 60px' }}>
+          <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
+            // クイズで楽しく学ぶ
+          </p>
+          <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '20px' }}>
+            駅名・地名・路線など、データをクイズ形式で楽しく学べます。
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Link href="/quiz" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '12px 20px', fontSize: '14px' }}>
+              クイズ一覧を見る
+            </Link>
+            <Link href="/station/hard-reading" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '12px 20px', fontSize: '14px' }}>
+              難読駅名一覧を見る
+            </Link>
+            <Link href="/city/hard-reading" style={{ color: '#e8edf5', textDecoration: 'none', background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '12px 20px', fontSize: '14px' }}>
+              難読市区町村名一覧を見る
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <footer style={{ padding: '20px 32px', borderTop: '1px solid #1e2d45', fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', textAlign: 'center', marginTop: 'auto' }}>
         <div style={{ marginBottom: '10px' }}>出典: 国土交通省 国土数値情報 / 総務省統計局 e-Stat | © 2025 AREASCOPE</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
