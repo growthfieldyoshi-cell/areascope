@@ -11,6 +11,31 @@ const ARTICLES = [
     title: '駅の乗降者数から見る街の特徴｜エリア分析の基本と見方',
     description: '駅の乗降者数データを使ったエリア分析の基本を解説。新宿・金沢・高山の具体例を交えながら、乗降者数の読み方と人口データとの組み合わせ方を紹介します。',
   },
+  {
+    slug: 'population-growth-area-ranking',
+    title: '人口増加エリアランキングの見方',
+    description: '人口増加ランキングは、増加率だけで見ると判断を誤りやすいです。絶対数、継続性、駅利用の変化まで含めて読み解くための基本を整理します。',
+  },
+  {
+    slug: 'station-ranking-livability',
+    title: '駅ランキングから見る住みやすい街',
+    description: '乗降者数が多い駅ほど住みやすい、とは限りません。ターミナル型・住宅型・バランス型に分けて、住みやすさの見方を整理します。',
+  },
+  {
+    slug: 'rural-city-livability',
+    title: '地方都市は住みやすいのか？',
+    description: '地方都市は一括りにできません。コンパクトシティ型、車依存型、衰退型の違いを踏まえ、人口と駅データから住みやすさを考えます。',
+  },
+  {
+    slug: 'how-to-find-bedroom-community',
+    title: 'ベッドタウンの見つけ方',
+    description: 'ベッドタウンは、都心に近いだけでは判断できません。通勤先との関係、駅利用、商業集積、人口の安定性から見つける考え方を整理します。',
+  },
+  {
+    slug: 'how-to-choose-commute-area',
+    title: '通勤しやすい街の選び方',
+    description: '通勤しやすさは距離だけでは決まりません。乗り換え回数、路線の強さ、代替ルート、混雑傾向から通勤しやすい街の選び方を解説します。',
+  },
 ];
 
 export default function ArticlesIndexPage() {
