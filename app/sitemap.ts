@@ -29,6 +29,26 @@ const KANA_LIST = [
 const ARTICLE_SLUGS = [
   'how-to-find-population-growth-area',
   'station-passengers-area-analysis',
+  'population-decline-area-analysis',
+  'station-passengers-livability',
+  'how-to-choose-area-for-moving',
+  'how-to-find-livable-city',
+  'population-passengers-combination-analysis',
+  'population-growth-area-ranking',
+  'station-ranking-livability',
+  'rural-city-livability',
+  'how-to-find-bedroom-community',
+  'how-to-choose-commute-area',
+  'how-to-read-livability-ranking',
+  'what-is-population-growth-rate',
+  'is-busy-station-livable',
+  'is-population-decline-dangerous',
+  'suburb-vs-city-livability',
+  'how-to-choose-family-friendly-city',
+  'best-city-for-single-living',
+  'will-redevelopment-area-grow',
+  'residential-vs-commercial-area',
+  'popular-vs-hidden-station',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

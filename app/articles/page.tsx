@@ -8,6 +8,9 @@ const CATEGORIES = [
       { slug: 'station-ranking-livability', title: '駅ランキングから見る住みやすい街', description: '乗降者数が多い駅ほど住みやすい、とは限りません。ターミナル型・住宅型・バランス型に分けて、住みやすさの見方を整理します。' },
       { slug: 'rural-city-livability', title: '地方都市は住みやすいのか？', description: '地方都市は一括りにできません。コンパクトシティ型、車依存型、衰退型の違いを踏まえ、人口と駅データから住みやすさを考えます。' },
       { slug: 'how-to-find-bedroom-community', title: 'ベッドタウンの見つけ方', description: 'ベッドタウンは、都心に近いだけでは判断できません。通勤先との関係、駅利用、商業集積、人口の安定性から見つける考え方を整理します。' },
+      { slug: 'suburb-vs-city-livability', title: '郊外と都心どっちが住みやすい？データで比較', description: '通勤・生活利便・住宅環境の3つの視点から郊外と都心を比較。どちらが正解かではなく、条件によって変わることを整理します。' },
+      { slug: 'is-busy-station-livable', title: '駅の乗降者数が多い街は住みやすいのか？', description: '乗降者数が多い＝住みやすいとは限りません。ターミナル型と住宅駅型の違い、混雑・商業の視点から住みやすさを考えます。' },
+      { slug: 'residential-vs-commercial-area', title: '住宅地と商業地の違い｜住みやすさの本質', description: '住宅地と商業地の違いをデータで解説。駅利用・人口構造・生活利便性の視点から、便利そうでも住みにくい街の見分け方を紹介します。' },
     ],
   },
   {
@@ -18,10 +21,23 @@ const CATEGORIES = [
     ],
   },
   {
+    label: 'ライフスタイル別',
+    description: 'ファミリー・一人暮らしなど、ライフスタイルに合ったエリアの選び方を整理した記事です。',
+    articles: [
+      { slug: 'how-to-choose-family-friendly-city', title: 'ファミリー向けの街の選び方｜失敗しない判断基準', description: '子育て世帯向けのエリア選びを解説。人口構成・学校・生活インフラ・駅利用のバランスから判断する方法を紹介します。' },
+      { slug: 'best-city-for-single-living', title: '一人暮らしに向いている街の特徴とは？', description: '一人暮らしに向いた街の特徴を解説。駅距離・商業集積・人口構成の視点から、家賃だけに頼らない選び方を紹介します。' },
+    ],
+  },
+  {
     label: 'データの見方',
     description: 'ランキングや人口推移をそのまま受け取らず、判断材料として使うための考え方を整理した記事です。',
     articles: [
       { slug: 'population-growth-area-ranking', title: '人口増加エリアランキングの見方', description: '人口増加ランキングは、増加率だけで見ると判断を誤りやすいです。絶対数、継続性、駅利用の変化まで含めて読み解くための基本を整理します。' },
+      { slug: 'how-to-read-livability-ranking', title: '住みやすい街ランキングの見方｜上位＝正解ではない理由', description: '住みやすさランキングは前提条件で大きく変わります。人口・駅利用・商業の視点から、ランキングに頼りすぎない街の選び方を整理します。' },
+      { slug: 'what-is-population-growth-rate', title: '人口増加率とは？意味と見方をわかりやすく解説', description: '増加率と絶対数の違い、小さい街の錯覚、継続性の重要性を解説。データを正しく読むための基礎知識をまとめます。' },
+      { slug: 'is-population-decline-dangerous', title: '人口減少している街は本当に危険なのか？', description: '人口減少イコール危険とは限りません。減少でも安定する街のパターン、地方と都市の違いから正しく判断する方法を解説します。' },
+      { slug: 'popular-vs-hidden-station', title: '人気駅と穴場駅の違いとは？', description: '人気駅と穴場駅の違いをデータで解説。乗降者数・需要と供給・生活バランスの視点から、自分に合った駅の見つけ方を紹介します。' },
+      { slug: 'will-redevelopment-area-grow', title: '再開発エリアは本当に伸びるのか？データで解説', description: '再開発＝必ず伸びるとは限りません。一時的増加と継続的成長の違い、人口推移との関係から正しい判断方法を解説します。' },
     ],
   },
 ];
