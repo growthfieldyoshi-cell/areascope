@@ -56,6 +56,16 @@ const ARTICLE_SLUGS = [
   'saitama-station-ranking-2023',
   'chiba-station-ranking-2023',
   'fukuoka-station-ranking-2023',
+  'kyoto-station-ranking-2023',
+  'hyogo-station-ranking-2023',
+  'hokkaido-station-ranking-2023',
+  'miyagi-station-ranking-2023',
+  'hiroshima-station-ranking-2023',
+  'niigata-station-ranking-2023',
+  'tochigi-station-ranking-2023',
+  'gunma-station-ranking-2023',
+  'ibaraki-station-ranking-2023',
+  'shizuoka-station-ranking-2023',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
