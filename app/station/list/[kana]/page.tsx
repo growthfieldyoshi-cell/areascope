@@ -6,6 +6,11 @@ import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 
+async function getLatestYear(): Promise<number> {
+  const rows = await sql`SELECT MAX(year) AS year FROM station_passengers`;
+  return rows[0]?.year ?? 2021;
+}
+
 const VALID_KANA = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ', 'その他'] as const;
 type Kana = (typeof VALID_KANA)[number];
 
@@ -31,9 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isValidKana(decoded)) return {};
 
   const label = kanaLabel(decoded);
+  const year = await getLatestYear();
   return {
     title: `「${label}」の駅一覧・乗降者数データ｜AreaScope`,
-    description: `「${label}」で始まる全国の駅一覧です。2021年乗降者数データとともに各駅の詳細を確認できます。`,
+    description: `「${label}」で始まる全国の駅一覧です。${year}年乗降者数データとともに各駅の詳細を確認できます。`,
   };
 }
 
@@ -54,6 +60,8 @@ export default async function KanaStationListPage({ params }: Props) {
   const { kana } = await params;
   const decoded = decodeURIComponent(kana);
   if (!isValidKana(decoded)) notFound();
+
+  const year = await getLatestYear();
 
   const [rows, prefRows] = await Promise.all([
     sql`
@@ -76,7 +84,7 @@ export default async function KanaStationListPage({ params }: Props) {
       CAST(SUM(sp.passengers) AS bigint) AS passengers
     FROM grouped g
     LEFT JOIN stations s ON s.station_group_slug = g.station_group_slug
-    LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = 2021
+    LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = ${year}
     GROUP BY g.station_name, g.prefecture_name, g.municipality_name, g.station_group_slug
     ORDER BY passengers DESC NULLS LAST
   `,
@@ -109,7 +117,7 @@ export default async function KanaStationListPage({ params }: Props) {
         全{rows.length.toLocaleString()}駅
       </p>
       <p style={{ color: '#6b7a99', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-        ※駅名は「{label}」で絞り込み、掲載順は2021年乗降者数が多い順です。
+        ※駅名は「{label}」で絞り込み、掲載順は{year}年乗降者数が多い順です。
       </p>
 
       {/* かな行ナビ */}
@@ -162,7 +170,7 @@ export default async function KanaStationListPage({ params }: Props) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-              {['駅名', '都道府県', '自治体', '2021年乗降者数', ''].map((h) => (
+              {['駅名', '都道府県', '自治体', `${year}年乗降者数`, ''].map((h) => (
                 <th key={h} style={{ padding: '12px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
               ))}
             </tr>

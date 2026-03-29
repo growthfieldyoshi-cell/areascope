@@ -5,6 +5,11 @@ import type { Metadata } from 'next';
 const sql = neon(process.env.DATABASE_URL!);
 const PER_PAGE = 100;
 
+async function getLatestYear(): Promise<number> {
+  const rows = await sql`SELECT MAX(year) AS year FROM station_passengers`;
+  return rows[0]?.year ?? 2021;
+}
+
 export const metadata: Metadata = {
   title: '駅乗降者数データ一覧｜全国駅データ',
   description: '全国の駅乗降者数データを一覧で確認できます。駅ごとの利用者数推移やランキングも確認可能です。',
@@ -24,6 +29,8 @@ export default async function StationListPage({ searchParams }: Props) {
   const { page } = await searchParams;
   const currentPage = Math.max(1, parseInt(page ?? '1', 10));
   const offset = (currentPage - 1) * PER_PAGE;
+
+  const year = await getLatestYear();
 
   const [rows, countRows] = await Promise.all([
     sql`
@@ -45,7 +52,7 @@ export default async function StationListPage({ searchParams }: Props) {
         CAST(SUM(sp.passengers) AS bigint) AS passengers
       FROM grouped g
       LEFT JOIN stations s ON s.station_group_slug = g.station_group_slug
-      LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = 2021
+      LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = ${year}
       GROUP BY g.station_name, g.prefecture_name, g.municipality_name, g.station_group_slug
       ORDER BY passengers DESC NULLS LAST
       LIMIT ${PER_PAGE} OFFSET ${offset}
@@ -105,7 +112,7 @@ export default async function StationListPage({ searchParams }: Props) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-              {['駅名', '都道府県', '自治体', '2021年乗降者数', ''].map(h => (
+              {['駅名', '都道府県', '自治体', `${year}年乗降者数`, ''].map(h => (
                 <th key={h} style={{ padding: '12px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
               ))}
             </tr>

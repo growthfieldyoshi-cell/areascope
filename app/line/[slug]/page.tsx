@@ -6,6 +6,11 @@ import type { Metadata } from 'next';
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 
+async function getLatestYear(): Promise<number> {
+  const rows = await sql`SELECT MAX(year) AS year FROM station_passengers`;
+  return rows[0]?.year ?? 2021;
+}
+
 // TODO: stations.line_slug を全路線で整備後、line_slug ベースに移行
 // TODO: 埼京線はDB上でline_nameが分散しているため保留。将来、表示用路線マスタを作って再構成予定
 const LINE_MAP: Record<string, { display_name: string; line_name: string; operator_name: string }> = {
@@ -51,6 +56,8 @@ export default async function LineDetailPage({ params }: Props) {
   const line = LINE_MAP[slug];
   if (!line) notFound();
 
+  const year = await getLatestYear();
+
   const stations = await sql`
     SELECT
       s.station_group_slug,
@@ -61,7 +68,7 @@ export default async function LineDetailPage({ params }: Props) {
     FROM stations s
     LEFT JOIN station_passengers sp
       ON s.station_key = sp.station_key
-      AND sp.year = 2021
+      AND sp.year = ${year}
     WHERE s.line_name = ${line.line_name}
       AND s.operator_name = ${line.operator_name}
       AND s.station_group_slug IS NOT NULL
@@ -97,7 +104,7 @@ export default async function LineDetailPage({ params }: Props) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                {['駅名', '都道府県', '自治体', '乗降者数（2021年）', ''].map((h) => (
+                {['駅名', '都道府県', '自治体', `乗降者数（${year}年）`, ''].map((h) => (
                   <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
                 ))}
               </tr>

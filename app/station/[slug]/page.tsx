@@ -159,7 +159,7 @@ export default async function StationPage({ params }: PageProps) {
 
         <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
           <div className="kpi">
-            <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>乗降者数（2021年）</div>
+            <div style={{ fontSize: '11px', color: '#6b7a99', fontFamily: 'monospace', marginBottom: '8px' }}>乗降者数（{latestPass?.year ?? '-'}年）</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: '#00d4aa' }}>
               {latestPass ? Number(latestPass.passengers).toLocaleString() : '-'}
             </div>

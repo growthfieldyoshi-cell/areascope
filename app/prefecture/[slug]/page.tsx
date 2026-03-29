@@ -6,6 +6,11 @@ import type { Metadata } from 'next';
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 
+async function getLatestYear(): Promise<number> {
+  const rows = await sql`SELECT MAX(year) AS year FROM station_passengers`;
+  return rows[0]?.year ?? 2021;
+}
+
 const PREF_NAMES: Record<string, string> = {
   hokkaido: '北海道', aomori: '青森県', iwate: '岩手県', miyagi: '宮城県',
   akita: '秋田県', yamagata: '山形県', fukushima: '福島県', ibaraki: '茨城県',
@@ -44,6 +49,8 @@ export default async function PrefectureDetailPage({ params }: Props) {
   const prefName = PREF_NAMES[slug];
   if (!prefName) notFound();
 
+  const year = await getLatestYear();
+
   const stations = await sql`
     SELECT
       s.station_group_slug,
@@ -53,7 +60,7 @@ export default async function PrefectureDetailPage({ params }: Props) {
     FROM stations s
     LEFT JOIN station_passengers sp
       ON s.station_key = sp.station_key
-      AND sp.year = 2021
+      AND sp.year = ${year}
     WHERE s.prefecture_slug = ${slug}
       AND s.station_group_slug IS NOT NULL
     GROUP BY s.station_group_slug
@@ -95,7 +102,7 @@ export default async function PrefectureDetailPage({ params }: Props) {
         </p>
         <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '32px' }}>
           {prefName}の最多利用駅は<strong style={{ color: '#e8edf5' }}>{stations[0]?.station_name}駅</strong>で、
-          2021年の乗降者数は<strong style={{ color: '#e8edf5' }}>{topPassengers.toLocaleString()}人</strong>です。
+          {year}年の乗降者数は<strong style={{ color: '#e8edf5' }}>{topPassengers.toLocaleString()}人</strong>です。
           {topPassengers > 500000
             ? '大規模なターミナル駅を擁するエリアです。'
             : topPassengers > 100000
@@ -112,7 +119,7 @@ export default async function PrefectureDetailPage({ params }: Props) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                  {['順位', '駅名', '市区町村', '乗降者数（2021年）', ''].map(h => (
+                  {['順位', '駅名', '市区町村', `乗降者数（${year}年）`, ''].map(h => (
                     <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
                   ))}
                 </tr>
@@ -153,13 +160,13 @@ export default async function PrefectureDetailPage({ params }: Props) {
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '16px' }}>
               <p style={{ fontWeight: 700, marginBottom: '8px' }}>Q. {prefName}で最も利用者が多い駅は？</p>
               <p style={{ color: '#9aa5c3', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>
-                {stations[0]?.station_name}駅です。2021年の乗降者数は{topPassengers.toLocaleString()}人となっています。
+                {stations[0]?.station_name}駅です。{year}年の乗降者数は{topPassengers.toLocaleString()}人となっています。
               </p>
             </div>
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '16px' }}>
               <p style={{ fontWeight: 700, marginBottom: '8px' }}>Q. {prefName}の駅データはどこから取得していますか？</p>
               <p style={{ color: '#9aa5c3', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>
-                国土交通省の国土数値情報をもとに集計しています。乗降者数は2021年のデータを使用しています。
+                国土交通省の国土数値情報をもとに集計しています。乗降者数は{year}年のデータを使用しています。
               </p>
             </div>
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '8px', padding: '16px' }}>

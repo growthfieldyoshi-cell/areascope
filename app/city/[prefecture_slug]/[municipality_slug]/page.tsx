@@ -8,6 +8,11 @@ const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 const OG_IMAGE = 'https://areascope.jp/og-default.jpg';
 
+async function getLatestYear(): Promise<number> {
+  const rows = await sql`SELECT MAX(year) AS year FROM station_passengers`;
+  return rows[0]?.year ?? 2021;
+}
+
 type Props = {
   params: Promise<{ prefecture_slug: string; municipality_slug: string }>;
 };
@@ -45,6 +50,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CityPage({ params }: Props) {
   const { prefecture_slug, municipality_slug } = await params;
 
+  const year = await getLatestYear();
+
   const infoRows = await sql`
     SELECT DISTINCT municipality_name, prefecture_name FROM stations
     WHERE prefecture_slug = ${prefecture_slug} AND municipality_slug = ${municipality_slug} LIMIT 1
@@ -67,7 +74,7 @@ export default async function CityPage({ params }: Props) {
     FROM grouped g
     LEFT JOIN stations s ON s.station_group_slug = g.station_group_slug
       AND s.prefecture_slug = ${prefecture_slug} AND s.municipality_slug = ${municipality_slug}
-    LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = 2021
+    LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = ${year}
     GROUP BY g.station_name, g.station_group_slug
     ORDER BY passengers DESC NULLS LAST, g.station_name ASC
   `) as StationRow[];
@@ -127,7 +134,7 @@ export default async function CityPage({ params }: Props) {
       <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: 1.8 }}>
         {prefecture_name}{municipality_name}には主要駅が{stationRows.length}駅あります。
         {topStation?.passengers != null && (
-          <>最多利用駅は<Link href={`/station/${topStation.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none' }}>{topStation.station_name}駅</Link>で、2021年の乗降者数は{Number(topStation.passengers).toLocaleString()}人です。</>
+          <>最多利用駅は<Link href={`/station/${topStation.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none' }}>{topStation.station_name}駅</Link>で、{year}年の乗降者数は{Number(topStation.passengers).toLocaleString()}人です。</>
         )}
         乗降者数と人口推移をあわせて確認できます。
       </p>
@@ -205,7 +212,7 @@ export default async function CityPage({ params }: Props) {
         <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
           主要駅ランキング（全{stationRows.length}駅）
         </h2>
-        <p style={{ fontSize: '13px', color: '#6b7a99', marginBottom: '1rem' }}>乗降者数（2021年）順に並べています。</p>
+        <p style={{ fontSize: '13px', color: '#6b7a99', marginBottom: '1rem' }}>乗降者数（{year}年）順に並べています。</p>
 
         {stationRows.length === 0 ? (
           <p style={{ color: '#aaa' }}>駅データがありません。</p>
@@ -216,7 +223,7 @@ export default async function CityPage({ params }: Props) {
                 <table className="city-table">
                   <thead>
                     <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                      {['順位', '駅名', '乗降者数（2021年）', ''].map(h => (
+                      {['順位', '駅名', `乗降者数（${year}年）`, ''].map(h => (
                         <th key={h}>{h}</th>
                       ))}
                     </tr>

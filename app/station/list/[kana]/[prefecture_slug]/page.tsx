@@ -6,6 +6,11 @@ import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 
+async function getLatestYear(): Promise<number> {
+  const rows = await sql`SELECT MAX(year) AS year FROM station_passengers`;
+  return rows[0]?.year ?? 2021;
+}
+
 const VALID_KANA = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ', 'その他'] as const;
 type Kana = (typeof VALID_KANA)[number];
 
@@ -42,9 +47,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!prefName) return {};
 
   const label = kanaLabel(decoded);
+  const year = await getLatestYear();
   return {
     title: `${prefName}の${label}の駅一覧・乗降者数データ｜AreaScope`,
-    description: `${prefName}の${label}で始まる駅を2021年乗降者数順で掲載しています。`,
+    description: `${prefName}の${label}で始まる駅を${year}年乗降者数順で掲載しています。`,
   };
 }
 
@@ -63,6 +69,8 @@ export default async function KanaPrefectureStationListPage({ params }: Props) {
 
   const prefName = await getPrefectureName(prefecture_slug, decoded);
   if (!prefName) notFound();
+
+  const year = await getLatestYear();
 
   const rows = (await sql`
     WITH grouped AS (
@@ -85,7 +93,7 @@ export default async function KanaPrefectureStationListPage({ params }: Props) {
       CAST(SUM(sp.passengers) AS bigint) AS passengers
     FROM grouped g
     LEFT JOIN stations s ON s.station_group_slug = g.station_group_slug
-    LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = 2021
+    LEFT JOIN station_passengers sp ON sp.station_key = s.station_key AND sp.year = ${year}
     GROUP BY g.station_name, g.prefecture_name, g.municipality_name, g.station_group_slug
     ORDER BY passengers DESC NULLS LAST
   `) as StationRow[];
@@ -110,7 +118,7 @@ export default async function KanaPrefectureStationListPage({ params }: Props) {
         全{rows.length.toLocaleString()}駅
       </p>
       <p style={{ color: '#6b7a99', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-        ※{prefName}の「{label}」で始まる駅を2021年乗降者数が多い順で掲載しています。
+        ※{prefName}の「{label}」で始まる駅を{year}年乗降者数が多い順で掲載しています。
       </p>
 
       {/* かな行ナビ */}
@@ -138,7 +146,7 @@ export default async function KanaPrefectureStationListPage({ params }: Props) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-              {['駅名', '都道府県', '自治体', '2021年乗降者数', ''].map((h) => (
+              {['駅名', '都道府県', '自治体', `${year}年乗降者数`, ''].map((h) => (
                 <th key={h} style={{ padding: '12px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
               ))}
             </tr>
