@@ -7,14 +7,20 @@ const sql = neon(process.env.DATABASE_URL!);
 
 type Props = { searchParams: Promise<{ pref?: string }> };
 
+async function getLatestYear(): Promise<number> {
+  const rows = await sql`SELECT MAX(year) AS year FROM station_passengers`;
+  return rows[0]?.year ?? 2021;
+}
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { pref } = await searchParams;
+  const year = await getLatestYear();
   const title = pref
-    ? `${pref} 駅乗降者数ランキング｜AreaScope`
-    : '全国駅乗降者数ランキング｜AreaScope';
+    ? `${pref} 駅乗降者数ランキング（${year}年）｜AreaScope`
+    : `全国駅乗降者数ランキング（${year}年）｜AreaScope`;
   return {
     title,
-    description: '日本全国の駅乗降者数ランキング。都道府県別に絞り込んで比較できます。',
+    description: `${year}年の全国駅乗降者数ランキング。乗降者数の多い駅TOP100を掲載。`,
     alternates: { canonical: pref ? `https://areascope.jp/station-ranking?pref=${pref}` : 'https://areascope.jp/station-ranking' },
   };
 }
@@ -32,6 +38,8 @@ type RankingRow = {
 export default async function StationRankingPage({ searchParams }: Props) {
   const { pref } = await searchParams;
 
+  const year = await getLatestYear();
+
   const rows = (await sql`
     SELECT
       s.station_group_slug,
@@ -44,7 +52,7 @@ export default async function StationRankingPage({ searchParams }: Props) {
     FROM stations s
     LEFT JOIN station_passengers sp
       ON s.station_key = sp.station_key
-      AND sp.year = 2021
+      AND sp.year = ${year}
     WHERE s.station_group_slug IS NOT NULL
       ${pref ? sql`AND s.prefecture_slug = ${pref}` : sql``}
     GROUP BY s.station_group_slug
@@ -65,10 +73,10 @@ export default async function StationRankingPage({ searchParams }: Props) {
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 20px' }}>
         <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#00d4aa', letterSpacing: '3px', marginBottom: '12px' }}>// 全国ランキング</div>
         <h1 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '8px' }}>
-          全国駅<span style={{ color: '#00d4aa' }}>乗降者数</span>ランキング
+          全国駅<span style={{ color: '#00d4aa' }}>乗降者数</span>ランキング（{year}年）
         </h1>
         <p style={{ color: '#6b7a99', fontSize: '14px', marginBottom: '32px', lineHeight: 1.7 }}>
-          {title}（2021年）を掲載しています。
+          {title}（{year}年）を掲載しています。
         </p>
 
         <PrefFilter current={pref ?? ''} />
@@ -77,7 +85,7 @@ export default async function StationRankingPage({ searchParams }: Props) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #1e2d45' }}>
-                {['順位', '駅名', '路線', '運営会社', '所在地', '乗降者数（2021年）', ''].map((h) => (
+                {['順位', '駅名', '路線', '運営会社', '所在地', `乗降者数（${year}年）`, ''].map((h) => (
                   <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#aaa' }}>{h}</th>
                 ))}
               </tr>
@@ -118,7 +126,7 @@ export default async function StationRankingPage({ searchParams }: Props) {
           <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '32px', marginBottom: '20px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00d4aa', marginBottom: '14px' }}>駅乗降者数ランキングの見方</h2>
             <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8 }}>
-              乗降者数とは、1日あたりにその駅で乗車・降車した人数の合計です。国土交通省「国土数値情報」に基づく2021年の年間データを掲載しています。同じ駅名でも路線が異なる場合は合算して集計しています。
+              乗降者数とは、1日あたりにその駅で乗車・降車した人数の合計です。国土交通省「国土数値情報」に基づく{year}年の年間データを掲載しています。同じ駅名でも路線が異なる場合は合算して集計しています。
             </p>
           </div>
 
@@ -138,9 +146,9 @@ export default async function StationRankingPage({ searchParams }: Props) {
           </div>
 
           <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#e8edf5', marginBottom: '10px' }}>2021年データの留意点</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#e8edf5', marginBottom: '10px' }}>データの留意点</h3>
             <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
-              2021年はコロナ禍の影響で多くの駅が2019年比で大幅減となっています。各駅の詳細ページでは時系列推移を確認でき、コロナ前後の回復度合いを把握できます。
+              各駅の詳細ページでは時系列推移を確認でき、コロナ前後の回復度合いや長期トレンドを把握できます。
             </p>
           </div>
         </div>
