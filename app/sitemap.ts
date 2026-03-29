@@ -82,6 +82,20 @@ const ARTICLE_SLUGS = [
   'akita-station-ranking-2023',
   'yamagata-station-ranking-2023',
   'fukushima-station-ranking-2023',
+  'gifu-station-ranking-2023',
+  'shimane-station-ranking-2023',
+  'tottori-station-ranking-2023',
+  'tokushima-station-ranking-2023',
+  'kagawa-station-ranking-2023',
+  'ehime-station-ranking-2023',
+  'kochi-station-ranking-2023',
+  'saga-station-ranking-2023',
+  'nagasaki-station-ranking-2023',
+  'kumamoto-station-ranking-2023',
+  'oita-station-ranking-2023',
+  'miyazaki-station-ranking-2023',
+  'kagoshima-station-ranking-2023',
+  'okinawa-station-ranking-2023',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
