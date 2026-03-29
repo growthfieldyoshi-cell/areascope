@@ -47,6 +47,14 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
+        <div style={{ padding: '12px 20px', textAlign: 'center', borderTop: '1px solid #1e2d45', background: '#0a0e1a' }}>
+          <p style={{ color: '#6b7a99', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
+            出典：「国土数値情報（駅別乗降客数データ）」（国土交通省）
+          </p>
+          <p style={{ color: '#6b7a99', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
+            https://nlftp.mlit.go.jp/ksj/
+          </p>
+        </div>
       </body>
       <GoogleAnalytics gaId="G-W711TVYVQT" />
     </html>
