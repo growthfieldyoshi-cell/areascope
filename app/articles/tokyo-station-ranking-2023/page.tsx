@@ -189,6 +189,10 @@ export default function TokyoStationRanking2023Page() {
           </p>
         </div>
 
+        <p style={{ color: '#6b7a99', fontSize: '13px', marginBottom: '24px' }}>
+          全国の都道府県ランキング一覧は<Link href="/articles/prefecture-ranking" style={linkStyle}>都道府県別駅乗降者数ランキング一覧</Link>もご覧ください。
+        </p>
+
         {/* CTA */}
         <div style={{ ...sectionStyle, textAlign: 'center' as const }}>
           <h2 style={{ ...h2Style, marginBottom: '12px' }}>東京都の駅データを詳しく見る</h2>
