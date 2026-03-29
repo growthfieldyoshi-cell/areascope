@@ -52,7 +52,7 @@ const ARTICLE_SLUGS = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [stations, cities, stationKanaPref, cityKanaPref] = await Promise.all([
+  const [stations, cities, stationKanaPref, cityKanaPref, rankingPrefs] = await Promise.all([
     sql`
       SELECT DISTINCT station_group_slug
       FROM stations
@@ -86,6 +86,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ) s
         ON s.municipality_code = m.code5
       WHERE m.municipality_name_initial_kana IS NOT NULL
+    `,
+    sql`
+      SELECT DISTINCT prefecture_slug
+      FROM stations
+      WHERE prefecture_slug IS NOT NULL
+        AND prefecture_slug ~ '^[a-z0-9][a-z0-9\\-]*$'
+      ORDER BY prefecture_slug
     `,
   ]);
 
@@ -143,6 +150,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const stationRankingPrefUrls: MetadataRoute.Sitemap = rankingPrefs.map((r) => ({
+    url: `${BASE_URL}/station-ranking/${r.prefecture_slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
   const articleUrls: MetadataRoute.Sitemap = ARTICLE_SLUGS.map((slug) => ({
     url: `${BASE_URL}/articles/${slug}`,
     changeFrequency: 'monthly',
@@ -170,6 +183,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/city/hard-reading`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/city/quiz`, changeFrequency: 'monthly', priority: 0.8 },
     ...articleUrls,
+    ...stationRankingPrefUrls,
     ...prefUrls,
     ...lineUrls,
     ...lineRankingUrls,
