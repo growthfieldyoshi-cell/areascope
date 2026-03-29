@@ -2,6 +2,13 @@ import Link from 'next/link';
 
 const CATEGORIES = [
   {
+    label: 'ランキング',
+    description: '都道府県別の駅乗降者数ランキングを、データの読み方とあわせて解説する記事です。',
+    articles: [
+      { slug: 'tokyo-station-ranking-2023', title: '東京都の駅乗降者数ランキング（2023年）｜利用者数TOP100', description: '2023年の東京都における駅別乗降者数ランキング。新宿・渋谷・池袋など利用者数の多い駅TOP20の特徴を解説。' },
+    ],
+  },
+  {
     label: '住みやすさ',
     description: '街の快適さや生活のしやすさを、駅利用や人口の動きから読み解く記事です。',
     articles: [

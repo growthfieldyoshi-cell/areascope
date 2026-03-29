@@ -49,6 +49,7 @@ const ARTICLE_SLUGS = [
   'will-redevelopment-area-grow',
   'residential-vs-commercial-area',
   'popular-vs-hidden-station',
+  'tokyo-station-ranking-2023',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
