@@ -25,6 +25,11 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
 }
 
+type PrefRow = {
+  prefecture_slug: string;
+  prefecture_name: string;
+};
+
 type RankingRow = {
   station_group_slug: string;
   station_name: string;
@@ -39,6 +44,13 @@ export default async function StationRankingPage({ searchParams }: Props) {
   const { pref } = await searchParams;
 
   const year = await getLatestYear();
+
+  const prefRows = (await sql`
+    SELECT DISTINCT prefecture_slug, prefecture_name
+    FROM stations
+    WHERE prefecture_slug IS NOT NULL AND prefecture_name IS NOT NULL
+    ORDER BY prefecture_name
+  `) as PrefRow[];
 
   const rows = (await sql`
     SELECT
@@ -119,6 +131,29 @@ export default async function StationRankingPage({ searchParams }: Props) {
         </div>
 
         <div style={{ marginTop: '48px' }}>
+          <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
+            // 都道府県別ランキング
+          </p>
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px', marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00d4aa', marginBottom: '14px' }}>都道府県別の駅ランキング</h2>
+            <p style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.7, marginBottom: '16px' }}>
+              都道府県ごとの駅乗降者数ランキングを確認できます。
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {prefRows.map((p) => (
+                <Link
+                  key={p.prefecture_slug}
+                  href={`/station-ranking/${p.prefecture_slug}`}
+                  style={{ color: '#e8edf5', textDecoration: 'none', background: '#0a0e1a', border: '1px solid #1e2d45', borderRadius: '4px', padding: '4px 12px', fontSize: '0.85rem' }}
+                >
+                  {p.prefecture_name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div>
           <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
             // ランキングの読み方
           </p>

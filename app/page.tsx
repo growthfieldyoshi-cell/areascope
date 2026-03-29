@@ -92,6 +92,23 @@ export default function Home() {
               <div className="nav-card-desc">全国の駅乗降者数ランキング。乗降者数順で主要駅を比較できます。</div>
               <div className="nav-card-link">/station-ranking →</div>
             </Link>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', gridColumn: '1 / -1' }}>
+              <span style={{ fontSize: '11px', color: '#6b7a99', alignSelf: 'center' }}>都道府県別：</span>
+              {[
+                { slug: 'tokyo', name: '東京都' },
+                { slug: 'kanagawa', name: '神奈川県' },
+                { slug: 'osaka', name: '大阪府' },
+                { slug: 'aichi', name: '愛知県' },
+                { slug: 'fukuoka', name: '福岡県' },
+                { slug: 'saitama', name: '埼玉県' },
+                { slug: 'chiba', name: '千葉県' },
+                { slug: 'hyogo', name: '兵庫県' },
+              ].map((p) => (
+                <Link key={p.slug} href={`/station-ranking/${p.slug}`} style={{ fontSize: '11px', color: '#00d4aa', background: '#111827', border: '1px solid #1e2d45', borderRadius: '4px', padding: '3px 8px', textDecoration: 'none' }}>
+                  {p.name}
+                </Link>
+              ))}
+            </div>
             <Link href="/line" className="nav-card">
               <div className="nav-card-icon">🗺️</div>
               <div className="nav-card-title">路線一覧</div>
