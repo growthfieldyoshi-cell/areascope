@@ -96,6 +96,7 @@ const ARTICLE_SLUGS = [
   'miyazaki-station-ranking-2023',
   'kagoshima-station-ranking-2023',
   'okinawa-station-ranking-2023',
+  'prefecture-ranking',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
