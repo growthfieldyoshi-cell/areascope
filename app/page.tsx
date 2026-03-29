@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { neon } from '@neondatabase/serverless';
+
+const sql = neon(process.env.DATABASE_URL!);
 
 export const metadata: Metadata = {
   title: 'AreaScope｜駅・エリアデータを可視化',
@@ -9,7 +12,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const yearRows = await sql`SELECT MIN(year) AS min_year, MAX(year) AS max_year FROM station_passengers`;
+  const minYear = yearRows[0]?.min_year ?? 2011;
+  const maxYear = yearRows[0]?.max_year ?? 2021;
+
   return (
     <main style={{
       minHeight: '100vh',
@@ -70,7 +77,7 @@ export default function Home() {
         <div className="hero-meta">
           <div className="hero-meta-item">全国 <span>9,012</span> 駅</div>
           <div className="hero-meta-item"><span>1,256</span> 市区町村</div>
-          <div className="hero-meta-item">時系列データ <span>2011〜2021年</span></div>
+          <div className="hero-meta-item">時系列データ <span>{minYear}〜{maxYear}年</span></div>
         </div>
       </section>
 
@@ -108,6 +115,9 @@ export default function Home() {
                   {p.name}
                 </Link>
               ))}
+              <Link href="/articles/prefecture-ranking" style={{ fontSize: '11px', color: '#6b7a99', alignSelf: 'center', textDecoration: 'none', marginLeft: '4px' }}>
+                全47都道府県 →
+              </Link>
             </div>
             <Link href="/line" className="nav-card">
               <div className="nav-card-icon">🗺️</div>
@@ -137,7 +147,7 @@ export default function Home() {
               AreaScopeは、国土交通省・総務省の公式データをもとに、全国9,000超の駅の乗降者数と1,200超の市区町村の人口推移を可視化するデータサービスです。駅やエリアごとの利用状況・人口動態を、誰でも無料で確認できます。
             </p>
             <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8 }}>
-              データは2011年〜2021年の時系列で収録しており、コロナ前後の変化や長期トレンドの把握に活用できます。
+              データは{minYear}年〜{maxYear}年の時系列で収録しており、コロナ前後の変化や長期トレンドの把握に活用できます。
             </p>
           </div>
 
