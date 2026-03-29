@@ -1,0 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '三重県の駅乗降者数ランキング｜利用者数TOP100 | AreaScope',
+  description: '三重県の駅別乗降者数ランキング。近鉄四日市・津など主要駅TOP20の特徴とエリアの見方を解説します。',
+};
+
+export default function ArticleLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}

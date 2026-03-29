@@ -66,6 +66,22 @@ const ARTICLE_SLUGS = [
   'gunma-station-ranking-2023',
   'ibaraki-station-ranking-2023',
   'shizuoka-station-ranking-2023',
+  'mie-station-ranking-2023',
+  'shiga-station-ranking-2023',
+  'nara-station-ranking-2023',
+  'wakayama-station-ranking-2023',
+  'okayama-station-ranking-2023',
+  'yamaguchi-station-ranking-2023',
+  'nagano-station-ranking-2023',
+  'yamanashi-station-ranking-2023',
+  'toyama-station-ranking-2023',
+  'ishikawa-station-ranking-2023',
+  'fukui-station-ranking-2023',
+  'iwate-station-ranking-2023',
+  'aomori-station-ranking-2023',
+  'akita-station-ranking-2023',
+  'yamagata-station-ranking-2023',
+  'fukushima-station-ranking-2023',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
