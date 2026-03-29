@@ -50,6 +50,12 @@ const ARTICLE_SLUGS = [
   'residential-vs-commercial-area',
   'popular-vs-hidden-station',
   'tokyo-station-ranking-2023',
+  'osaka-station-ranking-2023',
+  'kanagawa-station-ranking-2023',
+  'aichi-station-ranking-2023',
+  'saitama-station-ranking-2023',
+  'chiba-station-ranking-2023',
+  'fukuoka-station-ranking-2023',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

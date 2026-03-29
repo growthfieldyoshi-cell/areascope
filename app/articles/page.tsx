@@ -5,7 +5,13 @@ const CATEGORIES = [
     label: 'ランキング',
     description: '都道府県別の駅乗降者数ランキングを、データの読み方とあわせて解説する記事です。',
     articles: [
-      { slug: 'tokyo-station-ranking-2023', title: '東京都の駅乗降者数ランキング（2023年）｜利用者数TOP100', description: '2023年の東京都における駅別乗降者数ランキング。新宿・渋谷・池袋など利用者数の多い駅TOP20の特徴を解説。' },
+      { slug: 'tokyo-station-ranking-2023', title: '東京都の駅乗降者数ランキング｜利用者数TOP100', description: '東京都の駅別乗降者数ランキング。新宿・渋谷・池袋など利用者数の多い駅TOP20の特徴を解説。' },
+      { slug: 'osaka-station-ranking-2023', title: '大阪府の駅乗降者数ランキング｜利用者数TOP100', description: '大阪府の駅別乗降者数ランキング。難波・梅田・天王寺など利用者数の多い駅TOP20の特徴を解説。' },
+      { slug: 'kanagawa-station-ranking-2023', title: '神奈川県の駅乗降者数ランキング｜利用者数TOP100', description: '神奈川県の駅別乗降者数ランキング。横浜・武蔵小杉・川崎など利用者数の多い駅TOP20の特徴を解説。' },
+      { slug: 'aichi-station-ranking-2023', title: '愛知県の駅乗降者数ランキング｜利用者数TOP100', description: '愛知県の駅別乗降者数ランキング。名古屋・金山・栄など利用者数の多い駅TOP20の特徴を解説。' },
+      { slug: 'saitama-station-ranking-2023', title: '埼玉県の駅乗降者数ランキング｜利用者数TOP100', description: '埼玉県の駅別乗降者数ランキング。大宮・浦和・川越など利用者数の多い駅TOP20の特徴を解説。' },
+      { slug: 'chiba-station-ranking-2023', title: '千葉県の駅乗降者数ランキング｜利用者数TOP100', description: '千葉県の駅別乗降者数ランキング。西船橋・船橋・千葉など利用者数の多い駅TOP20の特徴を解説。' },
+      { slug: 'fukuoka-station-ranking-2023', title: '福岡県の駅乗降者数ランキング｜利用者数TOP100', description: '福岡県の駅別乗降者数ランキング。博多など利用者数の多い駅TOP20の特徴を解説。' },
     ],
   },
   {
