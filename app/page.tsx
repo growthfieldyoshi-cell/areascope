@@ -99,7 +99,7 @@ export default async function Home() {
               <div className="nav-card-desc">全国の駅乗降者数ランキング。乗降者数順で主要駅を比較できます。</div>
               <div className="nav-card-link">/station-ranking →</div>
             </Link>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', gridColumn: '1 / -1' }}>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', gridColumn: '1 / -1', alignItems: 'center' }}>
               <span style={{ fontSize: '11px', color: '#6b7a99', alignSelf: 'center' }}>都道府県別：</span>
               {[
                 { slug: 'tokyo', name: '東京都' },
@@ -115,9 +115,17 @@ export default async function Home() {
                   {p.name}
                 </Link>
               ))}
-              <Link href="/articles/prefecture-ranking" style={{ fontSize: '11px', color: '#6b7a99', alignSelf: 'center', textDecoration: 'none', marginLeft: '4px' }}>
+              <Link href="/articles/prefecture-ranking" style={{ fontSize: '11px', color: '#00d4aa', alignSelf: 'center', textDecoration: 'none', marginLeft: '4px', border: '1px solid #1e2d45', borderRadius: '4px', padding: '3px 8px', background: '#111827' }}>
                 全47都道府県 →
               </Link>
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <Link href="/articles/prefecture-ranking" style={{ color: '#00d4aa', fontSize: '14px', textDecoration: 'none', fontWeight: 600 }}>
+                都道府県別駅ランキング一覧を見る →
+              </Link>
+              <span style={{ color: '#6b7a99', fontSize: '12px', marginLeft: '10px' }}>
+                全国47都道府県の駅乗降者数ランキング記事を一覧で見られます。
+              </span>
             </div>
             <Link href="/line" className="nav-card">
               <div className="nav-card-icon">🗺️</div>

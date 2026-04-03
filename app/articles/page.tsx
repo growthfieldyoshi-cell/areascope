@@ -159,11 +159,40 @@ export default function ArticlesIndexPage() {
           </p>
         </section>
 
+        {/* 都道府県別ハブ導線 */}
+        <div style={{ background: '#111827', border: '1px solid #00d4aa', borderRadius: '12px', padding: '24px', marginBottom: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '4px' }}>全国47都道府県の駅ランキング</div>
+            <div style={{ color: '#6b7a99', fontSize: '13px' }}>都道府県別にまとめた駅乗降者数ランキングを地方ごとに確認できます。</div>
+          </div>
+          <Link href="/articles/prefecture-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '14px', fontWeight: 700, border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', flexShrink: 0 }}>
+            都道府県別ランキング一覧を見る →
+          </Link>
+        </div>
+
         {/* カテゴリ別セクション */}
         {CATEGORIES.map((cat) => (
           <section key={cat.label} style={{ marginBottom: '40px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00d4aa', marginBottom: '6px' }}>{cat.label}</h2>
-            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7, marginBottom: '16px' }}>{cat.description}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00d4aa', margin: 0 }}>{cat.label}</h2>
+              {cat.label === 'ランキング' && (
+                <Link href="/articles/prefecture-ranking" style={{ fontSize: '12px', color: '#00d4aa', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '4px', padding: '2px 8px' }}>
+                  全47都道府県を見る →
+                </Link>
+              )}
+            </div>
+            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7, marginBottom: '8px' }}>{cat.description}</p>
+            {cat.label === 'ランキング' && (
+              <div style={{ marginBottom: '16px' }}>
+                <Link href="/articles/prefecture-ranking" style={{ color: '#00d4aa', fontSize: '14px', textDecoration: 'none', fontWeight: 600 }}>
+                  都道府県別駅ランキング一覧
+                </Link>
+                <span style={{ color: '#6b7a99', fontSize: '12px', marginLeft: '10px' }}>
+                  全国47都道府県の駅乗降者数ランキング記事を一覧で確認できます。
+                </span>
+              </div>
+            )}
+            {cat.label !== 'ランキング' && <div style={{ marginBottom: '16px' }} />}
             <div className="articles-grid">
               {cat.articles.map((a) => (
                 <ArticleCard key={a.slug} {...a} />
