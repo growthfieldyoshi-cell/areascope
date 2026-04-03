@@ -1,59 +1,67 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
-const CATEGORIES = [
-  {
-    label: 'ランキング',
-    description: '都道府県別の駅乗降者数ランキングを、データの読み方とあわせて解説する記事です。',
-    articles: [
-      { slug: 'tokyo-station-ranking-2023', title: '東京都の駅乗降者数ランキング｜利用者数TOP100', description: '東京都の駅別乗降者数ランキング。新宿・渋谷・池袋など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'osaka-station-ranking-2023', title: '大阪府の駅乗降者数ランキング｜利用者数TOP100', description: '大阪府の駅別乗降者数ランキング。難波・梅田・天王寺など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'kanagawa-station-ranking-2023', title: '神奈川県の駅乗降者数ランキング｜利用者数TOP100', description: '神奈川県の駅別乗降者数ランキング。横浜・武蔵小杉・川崎など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'aichi-station-ranking-2023', title: '愛知県の駅乗降者数ランキング｜利用者数TOP100', description: '愛知県の駅別乗降者数ランキング。名古屋・金山・栄など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'saitama-station-ranking-2023', title: '埼玉県の駅乗降者数ランキング｜利用者数TOP100', description: '埼玉県の駅別乗降者数ランキング。大宮・浦和・川越など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'chiba-station-ranking-2023', title: '千葉県の駅乗降者数ランキング｜利用者数TOP100', description: '千葉県の駅別乗降者数ランキング。西船橋・船橋・千葉など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'fukuoka-station-ranking-2023', title: '福岡県の駅乗降者数ランキング｜利用者数TOP100', description: '福岡県の駅別乗降者数ランキング。博多など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'kyoto-station-ranking-2023', title: '京都府の駅乗降者数ランキング｜利用者数TOP100', description: '京都府の駅別乗降者数ランキング。京都・烏丸御池など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'hyogo-station-ranking-2023', title: '兵庫県の駅乗降者数ランキング｜利用者数TOP100', description: '兵庫県の駅別乗降者数ランキング。三ノ宮・神戸三宮など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'hokkaido-station-ranking-2023', title: '北海道の駅乗降者数ランキング｜利用者数TOP100', description: '北海道の駅別乗降者数ランキング。札幌・大通など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'miyagi-station-ranking-2023', title: '宮城県の駅乗降者数ランキング｜利用者数TOP100', description: '宮城県の駅別乗降者数ランキング。仙台・泉中央など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'hiroshima-station-ranking-2023', title: '広島県の駅乗降者数ランキング｜利用者数TOP100', description: '広島県の駅別乗降者数ランキング。福山・本通など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'niigata-station-ranking-2023', title: '新潟県の駅乗降者数ランキング｜利用者数TOP100', description: '新潟県の駅別乗降者数ランキング。新潟・長岡など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'tochigi-station-ranking-2023', title: '栃木県の駅乗降者数ランキング｜利用者数TOP100', description: '栃木県の駅別乗降者数ランキング。宇都宮・小山など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'gunma-station-ranking-2023', title: '群馬県の駅乗降者数ランキング｜利用者数TOP100', description: '群馬県の駅別乗降者数ランキング。高崎・前橋など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'ibaraki-station-ranking-2023', title: '茨城県の駅乗降者数ランキング｜利用者数TOP100', description: '茨城県の駅別乗降者数ランキング。守谷・水戸など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'shizuoka-station-ranking-2023', title: '静岡県の駅乗降者数ランキング｜利用者数TOP100', description: '静岡県の駅別乗降者数ランキング。静岡・浜松など利用者数の多い駅TOP20の特徴を解説。' },
-      { slug: 'mie-station-ranking-2023', title: '三重県の駅乗降者数ランキング｜利用者数TOP100', description: '三重県の駅別乗降者数ランキング。近鉄四日市・津など主要駅TOP20の特徴を解説。' },
-      { slug: 'shiga-station-ranking-2023', title: '滋賀県の駅乗降者数ランキング｜利用者数TOP100', description: '滋賀県の駅別乗降者数ランキング。草津・南草津など主要駅の利用状況を解説。' },
-      { slug: 'nara-station-ranking-2023', title: '奈良県の駅乗降者数ランキング｜利用者数TOP100', description: '奈良県の駅別乗降者数ランキング。近鉄奈良・王寺など主要駅TOP20の利用状況を解説。' },
-      { slug: 'wakayama-station-ranking-2023', title: '和歌山県の駅乗降者数ランキング｜利用者数TOP100', description: '和歌山県の駅別乗降者数ランキング。和歌山・和歌山市など県内主要駅の利用状況を解説。' },
-      { slug: 'okayama-station-ranking-2023', title: '岡山県の駅乗降者数ランキング｜利用者数TOP100', description: '岡山県の駅別乗降者数ランキング。岡山駅を中心とした県内主要駅TOP20の特徴を解説。' },
-      { slug: 'yamaguchi-station-ranking-2023', title: '山口県の駅乗降者数ランキング｜利用者数TOP100', description: '山口県の駅別乗降者数ランキング。下関・新山口など県内主要駅の利用状況を解説。' },
-      { slug: 'nagano-station-ranking-2023', title: '長野県の駅乗降者数ランキング｜利用者数TOP100', description: '長野県の駅別乗降者数ランキング。長野・松本など県内主要駅TOP20の特徴を解説。' },
-      { slug: 'yamanashi-station-ranking-2023', title: '山梨県の駅乗降者数ランキング｜利用者数TOP100', description: '山梨県の駅別乗降者数ランキング。甲府・大月など県内主要駅の利用状況を解説。' },
-      { slug: 'toyama-station-ranking-2023', title: '富山県の駅乗降者数ランキング｜利用者数TOP100', description: '富山県の駅別乗降者数ランキング。富山・高岡など県内主要駅TOP20の特徴を解説。' },
-      { slug: 'ishikawa-station-ranking-2023', title: '石川県の駅乗降者数ランキング｜利用者数TOP100', description: '石川県の駅別乗降者数ランキング。金沢を中心とした県内主要駅の利用状況を解説。' },
-      { slug: 'fukui-station-ranking-2023', title: '福井県の駅乗降者数ランキング｜利用者数TOP100', description: '福井県の駅別乗降者数ランキング。福井駅を中心とした県内主要駅の利用状況を解説。' },
-      { slug: 'iwate-station-ranking-2023', title: '岩手県の駅乗降者数ランキング｜利用者数TOP100', description: '岩手県の駅別乗降者数ランキング。盛岡・一ノ関など県内主要駅TOP20の特徴を解説。' },
-      { slug: 'aomori-station-ranking-2023', title: '青森県の駅乗降者数ランキング｜利用者数TOP100', description: '青森県の駅別乗降者数ランキング。青森・八戸など県内主要駅の利用状況を解説。' },
-      { slug: 'akita-station-ranking-2023', title: '秋田県の駅乗降者数ランキング｜利用者数TOP100', description: '秋田県の駅別乗降者数ランキング。大曲・土崎など県内主要駅の利用状況を解説。' },
-      { slug: 'yamagata-station-ranking-2023', title: '山形県の駅乗降者数ランキング｜利用者数TOP100', description: '山形県の駅別乗降者数ランキング。山形・米沢など県内主要駅TOP20の利用状況を解説。' },
-      { slug: 'fukushima-station-ranking-2023', title: '福島県の駅乗降者数ランキング｜利用者数TOP100', description: '福島県の駅別乗降者数ランキング。福島・郡山など県内主要駅の利用状況を解説。' },
-      { slug: 'gifu-station-ranking-2023', title: '岐阜県の駅乗降者数ランキング｜利用者数TOP100', description: '岐阜県の駅別乗降者数ランキング。岐阜・大垣など県内主要駅TOP20の特徴を解説。' },
-      { slug: 'shimane-station-ranking-2023', title: '島根県の駅乗降者数ランキング｜利用者数TOP100', description: '島根県の駅別乗降者数ランキング。松江・出雲市など県内主要駅の利用状況を解説。' },
-      { slug: 'tottori-station-ranking-2023', title: '鳥取県の駅乗降者数ランキング｜利用者数TOP100', description: '鳥取県の駅別乗降者数ランキング。鳥取・米子など県内主要駅TOP20の利用状況を解説。' },
-      { slug: 'tokushima-station-ranking-2023', title: '徳島県の駅乗降者数ランキング｜利用者数TOP100', description: '徳島県の駅別乗降者数ランキング。徳島駅を中心とした県内主要駅の利用状況を解説。' },
-      { slug: 'kagawa-station-ranking-2023', title: '香川県の駅乗降者数ランキング｜利用者数TOP100', description: '香川県の駅別乗降者数ランキング。高松・瓦町など県内主要駅TOP20の特徴を解説。' },
-      { slug: 'ehime-station-ranking-2023', title: '愛媛県の駅乗降者数ランキング｜利用者数TOP100', description: '愛媛県の駅別乗降者数ランキング。松山市・松山など県内主要駅の利用状況を解説。' },
-      { slug: 'kochi-station-ranking-2023', title: '高知県の駅乗降者数ランキング｜利用者数TOP100', description: '高知県の駅別乗降者数ランキング。高知・はりまや橋など県内主要駅の利用状況を解説。' },
-      { slug: 'saga-station-ranking-2023', title: '佐賀県の駅乗降者数ランキング｜利用者数TOP100', description: '佐賀県の駅別乗降者数ランキング。佐賀・鳥栖など県内主要駅TOP20の利用状況を解説。' },
-      { slug: 'nagasaki-station-ranking-2023', title: '長崎県の駅乗降者数ランキング｜利用者数TOP100', description: '長崎県の駅別乗降者数ランキング。長崎・諫早など県内主要駅の利用状況を解説。' },
-      { slug: 'kumamoto-station-ranking-2023', title: '熊本県の駅乗降者数ランキング｜利用者数TOP100', description: '熊本県の駅別乗降者数ランキング。熊本・新水前寺など県内主要駅TOP20の特徴を解説。' },
-      { slug: 'oita-station-ranking-2023', title: '大分県の駅乗降者数ランキング｜利用者数TOP100', description: '大分県の駅別乗降者数ランキング。別府・中津など県内主要駅の利用状況を解説。' },
-      { slug: 'miyazaki-station-ranking-2023', title: '宮崎県の駅乗降者数ランキング｜利用者数TOP100', description: '宮崎県の駅別乗降者数ランキング。宮崎・南宮崎など県内主要駅TOP20の利用状況を解説。' },
-      { slug: 'kagoshima-station-ranking-2023', title: '鹿児島県の駅乗降者数ランキング｜利用者数TOP100', description: '鹿児島県の駅別乗降者数ランキング。鹿児島中央・谷山など県内主要駅の利用状況を解説。' },
-      { slug: 'okinawa-station-ranking-2023', title: '沖縄県の駅乗降者数ランキング｜利用者数TOP100', description: '沖縄県の駅別乗降者数ランキング。ゆいレールのおもろまち・県庁前など全駅の利用状況を解説。' },
-    ],
+export const metadata: Metadata = {
+  title: 'AreaScopeの記事一覧｜人口・駅・成長エリア分析',
+  description: 'AreaScopeの記事一覧ページです。人口推移、駅乗降者数、成長エリア分析、都道府県別ランキングなど、データに基づくエリア分析コンテンツを掲載しています。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles',
   },
+};
+
+/* ── 既存記事カテゴリ（従来のランキング・テーマ記事） ── */
+
+const RANKING_ARTICLES = [
+  { slug: 'tokyo-station-ranking-2023', title: '東京都の駅乗降者数ランキング｜利用者数TOP100', description: '東京都の駅別乗降者数ランキング。新宿・渋谷・池袋など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'osaka-station-ranking-2023', title: '大阪府の駅乗降者数ランキング｜利用者数TOP100', description: '大阪府の駅別乗降者数ランキング。難波・梅田・天王寺など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'kanagawa-station-ranking-2023', title: '神奈川県の駅乗降者数ランキング｜利用者数TOP100', description: '神奈川県の駅別乗降者数ランキング。横浜・武蔵小杉・川崎など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'aichi-station-ranking-2023', title: '愛知県の駅乗降者数ランキング｜利用者数TOP100', description: '愛知県の駅別乗降者数ランキング。名古屋・金山・栄など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'saitama-station-ranking-2023', title: '埼玉県の駅乗降者数ランキング｜利用者数TOP100', description: '埼玉県の駅別乗降者数ランキング。大宮・浦和・川越など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'chiba-station-ranking-2023', title: '千葉県の駅乗降者数ランキング｜利用者数TOP100', description: '千葉県の駅別乗降者数ランキング。西船橋・船橋・千葉など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'fukuoka-station-ranking-2023', title: '福岡県の駅乗降者数ランキング｜利用者数TOP100', description: '福岡県の駅別乗降者数ランキング。博多など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'kyoto-station-ranking-2023', title: '京都府の駅乗降者数ランキング｜利用者数TOP100', description: '京都府の駅別乗降者数ランキング。京都・烏丸御池など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'hyogo-station-ranking-2023', title: '兵庫県の駅乗降者数ランキング｜利用者数TOP100', description: '兵庫県の駅別乗降者数ランキング。三ノ宮・神戸三宮など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'hokkaido-station-ranking-2023', title: '北海道の駅乗降者数ランキング｜利用者数TOP100', description: '北海道の駅別乗降者数ランキング。札幌・大通など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'miyagi-station-ranking-2023', title: '宮城県の駅乗降者数ランキング｜利用者数TOP100', description: '宮城県の駅別乗降者数ランキング。仙台・泉中央など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'hiroshima-station-ranking-2023', title: '広島県の駅乗降者数ランキング｜利用者数TOP100', description: '広島県の駅別乗降者数ランキング。福山・本通など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'niigata-station-ranking-2023', title: '新潟県の駅乗降者数ランキング｜利用者数TOP100', description: '新潟県の駅別乗降者数ランキング。新潟・長岡など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'tochigi-station-ranking-2023', title: '栃木県の駅乗降者数ランキング｜利用者数TOP100', description: '栃木県の駅別乗降者数ランキング。宇都宮・小山など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'gunma-station-ranking-2023', title: '群馬県の駅乗降者数ランキング｜利用者数TOP100', description: '群馬県の駅別乗降者数ランキング。高崎・前橋など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'ibaraki-station-ranking-2023', title: '茨城県の駅乗降者数ランキング｜利用者数TOP100', description: '茨城県の駅別乗降者数ランキング。守谷・水戸など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'shizuoka-station-ranking-2023', title: '静岡県の駅乗降者数ランキング｜利用者数TOP100', description: '静岡県の駅別乗降者数ランキング。静岡・浜松など利用者数の多い駅TOP20の特徴を解説。' },
+  { slug: 'mie-station-ranking-2023', title: '三重県の駅乗降者数ランキング｜利用者数TOP100', description: '三重県の駅別乗降者数ランキング。近鉄四日市・津など主要駅TOP20の特徴を解説。' },
+  { slug: 'shiga-station-ranking-2023', title: '滋賀県の駅乗降者数ランキング｜利用者数TOP100', description: '滋賀県の駅別乗降者数ランキング。草津・南草津など主要駅の利用状況を解説。' },
+  { slug: 'nara-station-ranking-2023', title: '奈良県の駅乗降者数ランキング｜利用者数TOP100', description: '奈良県の駅別乗降者数ランキング。近鉄奈良・王寺など主要駅TOP20の利用状況を解説。' },
+  { slug: 'wakayama-station-ranking-2023', title: '和歌山県の駅乗降者数ランキング｜利用者数TOP100', description: '和歌山県の駅別乗降者数ランキング。和歌山・和歌山市など県内主要駅の利用状況を解説。' },
+  { slug: 'okayama-station-ranking-2023', title: '岡山県の駅乗降者数ランキング｜利用者数TOP100', description: '岡山県の駅別乗降者数ランキング。岡山駅を中心とした県内主要駅TOP20の特徴を解説。' },
+  { slug: 'yamaguchi-station-ranking-2023', title: '山口県の駅乗降者数ランキング｜利用者数TOP100', description: '山口県の駅別乗降者数ランキング。下関・新山口など県内主要駅の利用状況を解説。' },
+  { slug: 'nagano-station-ranking-2023', title: '長野県の駅乗降者数ランキング｜利用者数TOP100', description: '長野県の駅別乗降者数ランキング。長野・松本など県内主要駅TOP20の特徴を解説。' },
+  { slug: 'yamanashi-station-ranking-2023', title: '山梨県の駅乗降者数ランキング｜利用者数TOP100', description: '山梨県の駅別乗降者数ランキング。甲府・大月など県内主要駅の利用状況を解説。' },
+  { slug: 'toyama-station-ranking-2023', title: '富山県の駅乗降者数ランキング｜利用者数TOP100', description: '富山県の駅別乗降者数ランキング。富山・高岡など県内主要駅TOP20の特徴を解説。' },
+  { slug: 'ishikawa-station-ranking-2023', title: '石川県の駅乗降者数ランキング｜利用者数TOP100', description: '石川県の駅別乗降者数ランキング。金沢を中心とした県内主要駅の利用状況を解説。' },
+  { slug: 'fukui-station-ranking-2023', title: '福井県の駅乗降者数ランキング｜利用者数TOP100', description: '福井県の駅別乗降者数ランキング。福井駅を中心とした県内主要駅の利用状況を解説。' },
+  { slug: 'iwate-station-ranking-2023', title: '岩手県の駅乗降者数ランキング｜利用者数TOP100', description: '岩手県の駅別乗降者数ランキング。盛岡・一ノ関など県内主要駅TOP20の特徴を解説。' },
+  { slug: 'aomori-station-ranking-2023', title: '青森県の駅乗降者数ランキング｜利用者数TOP100', description: '青森県の駅別乗降者数ランキング。青森・八戸など県内主要駅の利用状況を解説。' },
+  { slug: 'akita-station-ranking-2023', title: '秋田県の駅乗降者数ランキング｜利用者数TOP100', description: '秋田県の駅別乗降者数ランキング。大曲・土崎など県内主要駅の利用状況を解説。' },
+  { slug: 'yamagata-station-ranking-2023', title: '山形県の駅乗降者数ランキング｜利用者数TOP100', description: '山形県の駅別乗降者数ランキング。山形・米沢など県内主要駅TOP20の利用状況を解説。' },
+  { slug: 'fukushima-station-ranking-2023', title: '福島県の駅乗降者数ランキング｜利用者数TOP100', description: '福島県の駅別乗降者数ランキング。福島・郡山など県内主要駅の利用状況を解説。' },
+  { slug: 'gifu-station-ranking-2023', title: '岐阜県の駅乗降者数ランキング｜利用者数TOP100', description: '岐阜県の駅別乗降者数ランキング。岐阜・大垣など県内主要駅TOP20の特徴を解説。' },
+  { slug: 'shimane-station-ranking-2023', title: '島根県の駅乗降者数ランキング｜利用者数TOP100', description: '島根県の駅別乗降者数ランキング。松江・出雲市など県内主要駅の利用状況を解説。' },
+  { slug: 'tottori-station-ranking-2023', title: '鳥取県の駅乗降者数ランキング｜利用者数TOP100', description: '鳥取県の駅別乗降者数ランキング。鳥取・米子など県内主要駅TOP20の利用状況を解説。' },
+  { slug: 'tokushima-station-ranking-2023', title: '徳島県の駅乗降者数ランキング｜利用者数TOP100', description: '徳島県の駅別乗降者数ランキング。徳島駅を中心とした県内主要駅の利用状況を解説。' },
+  { slug: 'kagawa-station-ranking-2023', title: '香川県の駅乗降者数ランキング｜利用者数TOP100', description: '香川県の駅別乗降者数ランキング。高松・瓦町など県内主要駅TOP20の特徴を解説。' },
+  { slug: 'ehime-station-ranking-2023', title: '愛媛県の駅乗降者数ランキング｜利用者数TOP100', description: '愛媛県の駅別乗降者数ランキング。松山市・松山など県内主要駅の利用状況を解説。' },
+  { slug: 'kochi-station-ranking-2023', title: '高知県の駅乗降者数ランキング｜利用者数TOP100', description: '高知県の駅別乗降者数ランキング。高知・はりまや橋など県内主要駅の利用状況を解説。' },
+  { slug: 'saga-station-ranking-2023', title: '佐賀県の駅乗降者数ランキング｜利用者数TOP100', description: '佐賀県の駅別乗降者数ランキング。佐賀・鳥栖など県内主要駅TOP20の利用状況を解説。' },
+  { slug: 'nagasaki-station-ranking-2023', title: '長崎県の駅乗降者数ランキング｜利用者数TOP100', description: '長崎県の駅別乗降者数ランキング。長崎・諫早など県内主要駅の利用状況を解説。' },
+  { slug: 'kumamoto-station-ranking-2023', title: '熊本県の駅乗降者数ランキング｜利用者数TOP100', description: '熊本県の駅別乗降者数ランキング。熊本・新水前寺など県内主要駅TOP20の特徴を解説。' },
+  { slug: 'oita-station-ranking-2023', title: '大分県の駅乗降者数ランキング｜利用者数TOP100', description: '大分県の駅別乗降者数ランキング。別府・中津など県内主要駅の利用状況を解説。' },
+  { slug: 'miyazaki-station-ranking-2023', title: '宮崎県の駅乗降者数ランキング｜利用者数TOP100', description: '宮崎県の駅別乗降者数ランキング。宮崎・南宮崎など県内主要駅TOP20の利用状況を解説。' },
+  { slug: 'kagoshima-station-ranking-2023', title: '鹿児島県の駅乗降者数ランキング｜利用者数TOP100', description: '鹿児島県の駅別乗降者数ランキング。鹿児島中央・谷山など県内主要駅の利用状況を解説。' },
+  { slug: 'okinawa-station-ranking-2023', title: '沖縄県の駅乗降者数ランキング｜利用者数TOP100', description: '沖縄県の駅別乗降者数ランキング。ゆいレールのおもろまち・県庁前など全駅の利用状況を解説。' },
+];
+
+const THEME_CATEGORIES = [
   {
     label: '住みやすさ',
     description: '街の快適さや生活のしやすさを、駅利用や人口の動きから読み解く記事です。',
@@ -104,115 +112,273 @@ const OTHER_ARTICLES = [
   { slug: 'population-passengers-combination-analysis', title: '人口と乗降者数を組み合わせて見るエリア分析', description: '人口と駅の乗降者数を組み合わせたエリア分析の方法を解説。単一指標では見えない街の特徴や将来性の読み方を紹介します。' },
 ];
 
+/* ── スタイル定義 ── */
+
 const cardStyle = {
   background: '#111827',
   border: '1px solid #1e2d45',
   borderRadius: '12px',
-  padding: '28px',
+  padding: '24px',
   textDecoration: 'none' as const,
   color: '#e8edf5',
   display: 'flex' as const,
   flexDirection: 'column' as const,
-  gap: '10px',
+  gap: '8px',
 };
 
-function ArticleCard({ slug, title, description }: { slug: string; title: string; description: string }) {
+const h2Style = {
+  fontSize: '20px',
+  fontWeight: 700 as const,
+  color: '#00d4aa',
+  marginBottom: '8px',
+};
+
+const sectionDescStyle = {
+  color: '#6b7a99',
+  fontSize: '13px',
+  lineHeight: 1.7,
+  marginBottom: '16px',
+};
+
+const btnStyle = {
+  display: 'inline-block' as const,
+  color: '#00d4aa',
+  border: '1px solid #00d4aa',
+  borderRadius: '6px',
+  padding: '8px 16px',
+  textDecoration: 'none' as const,
+  fontSize: '13px',
+  fontWeight: 700 as const,
+};
+
+/* ── コンポーネント ── */
+
+function ArticleCard({ href, title, description }: { href: string; title: string; description: string }) {
   return (
-    <Link href={`/articles/${slug}`} className="article-card" style={cardStyle}>
-      <div style={{ fontSize: '16px', fontWeight: 700, lineHeight: 1.5 }}>{title}</div>
+    <Link href={href} className="article-card" style={cardStyle}>
+      <div style={{ fontSize: '15px', fontWeight: 700, lineHeight: 1.5 }}>{title}</div>
       <div style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.7 }}>{description}</div>
-      <div style={{ color: '#00d4aa', fontSize: '13px', marginTop: 'auto', paddingTop: '8px' }}>
+      <div style={{ color: '#00d4aa', fontSize: '13px', marginTop: 'auto', paddingTop: '6px' }}>
         記事を読む &rarr;
       </div>
     </Link>
   );
 }
 
+function PrefGuideCard({ href, title, description, examples }: { href: string; title: string; description: string; examples: { slug: string; name: string }[] }) {
+  return (
+    <div style={{ ...cardStyle, textDecoration: 'none' }}>
+      <div style={{ fontSize: '15px', fontWeight: 700, lineHeight: 1.5 }}>{title}</div>
+      <div style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.7 }}>{description}</div>
+      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
+        {examples.map((e) => (
+          <Link key={e.slug} href={href.replace('[prefecture_slug]', e.slug)} style={{ fontSize: '11px', color: '#00d4aa', background: 'rgba(0,212,170,0.08)', border: '1px solid #1e2d45', borderRadius: '4px', padding: '3px 8px', textDecoration: 'none' }}>
+            {e.name}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const SAMPLE_PREFS = [
+  { slug: 'tokyo', name: '東京都' },
+  { slug: 'osaka', name: '大阪府' },
+  { slug: 'kanagawa', name: '神奈川県' },
+  { slug: 'aichi', name: '愛知県' },
+  { slug: 'fukuoka', name: '福岡県' },
+];
+
+/* ── ページ本体 ── */
+
 export default function ArticlesIndexPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <style>{`
         .articles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .articles-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .article-card:hover { border-color: #00d4aa !important; }
-        @media (max-width: 640px) { .articles-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+          .articles-grid { grid-template-columns: 1fr; }
+          .articles-grid-3 { grid-template-columns: 1fr; }
+        }
       `}</style>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 20px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '12px' }}>
-          AreaScope <span style={{ color: '#00d4aa' }}>記事</span>一覧
+          AreaScopeの<span style={{ color: '#00d4aa' }}>記事</span>一覧
         </h1>
-        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '32px' }}>
-          駅の乗降者数や市区町村の人口推移を活用したエリア分析に関する記事をまとめています。
+        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '40px' }}>
+          人口推移と駅乗降者数を組み合わせたエリア分析コンテンツを掲載しています。成長エリアの発見、人流の変化、都道府県別のランキングなど、データに基づいた街の読み解き方をまとめています。
         </p>
 
-        {/* SEO説明文 */}
-        <section style={{ marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>エリア分析記事一覧</h2>
-          <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 2, marginBottom: '8px' }}>
-            AreaScopeでは、駅の乗降者数と人口データをもとに、「住みやすさ」「通勤しやすさ」「将来性」といった観点からエリアを読み解くための記事を掲載しています。
-          </p>
-          <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 2, marginBottom: '8px' }}>
-            ランキングをそのまま鵜呑みにするのではなく、データをどう解釈するかを整理することで、より再現性のあるエリア判断ができるようになります。
-          </p>
-          <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
-            人口・駅データをもとにしたエリア分析の考え方をまとめています。
-          </p>
+        {/* ── 成長エリア分析 ── */}
+        <section style={{ marginBottom: '48px' }}>
+          <h2 style={h2Style}>成長エリア分析</h2>
+          <p style={sectionDescStyle}>人口増加率と駅乗降者数を掛け合わせて、エリアの成長性を多角的に分析する記事です。</p>
+          <div className="articles-grid">
+            <ArticleCard
+              href="/articles/population-passengers-cross-analysis"
+              title="人口増加×駅乗降者数で見る成長エリアランキング"
+              description="人口が増えていて、かつ駅利用も多いエリアをスコア化してTOP20を紹介。"
+            />
+            <ArticleCard
+              href="/articles/population-growth-low-passenger-analysis"
+              title="人口は増えているのに駅利用が弱い街ランキング"
+              description="人口増加率と駅利用のギャップから、車社会・郊外型の成長エリアを可視化。"
+            />
+            <ArticleCard
+              href="/articles/population-decline-high-passenger-analysis"
+              title="人口は減っているのに人流が強い街ランキング"
+              description="人口減少でも駅利用が活発な街を抽出。観光地・商業地・オフィス街の特徴を分析。"
+            />
+          </div>
         </section>
 
-        {/* 都道府県別ハブ導線 */}
-        <div style={{ background: '#111827', border: '1px solid #00d4aa', borderRadius: '12px', padding: '24px', marginBottom: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '4px' }}>全国47都道府県の駅ランキング</div>
-            <div style={{ color: '#6b7a99', fontSize: '13px' }}>都道府県別にまとめた駅乗降者数ランキングを地方ごとに確認できます。</div>
+        {/* ── 人流分析 ── */}
+        <section style={{ marginBottom: '48px' }}>
+          <h2 style={h2Style}>人流分析</h2>
+          <p style={sectionDescStyle}>駅の乗降者数データから、人流の変化やコロナ前後の回復状況を分析する記事です。</p>
+          <div className="articles-grid">
+            <ArticleCard
+              href="/articles/station-passenger-recovery-analysis"
+              title="駅乗降者数の回復率ランキング（コロナ前後）"
+              description="2019年と最新年の乗降者数を比較し、回復率が高い駅をランキング形式で紹介。"
+            />
+            <ArticleCard
+              href="/articles/station-passengers-growth-2023"
+              title="2023年に乗降者数が最も増えた駅ランキング"
+              description="2022年から2023年にかけて乗降者数が最も増加した駅TOP20をデータで紹介。"
+            />
           </div>
-          <Link href="/articles/prefecture-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '14px', fontWeight: 700, border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', flexShrink: 0 }}>
-            都道府県別ランキング一覧を見る →
-          </Link>
-        </div>
+        </section>
 
-        {/* カテゴリ別セクション */}
-        {CATEGORIES.map((cat) => (
-          <section key={cat.label} style={{ marginBottom: '40px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00d4aa', margin: 0 }}>{cat.label}</h2>
-              {cat.label === 'ランキング' && (
-                <Link href="/articles/prefecture-ranking" style={{ fontSize: '12px', color: '#00d4aa', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '4px', padding: '2px 8px' }}>
-                  全47都道府県を見る →
-                </Link>
-              )}
+        {/* ── 都道府県別ランキング ── */}
+        <section style={{ marginBottom: '48px' }}>
+          <h2 style={h2Style}>都道府県別ランキング</h2>
+          <p style={sectionDescStyle}>全国版の分析を都道府県別に展開したページです。各テーマで全47都道府県分のページがあります。</p>
+
+          {/* 駅乗降者数ランキング */}
+          <div style={{ background: '#111827', border: '1px solid #00d4aa', borderRadius: '12px', padding: '24px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#e8edf5', marginBottom: '4px' }}>全国47都道府県の駅乗降者数ランキング</div>
+              <div style={{ color: '#6b7a99', fontSize: '13px' }}>都道府県別にまとめた駅乗降者数ランキングを地方ごとに確認できます。</div>
             </div>
-            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7, marginBottom: '8px' }}>{cat.description}</p>
-            {cat.label === 'ランキング' && (
-              <div style={{ marginBottom: '16px' }}>
-                <Link href="/articles/prefecture-ranking" style={{ color: '#00d4aa', fontSize: '14px', textDecoration: 'none', fontWeight: 600 }}>
-                  都道府県別駅ランキング一覧
-                </Link>
-                <span style={{ color: '#6b7a99', fontSize: '12px', marginLeft: '10px' }}>
-                  全国47都道府県の駅乗降者数ランキング記事を一覧で確認できます。
-                </span>
-              </div>
-            )}
-            {cat.label !== 'ランキング' && <div style={{ marginBottom: '16px' }} />}
+            <Link href="/articles/prefecture-ranking" style={btnStyle}>
+              都道府県別ランキング一覧 →
+            </Link>
+          </div>
+
+          <div className="articles-grid" style={{ marginBottom: '16px' }}>
+            <PrefGuideCard
+              href="/articles/station-passenger-recovery/[prefecture_slug]"
+              title="都道府県別 駅回復率ランキング"
+              description="県内の駅ごとにコロナ前後の回復率を比較できます。"
+              examples={SAMPLE_PREFS}
+            />
+            <PrefGuideCard
+              href="/population-ranking/[prefecture_slug]"
+              title="都道府県別 人口増加自治体ランキング"
+              description="県内で人口が増えている市区町村をランキング形式で確認できます。"
+              examples={SAMPLE_PREFS}
+            />
+            <PrefGuideCard
+              href="/population-decline-ranking/[prefecture_slug]"
+              title="都道府県別 人口減少自治体ランキング"
+              description="県内で人口が減少している市区町村をランキング形式で確認できます。"
+              examples={SAMPLE_PREFS}
+            />
+            <PrefGuideCard
+              href="/articles/growth-area-ranking/[prefecture_slug]"
+              title="都道府県別 成長エリアランキング"
+              description="県内で人口増×人流増のエリアをスコア化してランキングで確認できます。"
+              examples={SAMPLE_PREFS}
+            />
+            <PrefGuideCard
+              href="/articles/population-decline-high-passenger/[prefecture_slug]"
+              title="都道府県別 人口減×人流強い街ランキング"
+              description="県内で人口は減っているのに駅利用が強い街をランキングで確認できます。"
+              examples={SAMPLE_PREFS}
+            />
+          </div>
+        </section>
+
+        {/* ── 駅乗降者数ランキング記事（47県） ── */}
+        <section style={{ marginBottom: '48px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+            <h2 style={{ ...h2Style, margin: 0 }}>駅乗降者数ランキング記事</h2>
+            <Link href="/articles/prefecture-ranking" style={{ fontSize: '12px', color: '#00d4aa', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '4px', padding: '2px 8px' }}>
+              全47都道府県を見る →
+            </Link>
+          </div>
+          <p style={sectionDescStyle}>都道府県別の駅乗降者数ランキングを、データの読み方とあわせて解説する記事です。</p>
+          <div className="articles-grid">
+            {RANKING_ARTICLES.map((a) => (
+              <ArticleCard key={a.slug} href={`/articles/${a.slug}`} title={a.title} description={a.description} />
+            ))}
+          </div>
+        </section>
+
+        {/* ── テーマ別記事 ── */}
+        {THEME_CATEGORIES.map((cat) => (
+          <section key={cat.label} style={{ marginBottom: '40px' }}>
+            <h2 style={{ ...h2Style, margin: 0, marginBottom: '6px' }}>{cat.label}</h2>
+            <p style={sectionDescStyle}>{cat.description}</p>
             <div className="articles-grid">
               {cat.articles.map((a) => (
-                <ArticleCard key={a.slug} {...a} />
+                <ArticleCard key={a.slug} href={`/articles/${a.slug}`} title={a.title} description={a.description} />
               ))}
             </div>
           </section>
         ))}
 
-        {/* その他の記事 */}
-        <section style={{ marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#00d4aa', marginBottom: '6px' }}>その他の記事</h2>
-          <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7, marginBottom: '16px' }}>エリア分析の基本や引越し・投資判断に役立つ記事です。</p>
+        {/* ── その他の記事 ── */}
+        <section style={{ marginBottom: '48px' }}>
+          <h2 style={{ ...h2Style, margin: 0, marginBottom: '6px' }}>その他の記事</h2>
+          <p style={sectionDescStyle}>エリア分析の基本や引越し・投資判断に役立つ記事です。</p>
           <div className="articles-grid">
             {OTHER_ARTICLES.map((a) => (
-              <ArticleCard key={a.slug} {...a} />
+              <ArticleCard key={a.slug} href={`/articles/${a.slug}`} title={a.title} description={a.description} />
             ))}
           </div>
         </section>
 
-        <div style={{ marginTop: '48px', borderTop: '1px solid #1e2d45', paddingTop: '24px' }}>
+        {/* ── データ活用ガイド ── */}
+        <section style={{ marginBottom: '48px' }}>
+          <h2 style={h2Style}>データ活用ガイド</h2>
+          <p style={sectionDescStyle}>AreaScopeのデータツールを使って、エリア分析を始めてみましょう。</p>
+          <div className="articles-grid-3">
+            <Link href="/population" className="article-card" style={cardStyle}>
+              <div style={{ fontSize: '15px', fontWeight: 700 }}>人口分析</div>
+              <div style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.7 }}>市区町村の人口推移をグラフで確認できます。</div>
+              <div style={{ color: '#00d4aa', fontSize: '13px', marginTop: 'auto', paddingTop: '6px' }}>/population →</div>
+            </Link>
+            <Link href="/station-ranking" className="article-card" style={cardStyle}>
+              <div style={{ fontSize: '15px', fontWeight: 700 }}>全国駅ランキング</div>
+              <div style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.7 }}>全国の駅を乗降者数順にランキングで比較できます。</div>
+              <div style={{ color: '#00d4aa', fontSize: '13px', marginTop: 'auto', paddingTop: '6px' }}>/station-ranking →</div>
+            </Link>
+            <Link href="/articles/prefecture-ranking" className="article-card" style={cardStyle}>
+              <div style={{ fontSize: '15px', fontWeight: 700 }}>都道府県別駅ランキング一覧</div>
+              <div style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.7 }}>47都道府県の駅ランキング記事を地方別にまとめています。</div>
+              <div style={{ color: '#00d4aa', fontSize: '13px', marginTop: 'auto', paddingTop: '6px' }}>/articles/prefecture-ranking →</div>
+            </Link>
+          </div>
+        </section>
+
+        {/* ── まとめ ── */}
+        <section style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginBottom: '48px' }}>
+          <h2 style={h2Style}>AreaScopeのデータでエリアを分析する</h2>
+          <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '12px' }}>
+            AreaScopeは、国土交通省の駅乗降者数と総務省の人口データを組み合わせて、エリアの成長性・人流・居住需要を可視化するサービスです。
+          </p>
+          <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: 0 }}>
+            人口が増えているだけでは「強い街」とは限らず、人口が減っていても「弱い街」とは限りません。複数の指標を掛け合わせることで、イメージや知名度に頼らないエリア判断が可能になります。
+          </p>
+        </section>
+
+        {/* ── フッター関連リンク ── */}
+        <div style={{ borderTop: '1px solid #1e2d45', paddingTop: '24px' }}>
           <p style={{ color: '#6b7a99', fontSize: '12px', marginBottom: '12px', fontFamily: 'monospace', letterSpacing: '2px' }}>// 関連ページ</p>
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>駅乗降者数ランキングを見る</Link>

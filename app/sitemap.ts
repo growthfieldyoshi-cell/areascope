@@ -97,6 +97,16 @@ const ARTICLE_SLUGS = [
   'kagoshima-station-ranking-2023',
   'okinawa-station-ranking-2023',
   'prefecture-ranking',
+  /* 新規追加分 */
+  'station-passengers-growth-2023',
+  'population-passengers-cross-analysis',
+  'population-growth-low-passenger-analysis',
+  'population-decline-high-passenger-analysis',
+  'station-passenger-recovery-analysis',
+  'growth-areas',
+  'passenger-analysis',
+  'population-analysis',
+  'prefecture-rankings',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -210,6 +220,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  /* 都道府県別ページ（新規追加分） */
+  const prefSlugs = rankingPrefs.map((r) => r.prefecture_slug as string);
+
+  const populationRankingUrls: MetadataRoute.Sitemap = prefSlugs.map((slug) => ({
+    url: `${BASE_URL}/population-ranking/${slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
+  const populationDeclineRankingUrls: MetadataRoute.Sitemap = prefSlugs.map((slug) => ({
+    url: `${BASE_URL}/population-decline-ranking/${slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
+  const growthAreaRankingUrls: MetadataRoute.Sitemap = prefSlugs.map((slug) => ({
+    url: `${BASE_URL}/articles/growth-area-ranking/${slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
+  const popDeclineHighPassengerUrls: MetadataRoute.Sitemap = prefSlugs.map((slug) => ({
+    url: `${BASE_URL}/articles/population-decline-high-passenger/${slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
+  const stationRecoveryPrefUrls: MetadataRoute.Sitemap = prefSlugs.map((slug) => ({
+    url: `${BASE_URL}/articles/station-passenger-recovery/${slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
   return [
     { url: BASE_URL, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${BASE_URL}/station`, changeFrequency: 'weekly', priority: 0.9 },
@@ -232,6 +275,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/city/quiz`, changeFrequency: 'monthly', priority: 0.8 },
     ...articleUrls,
     ...stationRankingPrefUrls,
+    ...populationRankingUrls,
+    ...populationDeclineRankingUrls,
+    ...growthAreaRankingUrls,
+    ...popDeclineHighPassengerUrls,
+    ...stationRecoveryPrefUrls,
     ...prefUrls,
     ...lineUrls,
     ...lineRankingUrls,

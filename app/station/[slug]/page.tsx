@@ -335,6 +335,62 @@ export default async function StationPage({ params }: PageProps) {
           </div>
         </section>
 
+        {station.prefecture_slug && station.prefecture_name && (
+          <div
+            style={{
+              background: '#111827',
+              border: '1px solid #1e2d45',
+              borderRadius: '8px',
+              padding: '20px 24px',
+              marginTop: '32px',
+            }}
+          >
+            <p style={{ color: '#6b7a99', fontSize: '13px', marginBottom: '4px' }}>
+              この都道府県の関連ランキング
+            </p>
+            <p style={{ color: '#aaa', fontSize: '13px', marginBottom: '16px' }}>
+              この駅がある都道府県の人口・人流・成長エリア関連ランキングをまとめて確認できます。
+            </p>
+
+            {[
+              {
+                label: `${station.prefecture_name}の駅回復率ランキング`,
+                path: `/articles/station-passenger-recovery/${station.prefecture_slug}`,
+              },
+              {
+                label: `${station.prefecture_name}の人口増加自治体ランキング`,
+                path: `/population-ranking/${station.prefecture_slug}`,
+              },
+              {
+                label: `${station.prefecture_name}の人口減少自治体ランキング`,
+                path: `/population-decline-ranking/${station.prefecture_slug}`,
+              },
+              {
+                label: `${station.prefecture_name}の成長エリアランキング`,
+                path: `/articles/growth-area-ranking/${station.prefecture_slug}`,
+              },
+              {
+                label: `${station.prefecture_name}の人口減×人流強い街ランキング`,
+                path: `/articles/population-decline-high-passenger/${station.prefecture_slug}`,
+              },
+            ].map((link) => (
+              <Link
+                key={link.path}
+                href={link.path}
+                style={{
+                  display: 'block',
+                  color: '#00d4aa',
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                  marginBottom: '8px',
+                }}
+              >
+                → {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
+
       </div>
     </main>
   );
