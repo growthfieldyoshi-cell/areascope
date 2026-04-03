@@ -51,8 +51,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${lineName} 自治体人口上位駅｜AreaScope`,
-    description: `${lineName}の駅を、属する自治体の人口順で掲載しています。`,
+    title: `${lineName}の駅ランキング（自治体人口順）｜AreaScope`,
+    description: `${lineName}の駅を自治体人口順にランキング。沿線のどの駅が人口の多いエリアにあるかをデータで確認できます。`,
     alternates: { canonical: `${BASE_URL}/line/${slug}/ranking` },
     robots: { index: true, follow: true },
   };
@@ -101,9 +101,16 @@ export default async function LineRankingPage({ params }: Props) {
         {lineName} 自治体人口上位駅
       </h1>
 
-      <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: '1.8' }}>
-        {lineName}の駅を、駅が属する自治体の人口（2020年）順で掲載しています。
+      <p style={{ color: '#aaa', marginBottom: '0.8rem', fontSize: '0.95rem', lineHeight: '1.8' }}>
+        {lineName}の駅を、駅が属する自治体の人口（2020年）順でランキングしています。沿線のどの駅が人口の多いエリアにあるかが分かります。
       </p>
+      <p style={{ color: '#6b7a99', marginBottom: '2rem', fontSize: '0.9rem', lineHeight: '1.7' }}>
+        人口が多い自治体にある駅は、通勤・商業・生活の需要が集まりやすく、路線内での中心的な役割を担っている傾向があります。
+      </p>
+
+      <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>
+        {lineName}の駅ランキング（自治体人口順）
+      </h2>
 
       <section style={{ marginBottom: '2rem' }}>
         <div style={{ background: '#111827', borderRadius: '8px', overflow: 'hidden' }}>
@@ -161,7 +168,7 @@ export default async function LineRankingPage({ params }: Props) {
         </div>
       </section>
 
-      <section>
+      <section style={{ marginBottom: '2rem' }}>
         <Link
           href={`/line/${slug}`}
           style={{
@@ -177,6 +184,64 @@ export default async function LineRankingPage({ params }: Props) {
           🚃 {lineName}の駅一覧を見る
         </Link>
       </section>
+
+      {/* このランキングの見方 */}
+      <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>このランキングの見方</h2>
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+          このランキングは、{lineName}の各駅が属する自治体の人口（2020年国勢調査）で順位付けしています。自治体人口が多いエリアにある駅ほど上位に表示されます。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+          人口が多い自治体にある駅は、周辺の居住者数が多く、通勤・通学・買い物など日常的な利用者が集まりやすい傾向があります。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: 0 }}>
+          ターミナル駅や乗換駅は、自治体人口に加えて広域からの乗り換え需要も加わるため、路線内での重要度が高くなりやすいです。
+        </p>
+      </div>
+
+      {/* 利用者が多い駅の特徴 */}
+      <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>{lineName}で上位に入る駅の特徴</h2>
+        <ul style={{ color: '#aaa', fontSize: '15px', lineHeight: 2.2, paddingLeft: '20px', marginBottom: 0 }}>
+          <li>ターミナル駅や乗換駅は人口の多い自治体に位置していることが多い</li>
+          <li>商業施設やオフィスが集まるエリアの駅は、人口規模が大きい自治体に属しやすい</li>
+          <li>都市中心部に近い駅ほど、自治体人口が多く上位に入りやすい</li>
+          <li>郊外の駅でも、ベッドタウンとして発展した自治体に属する駅は上位に入ることがある</li>
+        </ul>
+      </div>
+
+      {/* まとめ */}
+      <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>まとめ</h2>
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+          このページでは、{lineName}の沿線構造を自治体人口の視点から確認できます。人口が多いエリアに位置する駅は、生活需要や商業需要が集まりやすい傾向があります。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: 0 }}>
+          各駅の詳細ページでは乗降者数の時系列データも確認できるため、人口データと合わせてエリア分析に活用できます。
+        </p>
+      </div>
+
+      {/* 関連データを見る */}
+      <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#00d4aa', marginBottom: '12px' }}>関連データを見る</h2>
+        <p style={{ color: '#6b7a99', fontSize: '13px', marginBottom: '16px' }}>
+          路線データと合わせて、人流や成長エリアのデータも確認できます。
+        </p>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <Link href="/articles/passenger-analysis" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            人流分析の記事一覧
+          </Link>
+          <Link href="/articles/growth-areas" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            成長エリア分析
+          </Link>
+          <Link href="/station-ranking" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            全国駅ランキング
+          </Link>
+          <Link href="/articles/prefecture-rankings" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            都道府県別ランキング一覧
+          </Link>
+        </div>
+      </div>
     </main>
   );
 }
