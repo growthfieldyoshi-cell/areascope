@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!prefName) return {};
   return {
     title: `${prefName}の人口増加自治体ランキング｜AreaScope`,
-    description: `${prefName}内で人口が増えている市区町村をランキング形式で紹介。直近2時点の人口データをもとに、県内の人口動向を可視化します。`,
+    description: `${prefName}で人口が増えている市区町村をランキング形式で紹介。直近2時点の人口データをもとに県内の人口動向を確認できます。`,
     alternates: { canonical: `https://areascope.jp/population-ranking/${prefecture_slug}` },
   };
 }
@@ -227,14 +227,14 @@ export default async function PrefecturePopulationRankingPage({ params }: Props)
             気になる自治体やエリアがあれば、詳細データを確認してみてください。
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link href="/articles/population-analysis" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              人口分析の記事一覧
+            </Link>
+            <Link href="/articles/growth-areas" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              成長エリア分析
+            </Link>
             <Link href="/population" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
-              人口分析
-            </Link>
-            <Link href="/articles/prefecture-ranking" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
-              都道府県別駅ランキング一覧
-            </Link>
-            <Link href="/articles" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
-              記事一覧
+              人口分析ツール
             </Link>
           </div>
         </div>

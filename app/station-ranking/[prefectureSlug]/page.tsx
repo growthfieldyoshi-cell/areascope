@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const year = await getLatestYear();
   return {
     title: `${prefName}の駅乗降者数ランキング（${year}年）｜AreaScope`,
-    description: `${prefName}の駅別乗降者数ランキング。${year}年のデータをもとに利用者数の多い駅TOP100を掲載。`,
+    description: `${prefName}の駅乗降者数ランキングを掲載。人の流れが多い駅や交通の中心となる駅を${year}年のデータで確認できます。`,
     alternates: { canonical: `https://areascope.jp/station-ranking/${prefectureSlug}` },
   };
 }
@@ -98,9 +98,16 @@ export default async function PrefectureStationRankingPage({ params }: Props) {
         <h1 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '8px' }}>
           {prefName}の駅<span style={{ color: '#00d4aa' }}>乗降者数</span>ランキング（{year}年）
         </h1>
-        <p style={{ color: '#6b7a99', fontSize: '14px', marginBottom: '32px', lineHeight: 1.7 }}>
-          {prefName}の駅別乗降者数ランキングです。{year}年のデータをもとに、利用者数の多い駅を掲載しています。
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+          {prefName}の駅乗降者数ランキングです。国土交通省「国土数値情報」の{year}年データをもとに、県内で利用者数の多い駅を掲載しています。
         </p>
+        <p style={{ color: '#6b7a99', fontSize: '14px', marginBottom: '32px', lineHeight: 1.7 }}>
+          乗降者数が多い駅は、通勤・商業・観光など人の流れが集中するエリアの中心です。{prefName}内でどの駅に人が集まっているかをデータで確認できます。
+        </p>
+
+        <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>
+          {prefName}の駅乗降者数ランキング
+        </h2>
 
         {rows.length === 0 ? (
           <div style={{ background: '#111827', borderRadius: '8px', padding: '40px', textAlign: 'center' }}>
@@ -151,6 +158,62 @@ export default async function PrefectureStationRankingPage({ params }: Props) {
           <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '14px', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', display: 'inline-block' }}>
             全国ランキングを見る
           </Link>
+        </div>
+
+        {/* このランキングの見方 */}
+        <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginTop: '48px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>このランキングの見方</h2>
+          <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+            乗降者数とは、1日あたりに駅で乗車・降車した人数の合計です。同じ駅名で複数路線がある場合は合算した数値を使用しています。
+          </p>
+          <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+            数字が大きい駅ほど、その駅を中心とした人の流れが大きいことを意味します。通勤・通学・買い物・観光など、さまざまな目的で駅が利用されています。
+          </p>
+          <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: 0 }}>
+            一般的に、複数路線が乗り入れるターミナル駅や、商業施設・オフィスが集積するエリアの駅が上位に入りやすい傾向があります。
+          </p>
+        </div>
+
+        {/* 利用者が多い駅の特徴 */}
+        <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginTop: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>{prefName}で利用者が多い駅の特徴</h2>
+          <ul style={{ color: '#aaa', fontSize: '15px', lineHeight: 2.2, paddingLeft: '20px', marginBottom: 0 }}>
+            <li>複数路線が集まるターミナル駅が上位に入りやすい</li>
+            <li>乗換駅や沿線の中心駅は、広域からの利用者が集まるため利用者数が大きい</li>
+            <li>商業施設やオフィスが集まる駅は、通勤・買い物需要で利用者数が伸びやすい</li>
+            <li>観光地の最寄り駅は、季節やイベントにより利用者数が変動しやすい</li>
+            <li>再開発が進むエリアでは、新規居住者の増加に伴い利用者数が成長している駅もある</li>
+          </ul>
+        </div>
+
+        {/* まとめ */}
+        <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginTop: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>まとめ</h2>
+          <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+            このページでは、{prefName}内の駅を乗降者数順に確認できます。どの駅に人が集まっているかを把握することで、県内の人流構造が見えてきます。
+          </p>
+          <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: 0 }}>
+            各駅の時系列データや人口推移と組み合わせると、エリアの成長性や特徴をより深く分析できます。気になる駅があれば、駅名をクリックして詳細ページをご確認ください。
+          </p>
+        </div>
+
+        {/* 関連データを見る */}
+        <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginTop: '24px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#00d4aa', marginBottom: '12px' }}>関連データを見る</h2>
+          <p style={{ color: '#6b7a99', fontSize: '13px', marginBottom: '16px' }}>
+            人流や人口データと組み合わせて、エリアをさらに分析できます。
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link href="/articles/passenger-analysis" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              人流分析の記事一覧
+            </Link>
+            <Link href="/articles/growth-areas" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              成長エリア分析
+            </Link>
+            <Link href="/population" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              人口分析
+            </Link>
+          </div>
         </div>
       </div>
     </main>
