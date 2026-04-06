@@ -1,6 +1,7 @@
 // app/layout.tsx
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -47,13 +48,19 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
-        <div style={{ padding: '12px 20px', textAlign: 'center', borderTop: '1px solid #1e2d45', background: '#0a0e1a' }}>
+        <div style={{ padding: '16px 20px', textAlign: 'center', borderTop: '1px solid #1e2d45', background: '#0a0e1a' }}>
           <p style={{ color: '#6b7a99', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
             出典：「国土数値情報（駅別乗降客数データ）」（国土交通省）
           </p>
-          <p style={{ color: '#6b7a99', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: '#6b7a99', fontSize: '12px', lineHeight: 1.6, margin: '0 0 10px 0' }}>
             https://nlftp.mlit.go.jp/ksj/
           </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <Link href="/about" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '12px', fontFamily: 'monospace' }}>About</Link>
+            <Link href="/contact" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '12px', fontFamily: 'monospace' }}>Contact</Link>
+            <Link href="/privacy" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '12px', fontFamily: 'monospace' }}>Privacy</Link>
+            <Link href="/data" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '12px', fontFamily: 'monospace' }}>Data</Link>
+          </div>
         </div>
       </body>
       <GoogleAnalytics gaId="G-W711TVYVQT" />
