@@ -81,6 +81,15 @@ export default async function Home() {
         </div>
       </section>
 
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 32px 40px' }}>
+        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '12px', maxWidth: '640px' }}>
+          AreaScopeは、駅の乗降者数と市区町村の人口データをもとに、エリアの特徴や将来性を分析できるデータサイトです。
+        </p>
+        <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7, maxWidth: '640px' }}>
+          居住エリアの比較や情報収集にご活用ください。すべてのデータは国土交通省・総務省の公式統計に基づいています。
+        </p>
+      </div>
+
       <div style={{ borderTop: '1px solid #1e2d45', paddingTop: '40px' }}>
         <div className="nav-section">
           <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>
