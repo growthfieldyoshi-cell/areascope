@@ -1,6 +1,7 @@
 export default function PrivacyPage() {
   return (
-    <main style={{ maxWidth: '800px', margin: '0 auto', padding: '60px 24px', color: '#e8edf5' }}>
+    <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '60px 24px' }}>
       <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#e8edf5', marginBottom: '24px' }}>
         プライバシーポリシー
       </h1>
@@ -29,6 +30,7 @@ export default function PrivacyPage() {
         <Section title="プライバシーポリシーの変更">
           本ポリシーは、必要に応じて予告なく変更されることがあります。
         </Section>
+      </div>
       </div>
     </main>
   );
