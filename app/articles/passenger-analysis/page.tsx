@@ -116,6 +116,24 @@ export default function PassengerAnalysisHubPage() {
           </div>
         </section>
 
+        {/* 主要路線の駅乗降者数ランキング */}
+        <section style={{ marginBottom: '48px' }}>
+          <h2 style={h2Style}>主要路線の駅乗降者数ランキング</h2>
+          <p style={sectionDescStyle}>路線ごとに利用者が多い駅をランキング形式で確認できます。路線内の人の流れや中心駅を把握するのに役立ちます。今後も主要路線を追加していく予定です。</p>
+          <div className="articles-grid">
+            <ArticleCard
+              href="/articles/line-passenger-ranking/yamanote"
+              title="山手線の駅乗降者数ランキング"
+              description="山手線の中で利用者数が多い駅をランキング形式で掲載。都心部の人流が集中する駅を確認できます。"
+            />
+            <ArticleCard
+              href="/articles/line-passenger-ranking/inokashira"
+              title="京王井の頭線の駅乗降者数ランキング"
+              description="京王井の頭線の中で利用者数が多い駅をランキング形式で掲載。沿線内で人の流れが集まる駅を確認できます。"
+            />
+          </div>
+        </section>
+
         {/* 都道府県別の人流ランキング */}
         <section style={{ marginBottom: '48px' }}>
           <h2 style={h2Style}>都道府県別の人流ランキング</h2>

@@ -107,6 +107,8 @@ const ARTICLE_SLUGS = [
   'passenger-analysis',
   'population-analysis',
   'prefecture-rankings',
+  'line-passenger-ranking/yamanote',
+  'line-passenger-ranking/inokashira',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
