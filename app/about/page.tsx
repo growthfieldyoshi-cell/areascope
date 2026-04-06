@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function AboutPage() {
   return (
     <main style={{ maxWidth: '800px', margin: '0 auto', padding: '60px 24px', color: '#e8edf5' }}>
@@ -33,7 +35,7 @@ export default function AboutPage() {
         <Row label="出典URL" value="https://nlftp.mlit.go.jp/ksj/" />
       </div>
 
-      <div style={{ background: '#111827', borderRadius: '12px', padding: '32px' }}>
+      <div style={{ background: '#111827', borderRadius: '12px', padding: '32px', marginBottom: '48px' }}>
         <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>データ利用時の注意点</h3>
         <ul style={{ color: '#aaa', fontSize: '14px', lineHeight: 2, margin: 0, paddingLeft: '20px' }}>
           <li>各鉄道事業者が独自に算出しており、統一された基準はありません</li>
@@ -41,6 +43,18 @@ export default function AboutPage() {
           <li>データ年度は整備年度から1年遡った年度が実データ年度です</li>
           <li>2021年度以前のデータはコロナ禍の影響を受けている場合があります</li>
         </ul>
+      </div>
+
+      <h2 style={{ fontSize: '22px', fontWeight: 'bold', marginBottom: '16px' }}>
+        関連ページ
+      </h2>
+      <div style={{ background: '#111827', borderRadius: '12px', padding: '32px' }}>
+        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '12px' }}>
+          お問い合わせは <Link href="/contact" style={{ color: '#00d4aa', textDecoration: 'none' }}>Contactページ</Link> をご覧ください。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: 0 }}>
+          使用データの出典・ライセンス・注意点は <Link href="/data" style={{ color: '#00d4aa', textDecoration: 'none' }}>Dataページ</Link> をご覧ください。
+        </p>
       </div>
     </main>
   );
