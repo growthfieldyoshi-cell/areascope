@@ -41,10 +41,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   `;
   const station = rows[0];
   if (!station) return { title: '駅が見つかりません｜AreaScope' };
+  const title = `${station.station_name}駅の乗降者数・年別推移｜全国ランキング【最新】`;
+  const description = `${station.station_name}駅の乗降者数を掲載。年別推移グラフ・全国ランキング・周辺駅との比較が一目でわかります。`;
   return {
-    title: `${station.station_name}駅の乗降者数・人口推移｜AreaScope`,
-    description: `${station.prefecture_name}${station.municipality_name}にある${station.station_name}駅の乗降者数推移・自治体人口データを掲載しています。`,
+    title,
+    description,
     alternates: { canonical: `https://areascope.jp/station/${slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `https://areascope.jp/station/${slug}`,
+      siteName: 'AreaScope',
+      type: 'article',
+    },
   };
 }
 
@@ -274,6 +283,9 @@ export default async function StationPage({ params }: PageProps) {
         {passengerRows.length > 0 && (
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>乗降者数推移</h2>
+            <p style={{ color: '#6b7a99', fontSize: '12px', marginBottom: '12px' }}>
+              ※本ページの最新データは{passengerRows[passengerRows.length - 1].year}年度（国土数値情報）です。
+            </p>
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
               {passengerRows.map(row => {
                 const pct = maxPass > 0 ? (Number(row.passengers) / maxPass) * 100 : 0;
