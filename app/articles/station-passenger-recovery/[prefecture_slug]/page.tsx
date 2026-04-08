@@ -37,10 +37,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { prefecture_slug } = await params;
   const prefName = await getPrefectureName(prefecture_slug);
   if (!prefName) return {};
+  const title = `${prefName}の駅乗降者数回復率ランキング【最新】｜2019年比`;
+  const description = `${prefName}の駅乗降者数を2019年と最新年で比較。回復率ランキングで人流の戻りが強いエリアを把握できます。`;
   return {
-    title: `${prefName}の駅乗降者数回復率ランキング｜AreaScope`,
-    description: `${prefName}内の駅乗降者数を2019年と最新年で比較し、回復率の高い駅をランキング形式で紹介。県内の人流回復状況をデータで可視化。`,
+    title,
+    description,
     alternates: { canonical: `https://areascope.jp/articles/station-passenger-recovery/${prefecture_slug}` },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `https://areascope.jp/articles/station-passenger-recovery/${prefecture_slug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 

@@ -44,10 +44,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { prefecture_slug } = await params;
   const prefName = await getPrefectureName(prefecture_slug);
   if (!prefName) return {};
+  const title = `${prefName}の成長エリアランキング【最新】｜人口増加×駅乗降者数`;
+  const description = `${prefName}内の成長エリアを人口増加率×駅乗降者数でランキング化。将来性の高いエリアをデータで把握できます。`;
   return {
-    title: `${prefName}の人口増×人流増 成長エリアランキング｜AreaScope`,
-    description: `${prefName}内で人口増加率と駅乗降者数を掛け合わせ、成長エリアをランキング形式で紹介。データに基づくエリア分析に活用できます。`,
+    title,
+    description,
     alternates: { canonical: `https://areascope.jp/articles/growth-area-ranking/${prefecture_slug}` },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `https://areascope.jp/articles/growth-area-ranking/${prefecture_slug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 

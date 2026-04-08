@@ -44,10 +44,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { prefecture_slug } = await params;
   const prefName = await getPrefectureName(prefecture_slug);
   if (!prefName) return {};
+  const title = `${prefName}の人口減少なのに人が集まる駅ランキング【最新】`;
+  const description = `${prefName}で人口減少しているのに乗降者数が多い駅をランキング化。観光・商業など人が集まるエリアの特徴がわかります。`;
   return {
-    title: `${prefName}の人口減×人流強い街ランキング｜AreaScope`,
-    description: `${prefName}内で人口減少率と駅乗降者数を掛け合わせ、人口は減っているのに人流が強い街をランキング形式で紹介。データに基づくエリア分析に活用できます。`,
+    title,
+    description,
     alternates: { canonical: `https://areascope.jp/articles/population-decline-high-passenger/${prefecture_slug}` },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `https://areascope.jp/articles/population-decline-high-passenger/${prefecture_slug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 
