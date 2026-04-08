@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   `;
   if (!rows[0]) return { title: '自治体が見つかりません｜AreaScope' };
   const { municipality_name, prefecture_name } = rows[0];
-  const title = `${prefecture_name}${municipality_name}の駅一覧・人口推移｜AreaScope`;
-  const description = `${prefecture_name}${municipality_name}の駅一覧、主要駅の乗降者数、人口推移・増減率を掲載しています。`;
+  const title = `${municipality_name}の主要駅一覧｜乗降者数ランキング・人口推移`;
+  const description = `${prefecture_name}${municipality_name}の主要駅一覧と乗降者数ランキングを掲載。人口推移や増減率もグラフで確認できます。`;
   return {
     title, description,
     alternates: { canonical: `${BASE_URL}/city/${prefecture_slug}/${municipality_slug}` },
