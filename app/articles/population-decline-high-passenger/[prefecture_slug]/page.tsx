@@ -158,6 +158,21 @@ export default async function PrefecturePopulationDeclineHighPassengerPage({ par
 
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'トップ', item: 'https://areascope.jp' },
+              { '@type': 'ListItem', position: 2, name: '記事一覧', item: 'https://areascope.jp/articles' },
+              { '@type': 'ListItem', position: 3, name: '人口分析', item: 'https://areascope.jp/articles/population-analysis' },
+              { '@type': 'ListItem', position: 4, name: `${prefName}の人口減少×人流強い街ランキング` },
+            ],
+          }),
+        }}
+      />
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           {prefName}の人口減×<span style={{ color: '#00d4aa' }}>人流強い街</span>ランキング
