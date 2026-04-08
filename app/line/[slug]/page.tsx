@@ -43,11 +43,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const line = LINE_MAP[slug];
   if (!line) return { title: '路線が見つかりません｜AreaScope' };
+  const title = `${line.display_name}の駅一覧・乗降者数ランキング【最新】`;
+  const description = `${line.display_name}の駅ごとの乗降者数を掲載。人の流れを比較・ランキングで確認できます。`;
   return {
-    title: `${line.display_name} 駅一覧・乗降者数データ｜AreaScope`,
-    description: `${line.display_name}の駅一覧と乗降者数データを掲載しています。各駅の人の流れを比較することで、路線全体の特徴を把握できます。`,
+    title,
+    description,
     alternates: { canonical: `${BASE_URL}/line/${slug}` },
     robots: { index: true, follow: true },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `${BASE_URL}/line/${slug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 
