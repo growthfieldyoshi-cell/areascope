@@ -1,5 +1,15 @@
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '岡山県の駅乗降者数ランキング｜主要駅TOP20',
+  description: '岡山県の駅乗降者数ランキングTOP20を掲載しています。',
+  alternates: {
+    canonical: 'https://areascope.jp/station-ranking/okayama',
+  },
+};
+
 
 const sql = neon(process.env.DATABASE_URL!);
 

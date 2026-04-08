@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '東京都の駅乗降者数ランキング｜主要駅TOP20',
+  description: '東京都の駅乗降者数ランキングTOP20を掲載しています。',
+  alternates: {
+    canonical: 'https://areascope.jp/station-ranking/tokyo',
+  },
+};
+
 
 const sectionStyle = {
   background: '#111827',
