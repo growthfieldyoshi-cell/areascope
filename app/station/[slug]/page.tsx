@@ -158,7 +158,7 @@ export default async function StationPage({ params }: PageProps) {
               🗺️ 路線の駅一覧
             </Link>
           )}
-          <Link href={`/station-ranking?pref=${station.prefecture_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
+          <Link href={`/station-ranking/${station.prefecture_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
             🏆 {station.prefecture_name}の駅ランキング
           </Link>
           <Link href={`/prefecture/${station.prefecture_slug}`} style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>
@@ -338,7 +338,7 @@ export default async function StationPage({ params }: PageProps) {
                 🗺️ 路線の駅一覧
               </Link>
             )}
-            <Link href={`/station-ranking?pref=${station.prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            <Link href={`/station-ranking/${station.prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
               🏆 {station.prefecture_name}の駅ランキング
             </Link>
             <Link href={`/prefecture/${station.prefecture_slug}`} style={{ color: '#6b7a99', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
