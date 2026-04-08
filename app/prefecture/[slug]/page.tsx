@@ -36,11 +36,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const prefName = PREF_NAMES[slug];
   if (!prefName) return { title: '都道府県が見つかりません｜AreaScope' };
+  const title = `${prefName}の駅乗降者数ランキング【最新】｜主要駅TOP50`;
+  const description = `${prefName}の駅乗降者数ランキングTOP50を掲載。人の流れと人口データを組み合わせてエリアの特徴を把握できます。`;
   return {
-    title: `${prefName}の駅一覧・乗降者数ランキング｜AreaScope`,
-    description: `${prefName}の主要駅乗降者数ランキングと人口データを掲載しています。駅の人の流れと居住規模からエリアの特徴を把握できます。`,
+    title,
+    description,
     alternates: { canonical: `${BASE_URL}/prefecture/${slug}` },
     robots: { index: true, follow: true },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `${BASE_URL}/prefecture/${slug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 
