@@ -171,6 +171,21 @@ export default async function StationPage({ params }: PageProps) {
 
       <div className="content" style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px' }}>
 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'トップ', item: 'https://areascope.jp' },
+                { '@type': 'ListItem', position: 2, name: '駅検索', item: 'https://areascope.jp/station' },
+                { '@type': 'ListItem', position: 3, name: `${station.prefecture_name}${station.municipality_name}`, item: `https://areascope.jp/city/${station.prefecture_slug}/${station.municipality_slug}` },
+                { '@type': 'ListItem', position: 4, name: `${station.station_name}駅` },
+              ],
+            }),
+          }}
+        />
         <nav style={{ marginBottom: '1.5rem', fontSize: '0.85rem', color: '#6b7a99' }}>
           <Link href="/" style={{ color: '#6b7a99', textDecoration: 'none' }}>トップ</Link>
           {' / '}
