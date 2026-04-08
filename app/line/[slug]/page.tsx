@@ -89,6 +89,20 @@ export default async function LineDetailPage({ params }: Props) {
 
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', padding: '2rem', fontFamily: 'sans-serif', maxWidth: '960px', margin: '0 auto' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'トップ', item: 'https://areascope.jp' },
+              { '@type': 'ListItem', position: 2, name: '路線一覧', item: 'https://areascope.jp/line' },
+              { '@type': 'ListItem', position: 3, name: line.display_name },
+            ],
+          }),
+        }}
+      />
       <nav style={{ marginBottom: '1.5rem', fontSize: '0.85rem', color: '#6b7a99' }}>
         <Link href="/" style={{ color: '#6b7a99', textDecoration: 'none' }}>トップ</Link>
         {' / '}

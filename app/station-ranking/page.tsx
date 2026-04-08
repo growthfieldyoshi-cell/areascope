@@ -82,6 +82,19 @@ export default async function StationRankingPage({ searchParams }: Props) {
 
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: "'Noto Sans JP', sans-serif" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'トップ', item: 'https://areascope.jp' },
+              { '@type': 'ListItem', position: 2, name: '全国駅乗降者数ランキング' },
+            ],
+          }),
+        }}
+      />
       <header style={{ padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1e2d45', background: 'rgba(10,14,26,0.95)' }}>
         <Link href="/" style={{ fontSize: '22px', fontWeight: 800, textDecoration: 'none', color: '#e8edf5' }}>
           AREA<span style={{ color: '#00d4aa' }}>SCOPE</span>
