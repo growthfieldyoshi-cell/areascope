@@ -5,10 +5,17 @@ import Link from 'next/link';
 const sql = neon(process.env.DATABASE_URL!);
 
 export const metadata: Metadata = {
-  title: '人口増加×駅乗降者数で見る成長エリアランキング｜AreaScope',
+  title: '人口増加×駅乗降者数で見る成長エリアランキング【最新】｜将来性分析',
   description: '人口増加率と駅乗降者数を掛け合わせたスコアで、成長エリアTOP20をランキング。データに基づくエリア分析に活用できます。',
   alternates: {
     canonical: 'https://areascope.jp/articles/population-passengers-cross-analysis',
+  },
+  openGraph: {
+    type: 'website',
+    title: '人口増加×駅乗降者数で見る成長エリアランキング【最新】｜将来性分析',
+    description: '人口増加率と駅乗降者数を掛け合わせたスコアで、成長エリアTOP20をランキング。データに基づくエリア分析に活用できます。',
+    url: 'https://areascope.jp/articles/population-passengers-cross-analysis',
+    siteName: 'AreaScope',
   },
 };
 

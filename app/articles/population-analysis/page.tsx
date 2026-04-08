@@ -2,10 +2,17 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '人口分析の記事一覧｜AreaScope',
+  title: '人口分析の記事一覧｜人口推移・増減ランキング',
   description: 'AreaScopeの人口分析の記事一覧です。人口推移、人口増加・減少自治体ランキング、人口と駅データを組み合わせた分析コンテンツをまとめています。',
   alternates: {
     canonical: 'https://areascope.jp/articles/population-analysis',
+  },
+  openGraph: {
+    type: 'website',
+    title: '人口分析の記事一覧｜人口推移・増減ランキング',
+    description: 'AreaScopeの人口分析の記事一覧です。人口推移、人口増加・減少自治体ランキング、人口と駅データを組み合わせた分析コンテンツをまとめています。',
+    url: 'https://areascope.jp/articles/population-analysis',
+    siteName: 'AreaScope',
   },
 };
 

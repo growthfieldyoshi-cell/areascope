@@ -2,10 +2,17 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '成長エリア分析の記事一覧｜AreaScope',
+  title: '成長エリア分析の記事一覧｜人口増加×人流データで見る',
   description: '人口推移、駅乗降者数、人流データを掛け合わせた成長エリア分析の記事一覧です。全国版記事と都道府県別ランキングへの入口をまとめています。',
   alternates: {
     canonical: 'https://areascope.jp/articles/growth-areas',
+  },
+  openGraph: {
+    type: 'website',
+    title: '成長エリア分析の記事一覧｜人口増加×人流データで見る',
+    description: '人口推移、駅乗降者数、人流データを掛け合わせた成長エリア分析の記事一覧です。全国版記事と都道府県別ランキングへの入口をまとめています。',
+    url: 'https://areascope.jp/articles/growth-areas',
+    siteName: 'AreaScope',
   },
 };
 

@@ -5,10 +5,17 @@ import Link from 'next/link';
 const sql = neon(process.env.DATABASE_URL!);
 
 export const metadata: Metadata = {
-  title: '人口は減っているのに人流が強い街ランキング｜AreaScope',
+  title: '人口減少なのに人流が強い街ランキング【最新】',
   description: '人口減少率と駅乗降者数のギャップから、人口は減っているのに人流が強い街をランキング。データに基づくエリア分析に活用できます。',
   alternates: {
     canonical: 'https://areascope.jp/articles/population-decline-high-passenger-analysis',
+  },
+  openGraph: {
+    type: 'website',
+    title: '人口減少なのに人流が強い街ランキング【最新】',
+    description: '人口減少率と駅乗降者数のギャップから、人口は減っているのに人流が強い街をランキング。データに基づくエリア分析に活用できます。',
+    url: 'https://areascope.jp/articles/population-decline-high-passenger-analysis',
+    siteName: 'AreaScope',
   },
 };
 

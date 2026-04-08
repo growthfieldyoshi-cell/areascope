@@ -5,10 +5,17 @@ import Link from 'next/link';
 const sql = neon(process.env.DATABASE_URL!);
 
 export const metadata: Metadata = {
-  title: '駅乗降者数の回復率ランキング｜AreaScope',
+  title: '駅乗降者数の回復率ランキング【最新】｜2019年比',
   description: 'コロナ前後の駅乗降者数を比較し、回復率の高い駅をランキング形式で紹介。人流の回復状況をデータで可視化。',
   alternates: {
     canonical: 'https://areascope.jp/articles/station-passenger-recovery-analysis',
+  },
+  openGraph: {
+    type: 'website',
+    title: '駅乗降者数の回復率ランキング【最新】｜2019年比',
+    description: 'コロナ前後の駅乗降者数を比較し、回復率の高い駅をランキング形式で紹介。人流の回復状況をデータで可視化。',
+    url: 'https://areascope.jp/articles/station-passenger-recovery-analysis',
+    siteName: 'AreaScope',
   },
 };
 

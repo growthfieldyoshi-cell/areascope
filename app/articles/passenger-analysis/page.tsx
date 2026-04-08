@@ -2,10 +2,17 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '駅乗降者数・人流分析の記事一覧｜AreaScope',
+  title: '駅乗降者数・人流分析の記事一覧｜ランキング・推移データ',
   description: 'AreaScopeの駅乗降者数・人流分析の記事一覧です。全国駅ランキング、回復率分析、都道府県別人流ランキングなど、駅データをもとにした分析コンテンツをまとめています。',
   alternates: {
     canonical: 'https://areascope.jp/articles/passenger-analysis',
+  },
+  openGraph: {
+    type: 'website',
+    title: '駅乗降者数・人流分析の記事一覧｜ランキング・推移データ',
+    description: 'AreaScopeの駅乗降者数・人流分析の記事一覧です。全国駅ランキング、回復率分析、都道府県別人流ランキングなど、駅データをもとにした分析コンテンツをまとめています。',
+    url: 'https://areascope.jp/articles/passenger-analysis',
+    siteName: 'AreaScope',
   },
 };
 

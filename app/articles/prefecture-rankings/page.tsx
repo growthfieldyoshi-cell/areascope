@@ -2,10 +2,17 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '都道府県別ランキングの記事一覧｜AreaScope',
+  title: '都道府県別駅ランキング一覧【最新】｜乗降者数TOP',
   description: 'AreaScopeの都道府県別ランキング記事一覧です。県別の駅ランキング、駅回復率、人口増減自治体、成長エリア分析などをまとめています。',
   alternates: {
     canonical: 'https://areascope.jp/articles/prefecture-rankings',
+  },
+  openGraph: {
+    type: 'website',
+    title: '都道府県別駅ランキング一覧【最新】｜乗降者数TOP',
+    description: 'AreaScopeの都道府県別ランキング記事一覧です。県別の駅ランキング、駅回復率、人口増減自治体、成長エリア分析などをまとめています。',
+    url: 'https://areascope.jp/articles/prefecture-rankings',
+    siteName: 'AreaScope',
   },
 };
 

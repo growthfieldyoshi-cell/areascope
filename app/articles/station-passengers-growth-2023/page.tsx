@@ -5,10 +5,17 @@ import Link from 'next/link';
 const sql = neon(process.env.DATABASE_URL!);
 
 export const metadata: Metadata = {
-  title: '2023年に乗降者数が最も増えた駅ランキング｜AreaScope',
+  title: '乗降者数が最も増えた駅ランキング【最新】｜前年比',
   description: '2022年から2023年にかけて乗降者数が最も増加した駅TOP20をデータで紹介します。',
   alternates: {
     canonical: 'https://areascope.jp/articles/station-passengers-growth-2023',
+  },
+  openGraph: {
+    type: 'website',
+    title: '乗降者数が最も増えた駅ランキング【最新】｜前年比',
+    description: '2022年から2023年にかけて乗降者数が最も増加した駅TOP20をデータで紹介します。',
+    url: 'https://areascope.jp/articles/station-passengers-growth-2023',
+    siteName: 'AreaScope',
   },
 };
 
