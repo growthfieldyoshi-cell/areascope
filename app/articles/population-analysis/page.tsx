@@ -187,6 +187,10 @@ export default function PopulationAnalysisHubPage() {
             <Link href="/articles" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>記事一覧に戻る</Link>
             <Link href="/articles/growth-areas" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>成長エリア分析</Link>
             <Link href="/population" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>人口分析ツール</Link>
+            <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>全国の駅乗降者数ランキングを見る</Link>
+            <Link href="/population-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>人口増加ランキングを見る</Link>
+            <Link href="/population-decline-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>人口減少ランキングを見る</Link>
+            <Link href="/city" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>市区町村一覧を見る</Link>
           </div>
         </div>
       </div>

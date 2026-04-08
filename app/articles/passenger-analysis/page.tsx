@@ -204,6 +204,9 @@ export default function PassengerAnalysisHubPage() {
             <Link href="/articles" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>記事一覧に戻る</Link>
             <Link href="/articles/growth-areas" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>成長エリア分析</Link>
             <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>全国駅ランキング</Link>
+            <Link href="/city" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>市区町村一覧を見る</Link>
+            <Link href="/population-ranking" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>人口増加ランキングを見る</Link>
+            <Link href="/prefecture" style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '13px' }}>都道府県別のエリア分析を見る</Link>
           </div>
         </div>
       </div>
