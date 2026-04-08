@@ -37,10 +37,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const prefName = await getPrefectureName(prefectureSlug);
   if (!prefName) return {};
   const year = await getLatestYear();
+  const title = `${prefName}の駅乗降者数ランキング【最新】｜主要駅TOP100`;
+  const description = `${prefName}の駅乗降者数ランキングTOP100を掲載。主要駅の比較・エリア分析・人口推移との組み合わせも確認できます。`;
   return {
-    title: `${prefName}の駅乗降者数ランキング（${year}年）｜AreaScope`,
-    description: `${prefName}の駅乗降者数ランキングを掲載。人の流れが多い駅や交通の中心となる駅を${year}年のデータで確認できます。`,
+    title,
+    description,
     alternates: { canonical: `https://areascope.jp/station-ranking/${prefectureSlug}` },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `https://areascope.jp/station-ranking/${prefectureSlug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 
