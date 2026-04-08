@@ -266,14 +266,35 @@ export default async function CityPage({ params }: Props) {
         )}
       </section>
 
+      <section style={{ marginBottom: '2.5rem' }}>
+        <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>このエリアの詳細データ</h2>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <Link href={`/station-ranking/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            {prefecture_name}の駅乗降者数ランキングを見る
+          </Link>
+          <Link href={`/population-ranking/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            {prefecture_name}の人口増加ランキングを見る
+          </Link>
+          <Link href={`/population-decline-ranking/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            {prefecture_name}の人口減少ランキングを見る
+          </Link>
+        </div>
+      </section>
+
       <section>
         <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>関連ページ</h2>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <Link href="/station-ranking" style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
-            🏆 全国駅ランキング
+          <Link href={`/station-ranking/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            🏆 {prefecture_name}の駅乗降者数ランキングを見る
           </Link>
           <Link href={`/prefecture/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
             🗾 {prefecture_name}のエリア分析
+          </Link>
+          <Link href={`/articles/growth-area-ranking/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            {prefecture_name}の成長エリアランキングを見る
+          </Link>
+          <Link href={`/articles/population-decline-high-passenger/${prefecture_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
+            {prefecture_name}の人口減少×人流強い街ランキングを見る
           </Link>
           <Link href="/city" style={{ color: '#6b7a99', textDecoration: 'none', border: '1px solid #1e2d45', borderRadius: '6px', padding: '10px 20px', fontSize: '0.9rem' }}>
             🏙️ 市区町村一覧
