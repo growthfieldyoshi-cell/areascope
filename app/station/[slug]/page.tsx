@@ -31,6 +31,12 @@ type PassengerRow = {
   passengers: number;
 };
 
+type SameLineStation = {
+  station_group_slug: string;
+  station_name: string;
+  passengers: number | null;
+};
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const rows = await sql`
@@ -97,6 +103,31 @@ export default async function StationPage({ params }: PageProps) {
     GROUP BY sp.year
     ORDER BY sp.year ASC
   `) as PassengerRow[];
+
+  const primaryLineName = station.line_names?.split('・')[0];
+  const primaryOperatorName = station.operator_names?.split('・')[0];
+  const latestYear = passengerRows.length > 0 ? passengerRows[passengerRows.length - 1].year : 2021;
+
+  const sameLineStations = (primaryLineName && primaryOperatorName)
+    ? (await sql`
+        SELECT
+          s.station_group_slug,
+          MAX(s.station_name) AS station_name,
+          CAST(SUM(sp.passengers) AS bigint) AS passengers
+        FROM stations s
+        LEFT JOIN station_passengers sp
+          ON s.station_key = sp.station_key
+          AND sp.year = ${latestYear}
+        WHERE s.line_name = ${primaryLineName}
+          AND s.operator_name = ${primaryOperatorName}
+          AND s.station_group_slug IS NOT NULL
+          AND s.station_group_slug != ${slug}
+          AND sp.passengers IS NOT NULL
+        GROUP BY s.station_group_slug
+        ORDER BY passengers DESC NULLS LAST
+        LIMIT 8
+      `) as SameLineStation[]
+    : [];
 
   const maxPop = populationRows.length > 0 ? Math.max(...populationRows.map(r => r.population)) : 1;
   const maxPass = passengerRows.length > 0 ? Math.max(...passengerRows.map(r => r.passengers)) : 1;
@@ -323,6 +354,29 @@ export default async function StationPage({ params }: PageProps) {
                   </div>
                 );
               })}
+            </div>
+          </section>
+        )}
+
+        {sameLineStations.length > 0 && (
+          <section style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '1rem' }}>同じ路線の主要駅</h2>
+            <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '16px 20px' }}>
+              {sameLineStations.map((s) => (
+                <div key={s.station_group_slug} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #1e2d45' }}>
+                  <Link href={`/station/${s.station_group_slug}`} style={{ color: '#e8edf5', textDecoration: 'none', fontWeight: 700, fontSize: '14px' }}>
+                    {s.station_name}駅
+                  </Link>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ color: '#6b7a99', fontSize: '12px', fontFamily: 'monospace' }}>
+                      {s.passengers ? `${Number(s.passengers).toLocaleString()}人` : '-'}
+                    </span>
+                    <Link href={`/station/${s.station_group_slug}`} style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '11px', border: '1px solid #00d4aa', borderRadius: '4px', padding: '3px 8px' }}>
+                      詳細
+                    </Link>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         )}
