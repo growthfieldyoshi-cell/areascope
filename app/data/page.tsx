@@ -2,10 +2,17 @@ import type { Metadata } from 'next';
 import Breadcrumb from '@/components/Breadcrumb';
 
 export const metadata: Metadata = {
-  title: 'AreaScopeが使用するデータについて | AreaScope',
+  title: 'AreaScopeが使用するデータ｜出典・ライセンス情報',
   description: 'AreaScopeで使用している駅乗降者数・人口データの出典、ライセンス、注意点を説明します。',
   alternates: {
     canonical: 'https://areascope.jp/data',
+  },
+  openGraph: {
+    type: 'website',
+    title: 'AreaScopeが使用するデータ｜出典・ライセンス情報',
+    description: 'AreaScopeで使用している駅乗降者数・人口データの出典、ライセンス、注意点を説明します。',
+    url: 'https://areascope.jp/data',
+    siteName: 'AreaScope',
   },
 };
 

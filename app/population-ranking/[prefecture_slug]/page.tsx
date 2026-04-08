@@ -39,10 +39,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { prefecture_slug } = await params;
   const prefName = await getPrefectureName(prefecture_slug);
   if (!prefName) return {};
+  const title = `${prefName}の人口増加自治体ランキング【最新】｜市区町村別`;
+  const description = `${prefName}で人口が増えている市区町村をランキング形式で紹介。直近2時点の人口データをもとに県内の人口動向を確認できます。`;
   return {
-    title: `${prefName}の人口増加自治体ランキング｜AreaScope`,
-    description: `${prefName}で人口が増えている市区町村をランキング形式で紹介。直近2時点の人口データをもとに県内の人口動向を確認できます。`,
+    title,
+    description,
     alternates: { canonical: `https://areascope.jp/population-ranking/${prefecture_slug}` },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `https://areascope.jp/population-ranking/${prefecture_slug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 

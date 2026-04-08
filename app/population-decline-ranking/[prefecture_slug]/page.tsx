@@ -40,9 +40,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const prefName = await getPrefectureName(prefecture_slug);
   if (!prefName) return {};
   return {
-    title: `${prefName}の人口減少自治体ランキング｜AreaScope`,
+    title: `${prefName}の人口減少自治体ランキング【最新】｜市区町村別`,
     description: `${prefName}で人口が減少している市区町村をランキング形式で紹介。直近2時点の人口データをもとに県内の人口動向を確認できます。`,
     alternates: { canonical: `https://areascope.jp/population-decline-ranking/${prefecture_slug}` },
+    openGraph: {
+      type: 'website' as const,
+      title: `${prefName}の人口減少自治体ランキング【最新】｜市区町村別`,
+      description: `${prefName}で人口が減少している市区��村をランキング形式で紹介。直近2時点の人口データをもとに県内の人口動向を確認できます。`,
+      url: `https://areascope.jp/population-decline-ranking/${prefecture_slug}`,
+      siteName: 'AreaScope',
+    },
   };
 }
 
