@@ -116,6 +116,7 @@ export default async function StationPage({ params }: PageProps) {
       WHERE s1.station_group_slug = ${slug}
         AND s2.station_group_slug IS NOT NULL
         AND s2.station_group_slug != ${slug}
+        AND s1.line_name NOT LIKE '%新幹線%'
     ),
     grouped_passengers AS (
       SELECT
