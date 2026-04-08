@@ -12,16 +12,21 @@ async function getLatestYear(): Promise<number> {
   return rows[0]?.year ?? 2021;
 }
 
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const { pref } = await searchParams;
-  const year = await getLatestYear();
-  const title = pref
-    ? `${pref} 駅乗降者数ランキング（${year}年）｜AreaScope`
-    : `全国駅乗降者数ランキング（${year}年）｜AreaScope`;
+const metaTitle = '全国駅乗降者数ランキング【最新】｜主要駅TOP100';
+const metaDescription = '全国の駅乗降者数ランキングTOP100を掲載。都道府県別の絞り込みや主要駅の比較も確認できます。';
+
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title,
-    description: `${year}年の全国駅乗降者数ランキング。乗降者数の多い駅TOP100を掲載。`,
-    alternates: { canonical: pref ? `https://areascope.jp/station-ranking?pref=${pref}` : 'https://areascope.jp/station-ranking' },
+    title: metaTitle,
+    description: metaDescription,
+    alternates: { canonical: 'https://areascope.jp/station-ranking' },
+    openGraph: {
+      type: 'website',
+      title: metaTitle,
+      description: metaDescription,
+      url: 'https://areascope.jp/station-ranking',
+      siteName: 'AreaScope',
+    },
   };
 }
 
