@@ -11,8 +11,16 @@ async function getLatestYear(): Promise<number> {
 }
 
 export const metadata: Metadata = {
-  title: '駅乗降者数データ一覧｜全国駅データ',
-  description: '全国の駅乗降者数データを一覧で確認できます。駅ごとの利用者数推移やランキングも確認可能です。',
+  title: '全国駅一覧・乗降者数データ【最新】｜駅を探す',
+  description: '全国約9,000駅の乗降者数データを一覧で掲載。かな別・都道府県別で絞り込みも可能です。',
+  alternates: { canonical: 'https://areascope.jp/station/list' },
+  openGraph: {
+    type: 'website',
+    title: '全国駅一覧・乗降者数データ【最新】｜駅を探す',
+    description: '全国約9,000駅の乗降者数データを一覧で掲載。かな別・都道府県別で絞り込みも可能です。',
+    url: 'https://areascope.jp/station/list',
+    siteName: 'AreaScope',
+  },
 };
 
 type Props = { searchParams: Promise<{ page?: string }> };
