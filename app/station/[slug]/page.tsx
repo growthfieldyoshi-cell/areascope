@@ -104,30 +104,39 @@ export default async function StationPage({ params }: PageProps) {
     ORDER BY sp.year ASC
   `) as PassengerRow[];
 
-  const primaryLineName = station.line_names?.split('・')[0];
-  const primaryOperatorName = station.operator_names?.split('・')[0];
   const latestYear = passengerRows.length > 0 ? passengerRows[passengerRows.length - 1].year : 2021;
 
-  const sameLineStations = (primaryLineName && primaryOperatorName)
-    ? (await sql`
-        SELECT
-          s.station_group_slug,
-          MAX(s.station_name) AS station_name,
-          CAST(SUM(sp.passengers) AS bigint) AS passengers
-        FROM stations s
-        LEFT JOIN station_passengers sp
-          ON s.station_key = sp.station_key
-          AND sp.year = ${latestYear}
-        WHERE s.line_name = ${primaryLineName}
-          AND s.operator_name = ${primaryOperatorName}
-          AND s.station_group_slug IS NOT NULL
-          AND s.station_group_slug != ${slug}
-          AND sp.passengers IS NOT NULL
-        GROUP BY s.station_group_slug
-        ORDER BY passengers DESC NULLS LAST
-        LIMIT 8
-      `) as SameLineStation[]
-    : [];
+  const sameLineStations = (await sql`
+    WITH related_station_groups AS (
+      SELECT DISTINCT s2.station_group_slug
+      FROM stations s1
+      JOIN stations s2
+        ON s1.line_name = s2.line_name
+       AND s1.operator_name = s2.operator_name
+      WHERE s1.station_group_slug = ${slug}
+        AND s2.station_group_slug IS NOT NULL
+        AND s2.station_group_slug != ${slug}
+    ),
+    grouped_passengers AS (
+      SELECT
+        s.station_group_slug,
+        MAX(s.station_name) AS station_name,
+        CAST(SUM(sp.passengers) AS bigint) AS passengers
+      FROM stations s
+      LEFT JOIN station_passengers sp
+        ON s.station_key = sp.station_key
+       AND sp.year = ${latestYear}
+      WHERE s.station_group_slug IN (
+        SELECT station_group_slug FROM related_station_groups
+      )
+      GROUP BY s.station_group_slug
+    )
+    SELECT station_group_slug, station_name, passengers
+    FROM grouped_passengers
+    WHERE passengers IS NOT NULL
+    ORDER BY passengers DESC NULLS LAST
+    LIMIT 8
+  `) as SameLineStation[];
 
   const maxPop = populationRows.length > 0 ? Math.max(...populationRows.map(r => r.population)) : 1;
   const maxPass = passengerRows.length > 0 ? Math.max(...passengerRows.map(r => r.passengers)) : 1;
