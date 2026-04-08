@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
+const BASE_URL = 'https://areascope.jp';
 
 type Props = { params: Promise<{ prefectureSlug: string }> };
 
@@ -42,12 +43,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: `https://areascope.jp/station-ranking/${prefectureSlug}` },
+    alternates: { canonical: `${BASE_URL}/station-ranking/${prefectureSlug}` },
     openGraph: {
       type: 'website',
       title,
       description,
-      url: `https://areascope.jp/station-ranking/${prefectureSlug}`,
+      url: `${BASE_URL}/station-ranking/${prefectureSlug}`,
       siteName: 'AreaScope',
     },
   };

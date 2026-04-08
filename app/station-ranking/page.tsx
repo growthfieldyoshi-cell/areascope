@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import PrefFilter from './PrefFilter';
 
 const sql = neon(process.env.DATABASE_URL!);
+const BASE_URL = 'https://areascope.jp';
 
 type Props = { searchParams: Promise<{ pref?: string }> };
 
@@ -19,12 +20,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: metaTitle,
     description: metaDescription,
-    alternates: { canonical: 'https://areascope.jp/station-ranking' },
+    alternates: { canonical: `${BASE_URL}/station-ranking` },
     openGraph: {
       type: 'website',
       title: metaTitle,
       description: metaDescription,
-      url: 'https://areascope.jp/station-ranking',
+      url: `${BASE_URL}/station-ranking`,
       siteName: 'AreaScope',
     },
   };

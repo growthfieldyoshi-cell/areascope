@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 const sql = neon(process.env.DATABASE_URL!);
+const BASE_URL = 'https://areascope.jp';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -52,11 +53,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    alternates: { canonical: `https://areascope.jp/station/${slug}` },
+    alternates: { canonical: `${BASE_URL}/station/${slug}` },
     openGraph: {
       title,
       description,
-      url: `https://areascope.jp/station/${slug}`,
+      url: `${BASE_URL}/station/${slug}`,
       siteName: 'AreaScope',
       type: 'article',
     },
