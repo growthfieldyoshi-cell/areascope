@@ -186,6 +186,22 @@ export default async function PrefectureRecoveryPage({ params }: Props) {
           </div>
         </div>
 
+        {/* このエリアの詳細データ */}
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
+          <Link href={`/station-ranking/${prefecture_slug}`} style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            {prefName}の駅乗降者数ランキングを見る
+          </Link>
+          <Link href={`/population-ranking/${prefecture_slug}`} style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            {prefName}の人口増加ランキングを見る
+          </Link>
+          <Link href={`/prefecture/${prefecture_slug}`} style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            {prefName}のエリア分析を見る
+          </Link>
+          <Link href={`/city/${prefecture_slug}`} style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+            {prefName}の市区町村一覧を見る
+          </Link>
+        </div>
+
         {/* ロジック説明 */}
         <div style={sectionStyle}>
           <h2 style={h2Style}>このランキングの見方</h2>
@@ -227,17 +243,20 @@ export default async function PrefectureRecoveryPage({ params }: Props) {
             気になる駅やエリアがあれば、詳細データを確認してみてください。
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link href={`/station-ranking/${prefecture_slug}`} style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              {prefName}の駅乗降者数ランキングを見る
+            </Link>
+            <Link href={`/population-ranking/${prefecture_slug}`} style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              {prefName}の人口増加ランキングを見る
+            </Link>
+            <Link href={`/prefecture/${prefecture_slug}`} style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
+              {prefName}のエリア分析を見る
+            </Link>
             <Link href="/articles/station-passenger-recovery-analysis" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
               全国版 回復率ランキング
             </Link>
-            <Link href="/station-ranking" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
-              全国駅ランキング
-            </Link>
-            <Link href="/articles/prefecture-ranking" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
-              都道府県別駅ランキング一覧
-            </Link>
             <Link href="/articles" style={{ display: 'inline-block', color: '#00d4aa', border: '1px solid #00d4aa', borderRadius: '6px', padding: '10px 20px', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
-              他の記事を見る
+              記事一覧
             </Link>
           </div>
         </div>
