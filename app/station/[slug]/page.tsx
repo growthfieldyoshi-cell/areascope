@@ -1,7 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
@@ -66,6 +66,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StationPage({ params }: PageProps) {
   const { slug } = await params;
+
+  // slug逆引き：station_group_slug または slug で検索し、slugヒット時はリダイレクト
+  const lookupRows = await sql`
+    SELECT station_group_slug,
+           CASE
+             WHEN station_group_slug = ${slug} THEN 'group'
+             WHEN slug = ${slug} THEN 'slug'
+           END AS matched_by
+    FROM stations
+    WHERE station_group_slug = ${slug}
+       OR slug = ${slug}
+    LIMIT 1
+  `;
+  if (lookupRows.length === 0) notFound();
+  if (lookupRows[0].matched_by === 'slug') {
+    permanentRedirect(`/station/${lookupRows[0].station_group_slug}`);
+  }
 
   const infoRows = await sql`
     SELECT
