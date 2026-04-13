@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       type: 'website' as const,
       title: `${prefName}の人口減少自治体ランキング【最新】｜市区町村別`,
-      description: `${prefName}で人口が減少している市区��村をランキング形式で紹介。直近2時点の人口データをもとに県内の人口動向を確認できます。`,
+      description: `${prefName}で人口が減少している市区町村をランキング形式で紹介。直近2時点の人口データをもとに県内の人口動向を確認できます。`,
       url: `https://areascope.jp/population-decline-ranking/${prefecture_slug}`,
       siteName: 'AreaScope',
     },
@@ -54,7 +54,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 type RankingRow = {
-  municipality_code: string;
   municipality_name: string;
   municipality_slug: string;
   pop_older: number;
@@ -97,20 +96,28 @@ export default async function PrefecturePopulationDeclineRankingPage({ params }:
   const { older: popOlderYear, newer: popNewerYear } = await getPopulationYears();
 
   const rows = (await sql`
-    WITH muni_stations AS (
+    WITH muni_names AS (
       SELECT DISTINCT
-        municipality_code,
         municipality_name,
-        municipality_slug
+        municipality_slug,
+        prefecture_name
       FROM stations
       WHERE prefecture_slug = ${prefecture_slug}
-        AND municipality_code IS NOT NULL
         AND municipality_slug IS NOT NULL
+    ),
+    muni_with_code AS (
+      SELECT
+        mn.municipality_name,
+        mn.municipality_slug,
+        m.code5
+      FROM muni_names mn
+      JOIN municipalities m
+        ON m.municipality = mn.municipality_name
+        AND m.prefecture = mn.prefecture_name
     )
     SELECT
-      mp.municipality_code,
-      MAX(ms.municipality_name) AS municipality_name,
-      MAX(ms.municipality_slug) AS municipality_slug,
+      mc.municipality_name,
+      mc.municipality_slug,
       MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) AS pop_older,
       MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END) AS pop_newer,
       ROUND(
@@ -119,11 +126,11 @@ export default async function PrefecturePopulationDeclineRankingPage({ params }:
           / MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)::numeric) * 100,
         2
       ) AS growth_rate
-    FROM municipality_populations mp
-    INNER JOIN muni_stations ms
-      ON mp.municipality_code = ms.municipality_code
+    FROM muni_with_code mc
+    JOIN municipality_populations mp
+      ON mp.municipality_code = mc.code5
     WHERE mp.year IN (${popOlderYear}, ${popNewerYear})
-    GROUP BY mp.municipality_code
+    GROUP BY mc.municipality_name, mc.municipality_slug
     HAVING
       MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) IS NOT NULL
       AND MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) > 0
@@ -182,7 +189,7 @@ export default async function PrefecturePopulationDeclineRankingPage({ params }:
               </thead>
               <tbody>
                 {rows.map((row, index) => (
-                  <tr key={row.municipality_code} style={{ borderBottom: '1px solid #1e2d45' }}>
+                  <tr key={row.municipality_name} style={{ borderBottom: '1px solid #1e2d45' }}>
                     <td style={{ padding: '10px 16px', color: index < 3 ? '#00d4aa' : '#aaa', fontWeight: index < 3 ? 'bold' : 'normal' }}>
                       {index + 1}位
                     </td>
