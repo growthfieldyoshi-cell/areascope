@@ -56,11 +56,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 type RankingRow = {
-  municipality_code: string;
   municipality_name: string;
   municipality_slug: string;
-  pop_older: number;
-  pop_newer: number;
+  older_population: number;
+  newer_population: number;
   growth_rate: number;
 };
 
@@ -99,55 +98,45 @@ export default async function PrefecturePopulationRankingPage({ params }: Props)
   const { older: popOlderYear, newer: popNewerYear } = await getPopulationYears();
 
   const rows = (await sql`
-    WITH muni_stations AS (
-      SELECT
-        CASE
-          WHEN LENGTH(municipality_code) = 5
-            AND SUBSTRING(municipality_code, 5, 1) != '0'
-          THEN SUBSTRING(municipality_code, 1, 4) || '0'
-          ELSE municipality_code
-        END AS municipality_code,
+    WITH muni_names AS (
+      SELECT DISTINCT
         municipality_name,
-        municipality_slug
+        municipality_slug,
+        prefecture_name
       FROM stations
       WHERE prefecture_slug = ${prefecture_slug}
-        AND municipality_code IS NOT NULL
-        AND municipality_slug IS NOT NULL
-      GROUP BY
-        CASE
-          WHEN LENGTH(municipality_code) = 5
-            AND SUBSTRING(municipality_code, 5, 1) != '0'
-          THEN SUBSTRING(municipality_code, 1, 4) || '0'
-          ELSE municipality_code
-        END,
-        municipality_name,
-        municipality_slug
+    ),
+    muni_with_code AS (
+      SELECT
+        mn.municipality_name,
+        mn.municipality_slug,
+        m.code5
+      FROM muni_names mn
+      JOIN municipalities m
+        ON m.municipality = mn.municipality_name
+        AND m.prefecture = mn.prefecture_name
     )
     SELECT
-      mp.municipality_code,
-      MAX(ms.municipality_name) AS municipality_name,
-      MAX(ms.municipality_slug) AS municipality_slug,
-      MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) AS pop_older,
-      MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END) AS pop_newer,
+      mc.municipality_name,
+      mc.municipality_slug,
+      MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) AS older_population,
+      MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END) AS newer_population,
       ROUND(
-        ((MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END)::numeric
-          - MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)::numeric)
-          / MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)::numeric) * 100,
-        2
+        (MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END)::numeric
+        - MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)::numeric)
+        / MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)::numeric * 100,
+        1
       ) AS growth_rate
-    FROM municipality_populations mp
-    INNER JOIN muni_stations ms
-      ON mp.municipality_code = ms.municipality_code
-    WHERE mp.year IN (${popOlderYear}, ${popNewerYear})
-      AND SUBSTRING(mp.municipality_code, 5, 1) = '0'
-    GROUP BY mp.municipality_code
+    FROM muni_with_code mc
+    JOIN municipality_populations mp
+      ON mp.municipality_code = mc.code5
+    GROUP BY mc.municipality_name, mc.municipality_slug
     HAVING
-      MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) IS NOT NULL
+      MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END) IS NOT NULL
+      AND MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) IS NOT NULL
       AND MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) > 0
-      AND MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END) IS NOT NULL
-      AND ((MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END)::numeric
-            - MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)::numeric)
-            / MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)::numeric) > 0
+      AND MAX(CASE WHEN mp.year = ${popNewerYear} THEN mp.population END)
+        > MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END)
     ORDER BY growth_rate DESC
     LIMIT 50
   `) as RankingRow[];
@@ -199,7 +188,7 @@ export default async function PrefecturePopulationRankingPage({ params }: Props)
               </thead>
               <tbody>
                 {rows.map((row, index) => (
-                  <tr key={row.municipality_code} style={{ borderBottom: '1px solid #1e2d45' }}>
+                  <tr key={row.municipality_name} style={{ borderBottom: '1px solid #1e2d45' }}>
                     <td style={{ padding: '10px 16px', color: index < 3 ? '#00d4aa' : '#aaa', fontWeight: index < 3 ? 'bold' : 'normal' }}>
                       {index + 1}位
                     </td>
@@ -209,10 +198,10 @@ export default async function PrefecturePopulationRankingPage({ params }: Props)
                       </Link>
                     </td>
                     <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>
-                      {Number(row.pop_older).toLocaleString()}人
+                      {Number(row.older_population).toLocaleString()}人
                     </td>
                     <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>
-                      {Number(row.pop_newer).toLocaleString()}人
+                      {Number(row.newer_population).toLocaleString()}人
                     </td>
                     <td style={{ padding: '10px 16px', color: '#00d4aa', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                       +{Number(row.growth_rate).toFixed(1)}%
