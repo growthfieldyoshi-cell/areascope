@@ -139,6 +139,7 @@ export default async function PrefecturePopulationRankingPage({ params }: Props)
     INNER JOIN muni_stations ms
       ON mp.municipality_code = ms.municipality_code
     WHERE mp.year IN (${popOlderYear}, ${popNewerYear})
+      AND SUBSTRING(mp.municipality_code, 5, 1) = '0'
     GROUP BY mp.municipality_code
     HAVING
       MAX(CASE WHEN mp.year = ${popOlderYear} THEN mp.population END) IS NOT NULL
