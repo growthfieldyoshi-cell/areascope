@@ -17,7 +17,7 @@ const LINE_MAP: Record<string, { display_name: string; line_name: string; operat
   yamanote:          { display_name: '山手線',       line_name: '山手線',           operator_name: '東日本旅客鉄道' },
   chuo:              { display_name: '中央線',       line_name: '中央線',           operator_name: '東日本旅客鉄道' },
   toyoko:            { display_name: '東横線',       line_name: '東横線',           operator_name: '東急電鉄' },
-  'keio-inokashira': { display_name: '京王井の頭線', line_name: '京王井の頭線',     operator_name: '京王電鉄' },
+  'keio-inokashira': { display_name: '京王井の頭線', line_name: '井の頭線',         operator_name: '京王電鉄' },
   keio:              { display_name: '京王線',       line_name: '京王線',           operator_name: '京王電鉄' },
   odakyu:            { display_name: '小田急線',     line_name: '小田原線',         operator_name: '小田急電鉄' },
   tokaido:           { display_name: '東海道線',     line_name: '東海道線',         operator_name: '東日本旅客鉄道' },

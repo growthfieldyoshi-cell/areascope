@@ -11,7 +11,7 @@ const LINE_MAP: Record<string, string> = {
   yamanote: '山手線',
   chuo: '中央線',
   toyoko: '東横線',
-  'keio-inokashira': '京王井の頭線',
+  'keio-inokashira': '井の頭線',
   keio: '京王線',
   odakyu: '小田急線',
   tokaido: '東海道線',
