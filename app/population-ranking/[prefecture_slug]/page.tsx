@@ -100,14 +100,28 @@ export default async function PrefecturePopulationRankingPage({ params }: Props)
 
   const rows = (await sql`
     WITH muni_stations AS (
-      SELECT DISTINCT
-        municipality_code,
+      SELECT
+        CASE
+          WHEN LENGTH(municipality_code) = 5
+            AND SUBSTRING(municipality_code, 5, 1) != '0'
+          THEN SUBSTRING(municipality_code, 1, 4) || '0'
+          ELSE municipality_code
+        END AS municipality_code,
         municipality_name,
         municipality_slug
       FROM stations
       WHERE prefecture_slug = ${prefecture_slug}
         AND municipality_code IS NOT NULL
         AND municipality_slug IS NOT NULL
+      GROUP BY
+        CASE
+          WHEN LENGTH(municipality_code) = 5
+            AND SUBSTRING(municipality_code, 5, 1) != '0'
+          THEN SUBSTRING(municipality_code, 1, 4) || '0'
+          ELSE municipality_code
+        END,
+        municipality_name,
+        municipality_slug
     )
     SELECT
       mp.municipality_code,
