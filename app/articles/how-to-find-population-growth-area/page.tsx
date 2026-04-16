@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '人口が増えている街の見つけ方｜AreaScope',
+  description: '人口増加エリアの見つけ方を人口推移データと乗降者数を組み合わせて解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/how-to-find-population-growth-area',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function HowToFindPopulationGrowthAreaPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '人口が増えている街の見つけ方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           人口が増えている街の見つけ方｜<br />エリア選びの<span style={{ color: '#00d4aa' }}>基本とデータの見方</span>
         </h1>

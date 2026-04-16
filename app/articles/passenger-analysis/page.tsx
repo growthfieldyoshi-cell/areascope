@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export const metadata: Metadata = {
   title: '駅乗降者数・人流分析の記事一覧｜ランキング・推移データ',
@@ -92,6 +93,11 @@ export default function PassengerAnalysisHubPage() {
       `}</style>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '駅乗降者数・人流分析の記事一覧' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '12px' }}>
           駅乗降者数・<span style={{ color: '#00d4aa' }}>人流分析</span>の記事一覧
         </h1>

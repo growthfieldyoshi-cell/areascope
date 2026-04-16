@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '人口と乗降者数を組み合わせて見るエリア分析｜AreaScope',
+  description: '人口と駅の乗降者数を組み合わせたエリア分析の方法と見るべき指標を解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/population-passengers-combination-analysis',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function PopulationPassengersCombinationAnalysisPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '人口と乗降者数を組み合わせたエリア分析' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           人口と乗降者数を組み合わせて見るエリア分析｜<br />本当に見るべき<span style={{ color: '#00d4aa' }}>指標とは</span>
         </h1>

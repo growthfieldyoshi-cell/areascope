@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '住みやすい街ランキングの見方｜AreaScope',
+  description: '住みやすさランキングの前提条件と正しい読み方を人口・駅利用・商業の視点から整理します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/how-to-read-livability-ranking',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function HowToReadLivabilityRankingPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '住みやすい街ランキングの見方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           住みやすい街ランキングの見方｜<br />上位＝正解では<span style={{ color: '#00d4aa' }}>ない理由</span>
         </h1>

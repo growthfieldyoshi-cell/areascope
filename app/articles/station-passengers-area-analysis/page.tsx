@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '駅の乗降者数から見る街の特徴｜AreaScope',
+  description: '駅の乗降者数データを使ったエリア分析の基本と具体例を交えた読み方を紹介します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/station-passengers-area-analysis',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function StationPassengersAreaAnalysisPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '駅の乗降者数から見る街の特徴' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           駅の乗降者数から見る街の特徴｜<br />エリア分析の<span style={{ color: '#00d4aa' }}>基本と見方</span>
         </h1>

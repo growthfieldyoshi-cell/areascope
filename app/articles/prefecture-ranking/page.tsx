@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '都道府県別駅乗降者数ランキング一覧｜AreaScope',
+  description: '全国47都道府県の駅乗降者数ランキングを地方別にまとめています。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/prefecture-ranking',
+  },
+};
 
 const REGIONS = [
   {
@@ -102,6 +112,11 @@ export default function PrefectureRankingHubPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '都道府県別駅乗降者数ランキング一覧' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '12px' }}>
           都道府県別駅<span style={{ color: '#00d4aa' }}>乗降者数</span>ランキング一覧
         </h1>

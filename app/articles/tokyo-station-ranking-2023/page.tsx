@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export const metadata: Metadata = {
   title: '東京都の駅乗降者数ランキング｜主要駅TOP20',
@@ -71,6 +72,11 @@ export default function TokyoStationRanking2023Page() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '東京都の駅乗降者数ランキング' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           東京都の駅<span style={{ color: '#00d4aa' }}>乗降者数</span>ランキング（2023年）
         </h1>

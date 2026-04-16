@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '乗降者数が多い駅は住みやすい？｜AreaScope',
+  description: '乗降者数が多い駅周辺の便利さとデメリットをデータで分析し判断方法を解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/station-passengers-livability',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function StationPassengersLivabilityPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '乗降者数が多い駅は住みやすい？' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           乗降者数が多い駅は住みやすい？<br />データで見る<span style={{ color: '#00d4aa' }}>街の実態</span>
         </h1>

@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '人口増加率とは？意味と見方をわかりやすく解説｜AreaScope',
+  description: '人口増加率の意味・増加率と絶対数の違い・継続性の重要性をわかりやすく解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/what-is-population-growth-rate',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function WhatIsPopulationGrowthRatePage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '人口増加率とは？意味と見方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           人口増加率とは？<br />意味と見方を<span style={{ color: '#00d4aa' }}>わかりやすく解説</span>
         </h1>

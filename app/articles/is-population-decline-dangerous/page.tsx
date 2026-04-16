@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '人口減少している街は本当に危険なのか？｜AreaScope',
+  description: '人口減少でも安定する街のパターンと正しい判断方法をデータで解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/is-population-decline-dangerous',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function IsPopulationDeclineDangerousPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '人口減少している街は本当に危険か' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           人口減少している街は<br />本当に<span style={{ color: '#00d4aa' }}>危険なのか？</span>
         </h1>

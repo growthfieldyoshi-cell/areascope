@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '住宅地と商業地の違い｜住みやすさの本質｜AreaScope',
+  description: '住宅地と商業地の違いを駅利用・人口構造・生活利便性の視点からデータで解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/residential-vs-commercial-area',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function ResidentialVsCommercialAreaPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '住宅地と商業地の違い' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           住宅地と商業地の違い｜<br /><span style={{ color: '#00d4aa' }}>住みやすさ</span>の本質
         </h1>

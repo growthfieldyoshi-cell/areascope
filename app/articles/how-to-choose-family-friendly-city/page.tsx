@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: 'ファミリー向けの街の選び方｜失敗しない判断基準｜AreaScope',
+  description: '子育て世帯向けのエリア選びを人口構成・学校・生活インフラ・駅利用から解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/how-to-choose-family-friendly-city',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function HowToChooseFamilyFriendlyCityPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: 'ファミリー向けの街の選び方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           ファミリー向けの街の選び方｜<br /><span style={{ color: '#00d4aa' }}>失敗しない</span>判断基準
         </h1>

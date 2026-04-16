@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '郊外と都心どっちが住みやすい？データで比較｜AreaScope',
+  description: '通勤・生活利便・住宅環境の3視点から郊外と都心を比較し条件別に整理します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/suburb-vs-city-livability',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function SuburbVsCityLivabilityPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '郊外と都心どっちが住みやすい？' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           郊外と都心どっちが住みやすい？<br /><span style={{ color: '#00d4aa' }}>データで比較</span>
         </h1>

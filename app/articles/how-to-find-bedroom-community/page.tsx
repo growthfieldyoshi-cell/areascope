@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: 'ベッドタウンの見つけ方｜AreaScope',
+  description: '通勤先との関係・駅利用・商業集積・人口の安定性からベッドタウンを見つける考え方を整理します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/how-to-find-bedroom-community',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function HowToFindBedroomCommunityPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: 'ベッドタウンの見つけ方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           ベッドタウンの見つけ方｜<br />データで見る<span style={{ color: '#00d4aa' }}>住宅地の特徴</span>
         </h1>

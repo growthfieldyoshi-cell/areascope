@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '再開発エリアは本当に伸びるのか？｜AreaScope',
+  description: '再開発エリアの一時的増加と継続的成長の違いを人口推移データで解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/will-redevelopment-area-grow',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function WillRedevelopmentAreaGrowPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '再開発エリアは本当に伸びるのか？' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           再開発エリアは本当に伸びるのか？<br /><span style={{ color: '#00d4aa' }}>データで解説</span>
         </h1>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export const metadata: Metadata = {
   title: '人口分析の記事一覧｜人口推移・増減ランキング',
@@ -92,6 +93,11 @@ export default function PopulationAnalysisHubPage() {
       `}</style>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '人口分析の記事一覧' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '12px' }}>
           <span style={{ color: '#00d4aa' }}>人口分析</span>の記事一覧
         </h1>

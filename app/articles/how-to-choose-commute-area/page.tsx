@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '通勤しやすい街の選び方｜AreaScope',
+  description: '通勤しやすさを距離ではなく路線構造や混雑傾向から考える方法を解説します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/how-to-choose-commute-area',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function HowToChooseCommuteAreaPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '通勤しやすい街の選び方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           通勤しやすい街の選び方｜<br />距離より大事な<span style={{ color: '#00d4aa' }}>データの見方</span>
         </h1>

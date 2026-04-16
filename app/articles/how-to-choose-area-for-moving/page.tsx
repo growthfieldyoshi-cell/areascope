@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '引越しで失敗しないエリアの選び方｜AreaScope',
+  description: '引越し先の選び方を人口推移や駅の乗降者数データで解説。住みやすいエリアを見極めるポイントを紹介します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/how-to-choose-area-for-moving',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function HowToChooseAreaForMovingPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '引越しで失敗しないエリアの選び方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           引越しで失敗しないエリアの選び方｜<br />データで見る<span style={{ color: '#00d4aa' }}>チェックポイント</span>
         </h1>

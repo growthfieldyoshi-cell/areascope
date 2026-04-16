@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '駅ランキングから見る住みやすい街｜AreaScope',
+  description: '乗降者数ランキングをターミナル型・住宅型・バランス型に分けて住みやすさを整理します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/station-ranking-livability',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function StationRankingLivabilityPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '駅ランキングから見る住みやすい街' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           駅ランキングから見る住みやすい街｜<br />乗降者数だけで<span style={{ color: '#00d4aa' }}>判断しない</span>
         </h1>

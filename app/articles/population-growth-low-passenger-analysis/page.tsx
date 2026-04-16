@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
+import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -125,6 +126,11 @@ export default async function PopulationGrowthLowPassengerAnalysisPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '人口増加なのに駅利用が弱い街ランキング' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           人口は増えているのに<span style={{ color: '#00d4aa' }}>駅利用が弱い街</span>ランキング
         </h1>

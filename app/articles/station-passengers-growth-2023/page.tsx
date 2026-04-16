@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
+import Breadcrumb from '@/components/Breadcrumb';
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -85,6 +86,11 @@ export default async function StationPassengersGrowth2023Page() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '乗降者数が最も増えた駅ランキング' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           2023年に乗降者数が最も<span style={{ color: '#00d4aa' }}>増えた駅</span>ランキング
         </h1>

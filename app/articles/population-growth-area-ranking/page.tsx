@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '人口増加エリアランキングの見方｜AreaScope',
+  description: '人口増加ランキングを増加率・絶対数・継続性・駅利用の変化から読み解く基本を整理します。',
+  alternates: {
+    canonical: 'https://areascope.jp/articles/population-growth-area-ranking',
+  },
+};
 
 const sectionStyle = {
   background: '#111827',
@@ -31,6 +41,11 @@ export default function PopulationGrowthAreaRankingPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5', fontFamily: 'sans-serif' }}>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '人口増加エリアランキングの見方' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '16px', lineHeight: 1.4 }}>
           人口増加エリアランキングの見方｜<br />増えている街を<span style={{ color: '#00d4aa' }}>正しく読む</span>
         </h1>

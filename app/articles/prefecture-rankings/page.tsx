@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export const metadata: Metadata = {
   title: '都道府県別駅ランキング一覧【最新】｜乗降者数TOP',
@@ -80,6 +81,11 @@ export default function PrefectureRankingsHubPage() {
       `}</style>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 20px' }}>
+        <Breadcrumb items={[
+          { label: 'TOP', href: '/' },
+          { label: '記事一覧', href: '/articles' },
+          { label: '都道府県別ランキングの記事一覧' },
+        ]} />
         <h1 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '12px' }}>
           <span style={{ color: '#00d4aa' }}>都道府県別ランキング</span>の記事一覧
         </h1>
