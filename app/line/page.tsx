@@ -52,6 +52,15 @@ export default function LineListPage() {
         ※ 現在主要路線に対応
       </p>
 
+      <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '28px', marginBottom: '32px' }}>
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: '12px' }}>
+          路線ページでは、路線ごとに各駅の乗降者数を一覧で確認できます。ターミナル駅から各駅の規模感、沿線全体の利用傾向を把握するのに役立ちます。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '15px', lineHeight: 1.8, marginBottom: 0 }}>
+          引っ越し先の沿線選びや、出店・投資エリアの候補を絞る際に、路線単位でデータを俯瞰することで、駅単体では見えにくい沿線の特性を把握できます。気になる路線を選んで、各駅の乗降者数推移を確認してください。
+        </p>
+      </div>
+
       <section style={{ marginBottom: '3rem' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
           {LINE_SLUGS.map((line) => (

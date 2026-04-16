@@ -258,7 +258,7 @@ export default async function Home() {
       </div>
 
       <footer style={{ padding: '20px 32px', borderTop: '1px solid #1e2d45', fontFamily: 'monospace', fontSize: '11px', color: '#6b7a99', textAlign: 'center', marginTop: 'auto' }}>
-        <div style={{ marginBottom: '10px' }}>出典: 国土交通省 国土数値情報 / 総務省統計局 e-Stat | © 2025 AREASCOPE</div>
+        <div style={{ marginBottom: '10px' }}>出典: 国土交通省 国土数値情報 / 総務省統計局 e-Stat | © 2026 AREASCOPE</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <Link href="/about" style={{ color: '#00d4aa', textDecoration: 'none' }}>運営者情報</Link>
           <Link href="/privacy" style={{ color: '#00d4aa', textDecoration: 'none' }}>プライバシーポリシー</Link>
