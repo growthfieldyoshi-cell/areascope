@@ -1,9 +1,24 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import Breadcrumb from '@/components/Breadcrumb';
+
+export const metadata: Metadata = {
+  title: '運営者情報｜AreaScope',
+  description: 'AreaScope（エリアスコープ）の運営会社・サービス概要・データについてご紹介します。グロースフィールド株式会社が運営する駅・エリアデータ可視化サービスです。',
+  alternates: {
+    canonical: 'https://areascope.jp/about',
+  },
+};
 
 export default function AboutPage() {
   return (
     <main style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e8edf5' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '60px 24px' }}>
+      <Breadcrumb items={[
+        { label: 'TOP', href: '/' },
+        { label: '運営者情報' },
+      ]} />
+
       <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#e8edf5', marginBottom: '24px' }}>
         運営者情報
       </h1>
@@ -13,6 +28,19 @@ export default function AboutPage() {
         <Row label="代表取締役" value="増田吉彦" />
         <Row label="設立" value="2025年" />
         <Row label="事業内容" value="コンサルティング業務、広告代理業務、データ分析・Webサービス運営" />
+      </div>
+
+      <div style={{ background: '#111827', borderRadius: '12px', padding: '32px', marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#00d4aa', marginBottom: '16px' }}>AreaScopeについて</h2>
+        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '16px' }}>
+          AreaScopeは、日本全国の駅乗降者数と市区町村人口推移を誰でも無料で調べられるデータ可視化サービスです。国土交通省・総務省が公開する公式統計データをもとに、全国9,000超の駅と1,200超の市区町村のデータを収録しています。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: '16px' }}>
+          「この街は人が増えているのか、減っているのか」「この駅の利用者数は多いのか、少ないのか」——住み替えや引っ越し、不動産投資、出店計画など、エリアに関わる意思決定の場面で客観的なデータをすぐに確認できる環境を提供することが、AreaScopeのミッションです。
+        </p>
+        <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.8, marginBottom: 0 }}>
+          データはすべて政府が公開するオープンデータを使用しており、推計や独自集計は行っていません。2011年から2021年にかけての時系列データを収録しているため、コロナ前後の変化や長期的なトレンドの把握にも活用できます。
+        </p>
       </div>
 
       <h2 style={{ fontSize: '22px', fontWeight: 'bold', marginBottom: '24px', borderBottom: '1px solid #1e2d45', paddingBottom: '12px' }}>
