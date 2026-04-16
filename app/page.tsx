@@ -41,6 +41,7 @@ export default async function Home() {
         .nav-card-desc { font-size: 13px; color: #6b7a99; line-height: 1.7; }
         .nav-card-link { font-size: 12px; color: #00d4aa; font-family: monospace; margin-top: 4px; }
         .header-nav { display: flex; gap: 10px; flex-wrap: wrap; }
+        .read-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         @media (max-width: 768px) {
           .hero { padding: 40px 20px 32px; }
           .hero-title { font-size: 36px; }
@@ -48,6 +49,7 @@ export default async function Home() {
           .nav-grid { grid-template-columns: 1fr; }
           .header-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
           .header-nav a { text-align: center; font-size: 11px !important; padding: 5px 8px !important; }
+          .read-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -72,7 +74,7 @@ export default async function Home() {
           <span style={{ color: '#00d4aa' }}>エリアデータ</span>を可視化。
         </h1>
         <p style={{ fontSize: '15px', color: '#6b7a99', lineHeight: 1.8, marginBottom: '24px', maxWidth: '560px' }}>
-          駅別乗降者数・市区町村人口推移を一目で確認。全国の公式データを無料で閲覧できます。
+          駅の乗降者数は、そのエリアの「人の動き」を最も正直に反映するデータです。人口が増えていても駅の利用者が伸びなければ、車移動が主体のエリアかもしれません。逆に人口が減っているのに乗降者数が維持されているなら、外部からの流入（観光・商業）が支えている可能性があります。AreaScopeは、駅と人口という2つの軸を重ねることで、数字の「意味」を読み解くお手伝いをします。
         </p>
         <div className="hero-meta">
           <div className="hero-meta-item">全国 <span>9,012</span> 駅</div>
@@ -88,6 +90,35 @@ export default async function Home() {
         <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7, maxWidth: '640px' }}>
           居住エリアの比較や情報収集にご活用ください。すべてのデータは国土交通省・総務省の公式統計に基づいています。
         </p>
+      </div>
+
+      {/* データの読み方 */}
+      <div style={{ borderTop: '1px solid #1e2d45', padding: '48px 32px 60px', maxWidth: '1200px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+        <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6b7a99', marginBottom: '20px', letterSpacing: '2px' }}>// データの読み方</p>
+        <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#e8edf5', marginBottom: '24px' }}>3つの視点でエリアを読む</h2>
+        <div className="read-grid">
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+            <div style={{ fontSize: '24px', marginBottom: '12px' }}>📈</div>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#00d4aa', marginBottom: '10px' }}>乗降者数の増減</h3>
+            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.8 }}>
+              ピーク時（2019年）と比較してコロナ後にどう回復したか、あるいは長期的に増加傾向にあるかを確認することで、そのエリアの「人の流れの強さ」を判断できます。
+            </p>
+          </div>
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+            <div style={{ fontSize: '24px', marginBottom: '12px' }}>👥</div>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#00d4aa', marginBottom: '10px' }}>人口推移との比較</h3>
+            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.8 }}>
+              人口が増加しているエリアは賃貸需要が高まりやすく、人口が減少していても駅利用者が多いエリアは商業・観光の拠点として機能している場合があります。2つのデータを重ねることが重要です。
+            </p>
+          </div>
+          <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
+            <div style={{ fontSize: '24px', marginBottom: '12px' }}>🔄</div>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#00d4aa', marginBottom: '10px' }}>同規模駅との比較</h3>
+            <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.8 }}>
+              単体の数値だけでなく、同じ路線・同規模の駅と比較することでそのエリアの相対的なポジションが見えます。ランキング機能を使って周辺駅との差を確認してください。
+            </p>
+          </div>
+        </div>
       </div>
 
       <div style={{ borderTop: '1px solid #1e2d45', paddingTop: '40px' }}>
@@ -172,25 +203,25 @@ export default async function Home() {
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>引っ越し・住み替え検討に</h3>
               <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
-                最寄り駅の利用者数や周辺人口の増減を確認すれば、街の活気度や将来性の判断材料になります。通勤路線の混雑度も乗降者数から推定できます。
+                候補エリアの最寄り駅の乗降者数を調べ、5〜10年間の推移を確認しましょう。増加傾向にある駅周辺は街の活気が高まっており、将来的な生活利便性の向上も期待できます。人口増加データと組み合わせることで、子育て世代が増えているエリアかどうかも判断できます。
               </p>
             </div>
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>エリア比較・出店検討に</h3>
               <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
-                複数駅の乗降者数を比較し、集客ポテンシャルを定量的に評価できます。人口推移と合わせて見ることで、エリアの成長性も判断可能です。
+                複数の候補駅を乗降者数ランキングで比較し、客数ポテンシャルを数値で評価できます。ランキング上位でも人口が減少傾向なら将来の商圏縮小リスクがあり、逆に中規模でも人口増加エリアは成長余地があると読めます。
               </p>
             </div>
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>路線・沿線分析に</h3>
               <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
-                路線単位で駅の乗降者数を一覧比較できます。ターミナル駅との距離感や、沿線全体の利用動向を把握するのに役立ちます。
+                路線単位で各駅の乗降者数を一覧で比較できます。ターミナル駅への依存度が高い路線か、複数の中核駅が分散している路線かによって、沿線の特性が大きく異なります。住み替えや出店の際は路線全体のデータを俯瞰してから候補駅を絞り込むことをおすすめします。
               </p>
             </div>
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', padding: '24px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#e8edf5', marginBottom: '12px' }}>データの出典と信頼性</h3>
               <p style={{ color: '#6b7a99', fontSize: '13px', lineHeight: 1.7 }}>
-                駅乗降者数は国土交通省「国土数値情報」、人口データは総務省「e-Stat」の公式統計を使用しています。推計値や独自集計ではなく、政府公開データに基づいています。
+                駅乗降者数は国土交通省「国土数値情報（S12）」のオープンデータ（CC BY 4.0）を使用。人口データは総務省「e-Stat」の国勢調査に基づいています。いずれも政府が公式に公開している一次データであり、推計や独自集計は行っていません。データの詳細・注意点・ライセンスについては<Link href="/data" style={{ color: '#00d4aa' }}>データについてのページ</Link>をご覧ください。
               </p>
             </div>
           </div>
@@ -231,6 +262,8 @@ export default async function Home() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <Link href="/about" style={{ color: '#00d4aa', textDecoration: 'none' }}>運営者情報</Link>
           <Link href="/privacy" style={{ color: '#00d4aa', textDecoration: 'none' }}>プライバシーポリシー</Link>
+          <Link href="/data" style={{ color: '#00d4aa', textDecoration: 'none' }}>データについて</Link>
+          <Link href="/contact" style={{ color: '#00d4aa', textDecoration: 'none' }}>お問い合わせ</Link>
         </div>
       </footer>
     </main>
