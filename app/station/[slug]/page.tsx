@@ -124,6 +124,23 @@ export default async function StationPage({ params }: PageProps) {
 
   const latestYear = passengerRows.length > 0 ? passengerRows[passengerRows.length - 1].year : 2021;
 
+  // 全国ランキング順位を取得
+  const rankRows = await sql`
+    SELECT ranked.rank
+    FROM (
+      SELECT
+        s.station_group_slug,
+        RANK() OVER (ORDER BY SUM(sp.passengers) DESC) AS rank
+      FROM stations s
+      JOIN station_passengers sp ON s.station_key = sp.station_key
+      WHERE sp.year = ${latestYear}
+      GROUP BY s.station_group_slug
+    ) ranked
+    WHERE ranked.station_group_slug = ${slug}
+    LIMIT 1
+  `;
+  const nationalRank = rankRows[0]?.rank ?? null;
+
   const sameLineStations = (await sql`
     WITH related_station_groups AS (
       SELECT DISTINCT s2.station_group_slug
@@ -273,8 +290,11 @@ export default async function StationPage({ params }: PageProps) {
             {station.line_names}（{station.operator_names}）が利用できる駅です。
           </p>
           <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '12px' }}>
-            最新の乗降者数は<strong style={{ color: '#e8edf5' }}>{latestPass ? Number(latestPass.passengers).toLocaleString() : 'データなし'}人</strong>、
-            同エリアの人口は<strong style={{ color: '#e8edf5' }}>{latestPop?.population.toLocaleString() ?? 'データなし'}人</strong>となっています。
+            最新の乗降者数は<strong style={{ color: '#e8edf5' }}>{latestPass ? Number(latestPass.passengers).toLocaleString() : 'データなし'}人</strong>
+            {nationalRank && (
+              <>（全国<strong style={{ color: '#00d4aa' }}>{nationalRank.toLocaleString()}</strong>位 / 9,012駅中）</>
+            )}
+            、同エリアの人口は<strong style={{ color: '#e8edf5' }}>{latestPop?.population.toLocaleString() ?? 'データなし'}人</strong>となっています。
           </p>
           <p style={{ fontSize: '14px', color: '#9aa5c3', lineHeight: 1.8, marginBottom: '12px' }}>
             人口は{oldestPop?.year}年から{latestPop?.year}年にかけて
