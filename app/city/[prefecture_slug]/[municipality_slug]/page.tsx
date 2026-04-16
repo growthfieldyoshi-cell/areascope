@@ -53,11 +53,11 @@ export default async function CityPage({ params }: Props) {
   const year = await getLatestYear();
 
   const infoRows = await sql`
-    SELECT DISTINCT municipality_name, prefecture_name FROM stations
+    SELECT DISTINCT municipality_name, prefecture_name, municipality_code FROM stations
     WHERE prefecture_slug = ${prefecture_slug} AND municipality_slug = ${municipality_slug} LIMIT 1
   `;
   if (!infoRows[0]) notFound();
-  const { municipality_name, prefecture_name } = infoRows[0];
+  const { municipality_name, prefecture_name, municipality_code } = infoRows[0];
 
   const stationRows = (await sql`
     WITH grouped AS (
@@ -78,6 +78,23 @@ export default async function CityPage({ params }: Props) {
     GROUP BY g.station_name, g.station_group_slug
     ORDER BY passengers DESC NULLS LAST, g.station_name ASC
   `) as StationRow[];
+
+  // 都道府県内人口ランキングを取得
+  const prefCode = municipality_code.slice(0, 2);
+  const popRankRows = await sql`
+    SELECT ranked.rank
+    FROM (
+      SELECT
+        municipality_code,
+        RANK() OVER (ORDER BY population DESC) AS rank
+      FROM municipality_populations
+      WHERE year = 2020
+        AND LEFT(municipality_code, 2) = ${prefCode}
+    ) ranked
+    WHERE municipality_code = ${municipality_code}
+    LIMIT 1
+  `;
+  const prefPopRank = popRankRows[0]?.rank ?? null;
 
   const populationRows = (await sql`
     SELECT mp.year, SUM(mp.population) AS population
@@ -147,11 +164,16 @@ export default async function CityPage({ params }: Props) {
         <p style={{ color: '#aaa', fontSize: '0.95rem', lineHeight: 1.8, marginBottom: '12px' }}>
           {prefecture_name}{municipality_name}の人口は
           <strong style={{ color: '#e8edf5' }}>{latestPop?.population.toLocaleString() ?? 'データなし'}人</strong>
-          で、{oldestPop?.year}年から{latestPop?.year}年にかけて
-          <strong style={{ color: '#e8edf5' }}>
-            {changeRate ? `${parseFloat(changeRate) >= 0 ? '増加' : '減少'}（${changeRate}%）` : '大きな変動は確認できません'}
-          </strong>
-          。
+          {prefPopRank && (
+            <>（{prefecture_name}内 <strong style={{ color: '#00d4aa' }}>{prefPopRank}</strong>位）</>
+          )}
+          です。{changeRate !== null && (
+            <>1995年から2020年にかけて
+            <strong style={{ color: parseFloat(String(changeRate)) >= 0 ? '#00d4aa' : '#ff4757' }}>
+              {parseFloat(String(changeRate)) >= 0 ? '▲' : '▼'}{Math.abs(parseFloat(String(changeRate)))}%
+            </strong>
+            の変化となっています。</>
+          )}
         </p>
         <p style={{ color: '#aaa', fontSize: '0.95rem', lineHeight: 1.8 }}>
           主要駅の乗降者数と人口推移をあわせて見ることで、
