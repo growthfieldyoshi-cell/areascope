@@ -47,7 +47,7 @@ export default async function Home() {
           .hero-title { font-size: 36px; }
           .nav-section { padding: 0 20px 40px; }
           .nav-grid { grid-template-columns: 1fr; }
-          .header-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+          .header-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
           .header-nav a { text-align: center; font-size: 11px !important; padding: 5px 8px !important; }
           .read-grid { grid-template-columns: 1fr; }
         }
@@ -62,6 +62,7 @@ export default async function Home() {
           <Link href="/station/list" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🚃 駅一覧</Link>
           <Link href="/city" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🏙️ 市区町村</Link>
           <Link href="/line" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>🗺️ 路線</Link>
+          <Link href="/articles" style={{ fontFamily: 'monospace', fontSize: '12px', color: '#6b7a99', background: '#111827', border: '1px solid #1e2d45', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none' }}>📝 記事一覧</Link>
         </div>
       </header>
 
