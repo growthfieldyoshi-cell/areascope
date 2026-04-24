@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '広島県の駅乗降者数ランキング｜主要駅TOP20',
   description: '広島県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/hiroshima',
+    canonical: 'https://areascope.jp/articles/hiroshima-station-ranking-2023',
   },
 };
 

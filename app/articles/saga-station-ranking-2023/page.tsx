@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '佐賀県の駅乗降者数ランキング｜主要駅TOP20',
   description: '佐賀県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/saga',
+    canonical: 'https://areascope.jp/articles/saga-station-ranking-2023',
   },
 };
 

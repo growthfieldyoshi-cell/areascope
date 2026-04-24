@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '宮崎県の駅乗降者数ランキング｜主要駅TOP20',
   description: '宮崎県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/miyazaki',
+    canonical: 'https://areascope.jp/articles/miyazaki-station-ranking-2023',
   },
 };
 

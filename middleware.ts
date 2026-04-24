@@ -6,6 +6,16 @@ const CANONICAL_HOST = 'areascope.jp';
 export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
 
+  // 開発環境・ローカルホストでは正規化しない
+  if (
+    process.env.NODE_ENV === 'development' ||
+    host.startsWith('localhost') ||
+    host.startsWith('127.0.0.1') ||
+    host.endsWith('.local')
+  ) {
+    return NextResponse.next();
+  }
+
   // areascope.jp（および www.areascope.jp）以外のホスト（Vercelプレビュー含む）は
   // 正規ドメインへリダイレクト
   if (host !== CANONICAL_HOST && host !== `www.${CANONICAL_HOST}`) {

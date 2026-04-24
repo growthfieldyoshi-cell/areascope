@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '福井県の駅乗降者数ランキング｜主要駅TOP20',
   description: '福井県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/fukui',
+    canonical: 'https://areascope.jp/articles/fukui-station-ranking-2023',
   },
 };
 

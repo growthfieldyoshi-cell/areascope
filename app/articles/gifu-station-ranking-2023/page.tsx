@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '岐阜県の駅乗降者数ランキング｜主要駅TOP20',
   description: '岐阜県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/gifu',
+    canonical: 'https://areascope.jp/articles/gifu-station-ranking-2023',
   },
 };
 

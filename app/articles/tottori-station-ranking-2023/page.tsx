@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '鳥取県の駅乗降者数ランキング｜主要駅TOP20',
   description: '鳥取県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/tottori',
+    canonical: 'https://areascope.jp/articles/tottori-station-ranking-2023',
   },
 };
 

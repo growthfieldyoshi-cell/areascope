@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '福岡県の駅乗降者数ランキング｜主要駅TOP20',
   description: '福岡県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/fukuoka',
+    canonical: 'https://areascope.jp/articles/fukuoka-station-ranking-2023',
   },
 };
 

@@ -61,6 +61,11 @@ const ARTICLE_SLUGS = [
   'prefecture-rankings',
   'line-passenger-ranking/yamanote',
   'line-passenger-ranking/inokashira',
+  'station-passengers-ranking-japan',
+  'how-to-read-line-passenger-ranking',
+  'how-to-read-prefecture-station-ranking',
+  'how-to-read-station-passengers-growth-ranking',
+  'station-passengers-decline',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

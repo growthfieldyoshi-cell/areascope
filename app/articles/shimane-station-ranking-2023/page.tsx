@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '島根県の駅乗降者数ランキング｜主要駅TOP20',
   description: '島根県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/shimane',
+    canonical: 'https://areascope.jp/articles/shimane-station-ranking-2023',
   },
 };
 

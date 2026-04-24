@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '高知県の駅乗降者数ランキング｜主要駅TOP20',
   description: '高知県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/kochi',
+    canonical: 'https://areascope.jp/articles/kochi-station-ranking-2023',
   },
 };
 

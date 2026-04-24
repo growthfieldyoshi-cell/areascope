@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '熊本県の駅乗降者数ランキング｜主要駅TOP20',
   description: '熊本県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/kumamoto',
+    canonical: 'https://areascope.jp/articles/kumamoto-station-ranking-2023',
   },
 };
 

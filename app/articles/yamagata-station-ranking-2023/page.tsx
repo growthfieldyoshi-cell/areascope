@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '山形県の駅乗降者数ランキング｜主要駅TOP20',
   description: '山形県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/yamagata',
+    canonical: 'https://areascope.jp/articles/yamagata-station-ranking-2023',
   },
 };
 

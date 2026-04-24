@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '岩手県の駅乗降者数ランキング｜主要駅TOP20',
   description: '岩手県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/iwate',
+    canonical: 'https://areascope.jp/articles/iwate-station-ranking-2023',
   },
 };
 

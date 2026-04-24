@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '兵庫県の駅乗降者数ランキング｜主要駅TOP20',
   description: '兵庫県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/hyogo',
+    canonical: 'https://areascope.jp/articles/hyogo-station-ranking-2023',
   },
 };
 

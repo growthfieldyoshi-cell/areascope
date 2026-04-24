@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '愛媛県の駅乗降者数ランキング｜主要駅TOP20',
   description: '愛媛県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/ehime',
+    canonical: 'https://areascope.jp/articles/ehime-station-ranking-2023',
   },
 };
 

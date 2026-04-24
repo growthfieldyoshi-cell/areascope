@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '京都府の駅乗降者数ランキング｜主要駅TOP20',
   description: '京都府の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/kyoto',
+    canonical: 'https://areascope.jp/articles/kyoto-station-ranking-2023',
   },
 };
 

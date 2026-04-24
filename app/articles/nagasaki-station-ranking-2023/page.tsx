@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '長崎県の駅乗降者数ランキング｜主要駅TOP20',
   description: '長崎県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/nagasaki',
+    canonical: 'https://areascope.jp/articles/nagasaki-station-ranking-2023',
   },
 };
 

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '香川県の駅乗降者数ランキング｜主要駅TOP20',
   description: '香川県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/kagawa',
+    canonical: 'https://areascope.jp/articles/kagawa-station-ranking-2023',
   },
 };
 

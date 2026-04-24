@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '大分県の駅乗降者数ランキング｜主要駅TOP20',
   description: '大分県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/oita',
+    canonical: 'https://areascope.jp/articles/oita-station-ranking-2023',
   },
 };
 

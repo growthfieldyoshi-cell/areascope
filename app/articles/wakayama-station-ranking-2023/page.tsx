@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '和歌山県の駅乗降者数ランキング｜主要駅TOP20',
   description: '和歌山県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/wakayama',
+    canonical: 'https://areascope.jp/articles/wakayama-station-ranking-2023',
   },
 };
 

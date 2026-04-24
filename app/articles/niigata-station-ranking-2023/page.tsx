@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '新潟県の駅乗降者数ランキング｜主要駅TOP20',
   description: '新潟県の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/niigata',
+    canonical: 'https://areascope.jp/articles/niigata-station-ranking-2023',
   },
 };
 

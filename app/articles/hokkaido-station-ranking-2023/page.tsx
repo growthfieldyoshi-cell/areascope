@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: '北海道の駅乗降者数ランキング｜主要駅TOP20',
   description: '北海道の駅乗降者数ランキングTOP20を掲載しています。',
   alternates: {
-    canonical: 'https://areascope.jp/station-ranking/hokkaido',
+    canonical: 'https://areascope.jp/articles/hokkaido-station-ranking-2023',
   },
 };
 
