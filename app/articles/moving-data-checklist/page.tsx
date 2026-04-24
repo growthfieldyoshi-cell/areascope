@@ -180,6 +180,27 @@ export default function MovingDataChecklistPage() {
           </p>
         </div>
 
+        <div style={{ textAlign: 'center', margin: '32px 0', padding: '24px', background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px' }}>
+          <p style={{ color: '#6b7a99', fontSize: '12px', fontFamily: 'monospace', marginBottom: '12px', letterSpacing: '2px' }}>
+            // PR
+          </p>
+          <a href="https://px.a8.net/svt/ejp?a8mat=4B1SPU+CR186Q+136+1BSOG1" rel="nofollow" target="_blank">
+            <img
+              width={300}
+              height={250}
+              alt="SUUMO 新築マンション・新築一戸建て購入者アンケート"
+              src="https://www26.a8.net/svt/bgt?aid=260424354771&wid=001&eno=01&mid=s00000000141008028000&mc=1"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+          </a>
+          <img
+            width={1}
+            height={1}
+            src="https://www17.a8.net/0.gif?a8mat=4B1SPU+CR186Q+136+1BSOG1"
+            alt=""
+          />
+        </div>
+
         <div style={sectionStyle}>
           <h2 style={h2Style}>ライフステージ別・重視すべきポイント</h2>
           <p style={pStyle}>
@@ -250,6 +271,28 @@ export default function MovingDataChecklistPage() {
           </p>
         </div>
 
+        <div style={{ margin: '32px 0', padding: '24px', background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px' }}>
+          <p style={{ color: '#6b7a99', fontSize: '12px', fontFamily: 'monospace', marginBottom: '12px', letterSpacing: '2px' }}>
+            // PR
+          </p>
+          <a
+            href="https://px.a8.net/svt/ejp?a8mat=4B1SPU+CR186Q+136+1BQYPU"
+            rel="nofollow"
+            target="_blank"
+            style={{ color: '#00d4aa', textDecoration: 'none', fontSize: '14px', lineHeight: 1.8, display: 'block' }}
+          >
+            ★回答者全員に5000円★新築マンション・新築一戸建て購入者アンケート★<br />
+            国内にて新築マンション、または首都圏・関西・東海にて新築一戸建てを購入された方。<br />
+            回答者全員に5,000円分のギフトカードプレゼント。
+          </a>
+          <img
+            width={1}
+            height={1}
+            src="https://www17.a8.net/0.gif?a8mat=4B1SPU+CR186Q+136+1BQYPU"
+            alt=""
+          />
+        </div>
+
         <div style={{ ...sectionStyle, textAlign: 'center' as const }}>
           <h2 style={{ ...h2Style, marginBottom: '12px' }}>データで引越し先を確認する</h2>
           <p style={{ color: '#6b7a99', fontSize: '13px', marginBottom: '16px' }}>
@@ -266,6 +309,27 @@ export default function MovingDataChecklistPage() {
               他の記事を見る
             </Link>
           </div>
+        </div>
+
+        <div style={{ textAlign: 'center', margin: '32px 0', padding: '24px', background: '#111827', border: '1px solid #1e2d45', borderRadius: '12px', overflow: 'hidden' }}>
+          <p style={{ color: '#6b7a99', fontSize: '12px', fontFamily: 'monospace', marginBottom: '12px', letterSpacing: '2px' }}>
+            // PR
+          </p>
+          <a href="https://px.a8.net/svt/ejp?a8mat=4B1SPU+CR186Q+136+1BSW5T" rel="nofollow" target="_blank">
+            <img
+              width={728}
+              height={90}
+              alt="SUUMO 新築マンション・新築一戸建て購入者アンケート"
+              src="https://www25.a8.net/svt/bgt?aid=260424354771&wid=001&eno=01&mid=s00000000141008029000&mc=1"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+          </a>
+          <img
+            width={1}
+            height={1}
+            src="https://www11.a8.net/0.gif?a8mat=4B1SPU+CR186Q+136+1BSW5T"
+            alt=""
+          />
         </div>
       </article>
     </main>
