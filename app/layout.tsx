@@ -2,17 +2,7 @@
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://areascope.jp'),
@@ -46,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="antialiased">
         {children}
         <div style={{ padding: '16px 20px', textAlign: 'center', borderTop: '1px solid #1e2d45', background: '#0a0e1a' }}>
           <p style={{ color: '#6b7a99', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
