@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Breadcrumb from '@/components/Breadcrumb';
 
+export const revalidate = 604800; // 7日
+export const dynamicParams = true; // 想定外の組み合わせもオンデマンド生成
+
 const sql = neon(process.env.DATABASE_URL!);
 
 async function getLatestYear(): Promise<number> {
@@ -20,6 +23,25 @@ function isValidKana(v: string): v is Kana {
 
 function kanaLabel(kana: Kana): string {
   return kana === 'その他' ? 'その他' : `${kana}行`;
+}
+
+export async function generateStaticParams() {
+  if (process.env.SKIP_STATIC_PARAMS === 'true') {
+    return [];
+  }
+  const rows = await sql.query(`
+    SELECT DISTINCT prefecture_slug
+    FROM stations
+    WHERE prefecture_slug IS NOT NULL
+    ORDER BY prefecture_slug
+  `);
+  const params: { kana: string; prefecture_slug: string }[] = [];
+  for (const kana of VALID_KANA) {
+    for (const r of rows) {
+      params.push({ kana, prefecture_slug: String(r.prefecture_slug) });
+    }
+  }
+  return params;
 }
 
 type Props = {

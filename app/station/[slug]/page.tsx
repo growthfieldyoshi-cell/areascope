@@ -6,6 +6,32 @@ import { notFound, permanentRedirect } from 'next/navigation';
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 
+export const revalidate = 604800; // 7日
+export const dynamicParams = true; // TOP500外もオンデマンド生成
+
+const STATION_SLUG_RE = /^[a-z0-9]+(?:[.-][a-z0-9]+)*$/;
+
+function isValidStationSlug(slug: string): boolean {
+  return slug.length >= 3 && slug.length <= 80 && STATION_SLUG_RE.test(slug);
+}
+
+export async function generateStaticParams() {
+  if (process.env.SKIP_STATIC_PARAMS === 'true') {
+    return [];
+  }
+  const rows = await sql.query(`
+    WITH latest_year AS (
+      SELECT MAX(year) AS year FROM mv_station_passenger_rank
+    )
+    SELECT r.station_group_slug
+    FROM mv_station_passenger_rank r
+    JOIN latest_year ly ON r.year = ly.year
+    ORDER BY r.national_rank ASC, r.total_passengers DESC, r.station_group_slug ASC
+    LIMIT 500
+  `);
+  return rows.map((r) => ({ slug: String(r.station_group_slug) }));
+}
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
@@ -40,6 +66,9 @@ type SameLineStation = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  if (!isValidStationSlug(slug)) {
+    return {};
+  }
   const rows = await sql`
     SELECT station_name, prefecture_name, municipality_name
     FROM stations
@@ -66,6 +95,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StationPage({ params }: PageProps) {
   const { slug } = await params;
+
+  if (!isValidStationSlug(slug)) {
+    notFound();
+  }
 
   // slug逆引き：station_group_slug または slug で検索し、slugヒット時はリダイレクト
   const lookupRows = await sql`
@@ -122,24 +155,17 @@ export default async function StationPage({ params }: PageProps) {
     ORDER BY sp.year ASC
   `) as PassengerRow[];
 
-  const latestYear = passengerRows.length > 0 ? passengerRows[passengerRows.length - 1].year : 2021;
+  const latestYear = passengerRows.length > 0 ? passengerRows[passengerRows.length - 1].year : 2023;
 
-  // 全国ランキング順位を取得
+  // 全国ランキング順位を MV から取得 (Stage 2.5: mv_station_passenger_rank)
   const rankRows = await sql`
-    SELECT ranked.rank
-    FROM (
-      SELECT
-        s.station_group_slug,
-        RANK() OVER (ORDER BY SUM(sp.passengers) DESC) AS rank
-      FROM stations s
-      JOIN station_passengers sp ON s.station_key = sp.station_key
-      WHERE sp.year = ${latestYear}
-      GROUP BY s.station_group_slug
-    ) ranked
-    WHERE ranked.station_group_slug = ${slug}
+    SELECT national_rank, total_passengers, year
+    FROM mv_station_passenger_rank
+    WHERE station_group_slug = ${slug}
+    ORDER BY year DESC
     LIMIT 1
   `;
-  const nationalRank = rankRows[0]?.rank ?? null;
+  const nationalRank = rankRows[0]?.national_rank ?? null;
 
   const sameLineStations = (await sql`
     WITH related_station_groups AS (

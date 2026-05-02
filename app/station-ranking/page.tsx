@@ -3,6 +3,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import PrefFilter from './PrefFilter';
 
+export const revalidate = 86400; // 1日
+
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 

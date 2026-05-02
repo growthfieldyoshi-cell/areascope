@@ -12,7 +12,10 @@
     "export:review": "node scripts/export-review-candidates.mjs",
     "build:overrides": "node scripts/build-overrides-from-csv.mjs",
     "fill:municipality-readings:dry": "node scripts/fill-municipality-readings.mjs --dry-run --limit=50",
-    "fill:municipality-readings": "node scripts/fill-municipality-readings.mjs"
+    "fill:municipality-readings": "node scripts/fill-municipality-readings.mjs",
+    "setup:rank-mv": "node scripts/setup-mv-rank.mjs",
+    "refresh:rank-mv": "node scripts/refresh-mv-rank.mjs",
+    "drop:rank-mv": "node scripts/drop-mv-rank.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
