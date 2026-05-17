@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Breadcrumb from '@/components/Breadcrumb';
+import RealEstateSection, { type RealEstateStatRow } from '@/components/RealEstateSection';
 
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
@@ -53,11 +54,50 @@ export default async function CityPage({ params }: Props) {
   const year = await getLatestYear();
 
   const infoRows = await sql`
-    SELECT DISTINCT municipality_name, prefecture_name, municipality_code FROM stations
+    SELECT DISTINCT municipality_name, prefecture_name, municipality_code, municipality_code_normalized FROM stations
     WHERE prefecture_slug = ${prefecture_slug} AND municipality_slug = ${municipality_slug} LIMIT 1
   `;
   if (!infoRows[0]) notFound();
-  const { municipality_name, prefecture_name, municipality_code } = infoRows[0];
+  const { municipality_name, prefecture_name, municipality_code, municipality_code_normalized } = infoRows[0];
+
+  // 不動産取引価格 (price_category=transaction)。
+  // 優先順位: 1) annual 通年集計 → 2) quarterly 最新四半期 → 3) どちらも無ければ非表示。
+  const annualRows = (await sql`
+    WITH latest AS (
+      SELECT MAX(year) AS year FROM real_estate_market_stats_annual
+      WHERE municipality_code_6 = ${municipality_code_normalized} AND price_category = 'transaction'
+    )
+    SELECT a.property_type, a.transaction_count, a.median_price, a.median_price_per_sqm,
+           a.median_price_per_tsubo, a.median_area_sqm, a.is_low_sample, a.year
+    FROM real_estate_market_stats_annual a
+    JOIN latest l ON a.year = l.year
+    WHERE a.municipality_code_6 = ${municipality_code_normalized} AND a.price_category = 'transaction'
+    ORDER BY a.transaction_count DESC
+  `) as (RealEstateStatRow & { year: number })[];
+
+  let realEstateRows: RealEstateStatRow[] = annualRows;
+  let realEstatePeriod = annualRows.length > 0 ? `${annualRows[0].year}年通年` : '';
+
+  if (annualRows.length === 0) {
+    // annual が無い市区町村は従来どおり最新四半期にフォールバック
+    const quarterlyRows = (await sql`
+      WITH latest AS (
+        SELECT year, quarter FROM real_estate_market_stats
+        WHERE municipality_code_6 = ${municipality_code_normalized} AND price_category = 'transaction'
+        ORDER BY year DESC, quarter DESC LIMIT 1
+      )
+      SELECT r.property_type, r.transaction_count, r.median_price, r.median_price_per_sqm,
+             r.median_price_per_tsubo, r.median_area_sqm, r.is_low_sample, r.year, r.quarter
+      FROM real_estate_market_stats r
+      JOIN latest l ON r.year = l.year AND r.quarter = l.quarter
+      WHERE r.municipality_code_6 = ${municipality_code_normalized} AND r.price_category = 'transaction'
+      ORDER BY r.transaction_count DESC
+    `) as (RealEstateStatRow & { year: number; quarter: number })[];
+    realEstateRows = quarterlyRows;
+    realEstatePeriod = quarterlyRows.length > 0
+      ? `${quarterlyRows[0].year}年第${quarterlyRows[0].quarter}四半期`
+      : '';
+  }
 
   const stationRows = (await sql`
     WITH grouped AS (
@@ -229,6 +269,13 @@ export default async function CityPage({ params }: Props) {
           </>
         )}
       </section>
+
+      <RealEstateSection
+        rows={realEstateRows}
+        prefectureName={prefecture_name}
+        municipalityName={municipality_name}
+        periodLabel={realEstatePeriod}
+      />
 
       <section style={{ marginBottom: '3rem' }}>
         <h2 style={{ fontSize: '1.3rem', color: '#00d4aa', marginBottom: '0.5rem' }}>
