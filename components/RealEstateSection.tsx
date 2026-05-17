@@ -21,6 +21,10 @@ const PROPERTY_TYPE_LABEL: Record<string, string> = {
   forest: '林地',
 };
 
+// 市区町村ページで表示する種別と固定表示順。
+// farmland / forest は集計データには残すが、初期表示では除外する。
+const DISPLAY_ORDER = ['land_and_building', 'land', 'used_condominium'];
+
 // 円 -> 万円。数値化できなければ null。
 function toMan(yen: number | string | null): number | null {
   if (yen == null) return null;
@@ -49,8 +53,11 @@ export default function RealEstateSection({
   // 集計期間ラベル (例: '2024年通年' / '2024年第4四半期')。呼び出し側で決定する。
   periodLabel: string;
 }) {
-  // median_price が NULL の種別は表示しない
-  const visible = rows.filter((r) => r.median_price != null);
+  // 表示対象3種 (land_and_building / land / used_condominium) かつ median_price あり に限定し、
+  // DISPLAY_ORDER の固定順に並べる。farmland / forest は表示しない。
+  const visible = rows
+    .filter((r) => r.median_price != null && DISPLAY_ORDER.includes(r.property_type))
+    .sort((a, b) => DISPLAY_ORDER.indexOf(a.property_type) - DISPLAY_ORDER.indexOf(b.property_type));
   // データが無ければセクション自体を描画しない
   if (visible.length === 0) return null;
 
