@@ -29,14 +29,9 @@ const RUN_ANNUAL = true; // 全quarter処理後に 2024年通年集計を行う�
 // 対象政令市。parentCode6 に区データを集約する。wardJis は行政区の5桁jisコード。
 const TARGETS = [
   {
-    name: "川崎市",
-    parentCode6: "141305",
-    wardJis: ["14131", "14132", "14133", "14134", "14135", "14136", "14137"],
-  },
-  {
-    name: "相模原市",
-    parentCode6: "141500",
-    wardJis: ["14151", "14152", "14153"],
+    name: "千葉市",
+    parentCode6: "121002",
+    wardJis: ["12101", "12102", "12103", "12104", "12105", "12106"],
   },
 ];
 
@@ -245,7 +240,8 @@ async function processQuarter(client, city, quarter) {
   return { quarter, apiCount: allRows.length, deleteCount: del.rowCount, insertCount, quarterlyRows: agg.rowCount };
 }
 
-const client = new pg.Client({ connectionString: DB_URL });
+const client = new pg.Client({ connectionString: DB_URL, keepAlive: true });
+client.on("error", (e) => console.error("pg client error:", e.message));
 
 try {
   await client.connect();
