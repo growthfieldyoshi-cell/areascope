@@ -2,7 +2,7 @@
  * 不動産情報ライブラリ API (XIT001) — 政令指定都市の市単位集約 取得・集計スクリプト (案C)。
  *
  * 行政区コードでAPI取得し、AreaScope上は親市コードに集約して保存・集計する。
- * 対象: 横浜市 (親市 municipality_code_6=141003) / 2024年 / 18区。
+ * 対象政令市・区・年は TARGETS / YEAR / QUARTERS 定数で指定する。
  *
  * 実行: node --env-file=.env.local scripts/import-reinfolib-ordinance-city.mjs
  *
@@ -22,19 +22,23 @@
 import pg from "pg";
 
 // ---- 対象政令市の設定 ------------------------------------------------------
-const TARGET = {
-  name: "横浜市",
-  parentCode6: "141003", // 親市の municipality_code_6 (集約先)
-  year: 2024,
-  quarters: [2, 3, 4],   // 今回取得する四半期 (Q1は投入済み)
-  runAnnual: true,       // 全quarter処理後に 2024年通年集計を行うか
-  // 行政区の5桁jisコード (14101〜14118 の18区)
-  wardJis: [
-    "14101", "14102", "14103", "14104", "14105", "14106",
-    "14107", "14108", "14109", "14110", "14111", "14112",
-    "14113", "14114", "14115", "14116", "14117", "14118",
-  ],
-};
+const YEAR = 2024;
+const QUARTERS = [1, 2, 3, 4];
+const RUN_ANNUAL = true; // 全quarter処理後に 2024年通年集計を行うか
+
+// 対象政令市。parentCode6 に区データを集約する。wardJis は行政区の5桁jisコード。
+const TARGETS = [
+  {
+    name: "川崎市",
+    parentCode6: "141305",
+    wardJis: ["14131", "14132", "14133", "14134", "14135", "14136", "14137"],
+  },
+  {
+    name: "相模原市",
+    parentCode6: "141500",
+    wardJis: ["14151", "14152", "14153"],
+  },
+];
 
 const PROPERTY_TYPE_MAP = {
   "宅地(土地)": "land",
@@ -188,13 +192,13 @@ DO UPDATE SET
 RETURNING 1
 `;
 
-// 1四半期分: 18区を取得 -> raw一括置換 -> quarterly集計 (1トランザクション)
-async function processQuarter(client, quarter) {
-  console.log(`\n--- ${TARGET.name} ${TARGET.year}年Q${quarter} ---`);
+// 1政令市×1四半期分: 全区を取得 -> raw一括置換 -> quarterly集計 (1トランザクション)
+async function processQuarter(client, city, quarter) {
+  console.log(`\n--- ${city.name} ${YEAR}年Q${quarter} ---`);
   const allRows = [];
-  for (const wardJis of TARGET.wardJis) {
+  for (const wardJis of city.wardJis) {
     const params = new URLSearchParams({
-      year: String(TARGET.year), quarter: String(quarter), city: wardJis,
+      year: String(YEAR), quarter: String(quarter), city: wardJis,
     });
     const res = await fetch(`https://www.reinfolib.mlit.go.jp/ex-api/external/XIT001?${params}`, {
       headers: { "Ocp-Apim-Subscription-Key": API_KEY },
@@ -219,12 +223,12 @@ async function processQuarter(client, quarter) {
     `DELETE FROM real_estate_transactions_raw
       WHERE municipality_code_6 = $1 AND transaction_year = $2 AND transaction_quarter = $3
         AND price_category IN ('transaction', 'contract')`,
-    [TARGET.parentCode6, TARGET.year, quarter],
+    [city.parentCode6, YEAR, quarter],
   );
   let insertCount = 0;
   for (const { record: r, propertyType, priceCategory } of allRows) {
     await client.query(INSERT_RAW_SQL, [
-      TARGET.parentCode6, propertyType, priceCategory, TARGET.year, quarter,
+      city.parentCode6, propertyType, priceCategory, YEAR, quarter,
       r.Type, r.PriceCategory, r.Region, r.Prefecture, r.Municipality,
       r.DistrictName, r.DistrictCode, r.TradePrice, r.PricePerUnit, r.UnitPrice,
       r.Area, r.LandShape, r.Frontage, r.TotalFloorArea, r.BuildingYear,
@@ -234,7 +238,7 @@ async function processQuarter(client, quarter) {
     ]);
     insertCount++;
   }
-  const agg = await client.query(AGGREGATE_QUARTERLY_SQL, [TARGET.parentCode6, TARGET.year, quarter]);
+  const agg = await client.query(AGGREGATE_QUARTERLY_SQL, [city.parentCode6, YEAR, quarter]);
   await client.query("COMMIT");
 
   console.log(`  Q${quarter}: 取得${allRows.length}件 / DELETE ${del.rowCount} / INSERT ${insertCount} / quarterly UPSERT ${agg.rowCount}`);
@@ -246,83 +250,84 @@ const client = new pg.Client({ connectionString: DB_URL });
 try {
   await client.connect();
 
-  // 親市コードの実在確認 (FK参照先)
-  const parent = await client.query(
-    `SELECT code, municipality FROM municipalities WHERE code = $1`,
-    [TARGET.parentCode6],
-  );
-  if (parent.rowCount !== 1) {
-    throw new Error(`親市コード ${TARGET.parentCode6} が municipalities に見つかりません`);
+  for (const city of TARGETS) {
+    // 親市コードの実在確認 (FK参照先)
+    const parent = await client.query(
+      `SELECT code, municipality FROM municipalities WHERE code = $1`,
+      [city.parentCode6],
+    );
+    if (parent.rowCount !== 1) {
+      throw new Error(`親市コード ${city.parentCode6} が municipalities に見つかりません`);
+    }
+    console.log(`\n========== ${parent.rows[0].municipality} (code6=${city.parentCode6}) / ${city.wardJis.length}区 ==========`);
+
+    // quarterごとに 取得 → raw一括置換 → quarterly集計
+    const perQuarter = [];
+    for (const q of QUARTERS) {
+      perQuarter.push(await processQuarter(client, city, q));
+    }
+
+    // 全quarter完了後、annual集計 (raw年間全件から再計算)
+    let annualRows = 0;
+    if (RUN_ANNUAL) {
+      const annual = await client.query(AGGREGATE_ANNUAL_SQL, [city.parentCode6, YEAR]);
+      annualRows = annual.rowCount;
+      console.log(`\nannual集計 UPSERT: ${annualRows}`);
+    }
+
+    // ---- 市ごとの確認SELECT ------------------------------------------------
+    console.log(`\n=== ${city.name} 処理サマリ (quarter別) ===`);
+    console.table(perQuarter);
+
+    console.log(`=== raw: ${city.name}${city.parentCode6} / ${YEAR} quarter別件数 ===`);
+    console.table((await client.query(
+      `SELECT transaction_quarter AS quarter, COUNT(*)::int AS c
+         FROM real_estate_transactions_raw
+        WHERE municipality_code_6=$1 AND transaction_year=$2
+        GROUP BY transaction_quarter ORDER BY transaction_quarter`,
+      [city.parentCode6, YEAR],
+    )).rows);
+    const rawTotal = await client.query(
+      `SELECT COUNT(*)::int AS c FROM real_estate_transactions_raw
+        WHERE municipality_code_6=$1 AND transaction_year=$2`,
+      [city.parentCode6, YEAR],
+    );
+    console.log(`${city.name} raw総件数 (${YEAR}):`, rawTotal.rows[0].c);
+
+    console.log(`=== raw: property_type別 / price_category別 (${city.name} ${YEAR}) ===`);
+    console.table((await client.query(
+      `SELECT property_type, COUNT(*)::int AS c FROM real_estate_transactions_raw
+        WHERE municipality_code_6=$1 AND transaction_year=$2
+        GROUP BY property_type ORDER BY property_type`,
+      [city.parentCode6, YEAR],
+    )).rows);
+    console.table((await client.query(
+      `SELECT price_category, COUNT(*)::int AS c FROM real_estate_transactions_raw
+        WHERE municipality_code_6=$1 AND transaction_year=$2
+        GROUP BY price_category ORDER BY price_category`,
+      [city.parentCode6, YEAR],
+    )).rows);
+
+    console.log(`=== quarterly集計行数 (${city.name} ${YEAR}) ===`);
+    console.log((await client.query(
+      `SELECT COUNT(*)::int AS c FROM real_estate_market_stats
+        WHERE municipality_code_6=$1 AND year=$2`,
+      [city.parentCode6, YEAR],
+    )).rows[0].c, "行");
+
+    console.log(`=== annual集計 (${city.name} ${YEAR}) — transaction集計サンプル ===`);
+    console.table((await client.query(
+      `SELECT property_type, transaction_count, median_price, avg_price,
+              median_price_per_sqm, median_price_per_tsubo, median_area_sqm, is_low_sample
+         FROM real_estate_market_stats_annual
+        WHERE municipality_code_6=$1 AND year=$2 AND price_category='transaction'
+        ORDER BY transaction_count DESC`,
+      [city.parentCode6, YEAR],
+    )).rows);
   }
-  console.log(`親市: ${parent.rows[0].municipality} (code6=${TARGET.parentCode6})`);
-  console.log(`対象: ${TARGET.name} ${TARGET.year}年 Q${TARGET.quarters.join(",")} / ${TARGET.wardJis.length}区`);
 
-  // ---- quarterごとに 取得 → raw一括置換 → quarterly集計 --------------------
-  const perQuarter = [];
-  for (const q of TARGET.quarters) {
-    perQuarter.push(await processQuarter(client, q));
-  }
-
-  // ---- 全quarter完了後、annual集計 (raw年間全件から再計算) -----------------
-  let annualRows = 0;
-  if (TARGET.runAnnual) {
-    const annual = await client.query(AGGREGATE_ANNUAL_SQL, [TARGET.parentCode6, TARGET.year]);
-    annualRows = annual.rowCount;
-    console.log(`\nannual集計 UPSERT: ${annualRows}`);
-  }
-
-  // ---- 確認SELECT ----------------------------------------------------------
-  console.log("\n=== 今回処理サマリ (quarter別) ===");
-  console.table(perQuarter);
-
-  console.log("=== raw: 横浜市141003 / 2024 全quarter 集約結果 ===");
-  console.table((await client.query(
-    `SELECT transaction_quarter AS quarter, COUNT(*)::int AS c
-       FROM real_estate_transactions_raw
-      WHERE municipality_code_6=$1 AND transaction_year=$2
-      GROUP BY transaction_quarter ORDER BY transaction_quarter`,
-    [TARGET.parentCode6, TARGET.year],
-  )).rows);
-  const rawTotal = await client.query(
-    `SELECT COUNT(*)::int AS c FROM real_estate_transactions_raw
-      WHERE municipality_code_6=$1 AND transaction_year=$2`,
-    [TARGET.parentCode6, TARGET.year],
-  );
-  console.log("横浜市 raw総件数 (2024):", rawTotal.rows[0].c);
-
-  console.log("=== raw: property_type別 / price_category別 (横浜市 2024) ===");
-  console.table((await client.query(
-    `SELECT property_type, COUNT(*)::int AS c FROM real_estate_transactions_raw
-      WHERE municipality_code_6=$1 AND transaction_year=$2
-      GROUP BY property_type ORDER BY property_type`,
-    [TARGET.parentCode6, TARGET.year],
-  )).rows);
-  console.table((await client.query(
-    `SELECT price_category, COUNT(*)::int AS c FROM real_estate_transactions_raw
-      WHERE municipality_code_6=$1 AND transaction_year=$2
-      GROUP BY price_category ORDER BY price_category`,
-    [TARGET.parentCode6, TARGET.year],
-  )).rows);
-
-  console.log("=== quarterly集計行数 (横浜市 2024) ===");
-  console.log((await client.query(
-    `SELECT COUNT(*)::int AS c FROM real_estate_market_stats
-      WHERE municipality_code_6=$1 AND year=$2`,
-    [TARGET.parentCode6, TARGET.year],
-  )).rows[0].c, "行");
-
-  console.log("=== annual集計 (横浜市 2024) ===");
   const annualTotal = await client.query(`SELECT COUNT(*)::int AS c FROM real_estate_market_stats_annual`);
-  console.log("annual総件数 (全体):", annualTotal.rows[0].c);
-  console.log("--- transaction集計サンプル ---");
-  console.table((await client.query(
-    `SELECT property_type, transaction_count, median_price, avg_price,
-            median_price_per_sqm, median_price_per_tsubo, median_area_sqm, is_low_sample
-       FROM real_estate_market_stats_annual
-      WHERE municipality_code_6=$1 AND year=$2 AND price_category='transaction'
-      ORDER BY transaction_count DESC`,
-    [TARGET.parentCode6, TARGET.year],
-  )).rows);
+  console.log("\nannual総件数 (全体):", annualTotal.rows[0].c);
 } catch (err) {
   try { await client.query("ROLLBACK"); } catch {}
   console.error("ERROR:", err.message);
