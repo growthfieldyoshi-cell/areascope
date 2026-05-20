@@ -6,7 +6,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 const sql = neon(process.env.DATABASE_URL!);
 const BASE_URL = 'https://areascope.jp';
 
-export const revalidate = 604800; // 7日
+export const revalidate = false; // 凍結中(2026-05〜): ISR無効化
 export const dynamicParams = true; // TOP500外もオンデマンド生成
 
 const STATION_SLUG_RE = /^[a-z0-9]+(?:[.-][a-z0-9]+)*$/;

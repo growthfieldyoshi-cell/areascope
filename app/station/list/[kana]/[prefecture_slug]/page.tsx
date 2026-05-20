@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Breadcrumb from '@/components/Breadcrumb';
 
-export const revalidate = 604800; // 7日
+export const revalidate = false; // 凍結中(2026-05〜): ISR無効化
 export const dynamicParams = true; // 想定外の組み合わせもオンデマンド生成
 
 const sql = neon(process.env.DATABASE_URL!);

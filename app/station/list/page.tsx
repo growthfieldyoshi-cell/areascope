@@ -2,7 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
-export const revalidate = 86400; // 1日 (searchParams使用のため暫定)
+export const revalidate = false; // 凍結中(2026-05〜): ISR無効化
 
 const sql = neon(process.env.DATABASE_URL!);
 const PER_PAGE = 100;
